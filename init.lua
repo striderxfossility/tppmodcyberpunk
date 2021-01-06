@@ -27,6 +27,8 @@ function JBMOD:new ()
    obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
    obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
    obj.headString = "Items.CharacterCustomizationWaHead"
+   obj.femaleHead = "Items.CharacterCustomizationWaHead"
+   obj.maleHead = "Items.CharacterCustomizationMaHead"
    obj.camViews = {}
    obj.isTppEnabled = false
    obj.camActive = 1
@@ -34,6 +36,8 @@ function JBMOD:new ()
    obj.exitCar = false
    obj.timeStamp = 0.0
    obj.enterCar = false
+   obj.gender = true
+   obj.genderOverride = false
    return obj
 end
 
@@ -49,11 +53,13 @@ end
 
 function JBMOD:CheckForRestoration()
 
+	self:GetComps()
+	self:CheckGender()
+
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
 	end
-
-	self:GetComps()
+	
 	self.inCar = self.vehicleCameraComp:IsTPPActive()
 
 	if(self.inCar) then
@@ -82,6 +88,26 @@ function JBMOD:CheckForRestoration()
 	end
 end
 
+function JBMOD:CheckGender()
+	gender = self.player:GetResolvedGenderName() 
+	gender = tostring(gender) 
+	strfound = string.find(gender, "Female") 
+
+	if strfound == nil then -- male
+		if(self.genderOverride == false) then
+	    	self.headString = self.maleHead
+	    else
+	    	self.headString = self.femaleHead
+	    end
+	else -- female
+	    if(self.genderOverride == false) then
+	    	self.headString = self.femaleHead
+	    else
+	    	self.headString = self.maleHead
+	    end
+	end
+end
+
 function JBMOD:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 
@@ -100,7 +126,7 @@ end
 
 function JBMOD:RestoreFPPView()
 	if (self.isTppEnabled == false) then
-		self.fppComp:SetLocalPosition(Vector4:new(0.01, 0.01, 0.01, 1.0))
+		self.fppComp:SetLocalPosition(Vector4:new(0.0, 0.0, 0.0, 1.0))
 		self.fppComp:SetLocalOrientation(Quaternion:new(0.0, 0.0, 0.0, 1.0))
 	end
 end
@@ -117,6 +143,7 @@ function JBMOD:EquipHead()
 end
 
 function JBMOD:ActivateTPP ()
+	print("b")
 	self.isTppEnabled = true
 	self:EquipHead()
 	self:UpdateCamera()
@@ -150,7 +177,6 @@ JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
-
 	if (ImGui.IsKeyDown(string.byte('0'))) then
 		JbMod:Zoom(0.06)
 	end
@@ -162,15 +188,17 @@ registerForEvent("onUpdate", function(deltaTime)
 	JbMod:CheckForRestoration()
 
 	if(JbMod.inCar == false) then
-		if (GetAsyncKeyState(0x42)) then -- B
+		if (ImGui.IsKeyPressed(string.byte('B'))) then
+			print("b")
 			if(JbMod.isTppEnabled) then
 				JbMod:DeactivateTPP()
 			else
+				print("b")
 				JbMod:ActivateTPP()
 			end
 		end
 
-		if (GetAsyncKeyState(0x70)) then -- F1
+		if (GetAsyncKeyState(0x71)) then -- F2
 			JbMod:SwitchCamTo(JbMod.camActive + 1)
 		end
 	end
@@ -180,7 +208,7 @@ end)
 onOpenDebug = false
 
 registerForEvent("onDraw", function()
-	if (GetAsyncKeyState(0x71)) then -- F2
+	if (GetAsyncKeyState(0x72)) then -- F3
 	    if(onOpenDebug) then
 	    	onOpenDebug = false
 	    else
@@ -192,8 +220,15 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 	    if (ImGui.Begin("JB Third Person Mod")) then
+
+	    	clicked = ImGui.Button("Equip / unequip head")
+			if (clicked) then
+				JbMod:EquipHead()
+			end
+
 	      	ImGui.Text("Well hello there, General Kenobi")
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
@@ -201,14 +236,11 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("enterCar: " .. tostring(JbMod.enterCar))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
 	      	ImGui.Text("playerAttached: " .. tostring(Game.GetPlayer():IsPlayer()))
-
 	      	ImGui.Text("Current Cam: x:" .. tostring(JbMod.fppComp:GetLocalPosition().x) .. " y:" .. tostring(JbMod.fppComp:GetLocalPosition().y) .. " z: " .. tostring(JbMod.fppComp:GetLocalPosition().z))
-
 	      	ImGui.Text("CAM1: x:" .. tostring(JbMod.camViews[1].pos.x) .. " y:" .. tostring(JbMod.camViews[1].pos.y) .. " z: " .. tostring(JbMod.camViews[1].pos.z))
 	      	ImGui.Text("CAM2: x:" .. tostring(JbMod.camViews[2].pos.x) .. " y:" .. tostring(JbMod.camViews[2].pos.y) .. " z: " .. tostring(JbMod.camViews[2].pos.z))
 	      	ImGui.Text("CAM3: x:" .. tostring(JbMod.camViews[3].pos.x) .. " y:" .. tostring(JbMod.camViews[3].pos.y) .. " z: " .. tostring(JbMod.camViews[3].pos.z))
-	      	ImGui.Text("CAM4: x:" .. tostring(JbMod.camViews[4].pos.x) .. " y:" .. tostring(JbMod.camViews[4].pos.y) .. " z: " .. tostring(JbMod.camViews[4].pos.z))
-
+	      	ImGui.Text("CAM4: x:" .. tostring(JbMod.camViews[4].pos.x) .. " y:" .. tostring(JbMod.camViews[4].pos.y) .. " z: " .. tostring(JbMod.camViews[4].pos.z))	
 	    end
 
 	    ImGui.End()
