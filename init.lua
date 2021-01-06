@@ -143,7 +143,6 @@ function JBMOD:EquipHead()
 end
 
 function JBMOD:ActivateTPP ()
-	print("b")
 	self.isTppEnabled = true
 	self:EquipHead()
 	self:UpdateCamera()
@@ -189,11 +188,9 @@ registerForEvent("onUpdate", function(deltaTime)
 
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
-			print("b")
 			if(JbMod.isTppEnabled) then
 				JbMod:DeactivateTPP()
 			else
-				print("b")
 				JbMod:ActivateTPP()
 			end
 		end
