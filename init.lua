@@ -38,7 +38,6 @@ function JBMOD:new ()
    obj.enterCar = false
    obj.gender = true
    obj.genderOverride = false
-   obj.switchToFPPInWeaponMode = false
    return obj
 end
 
@@ -134,6 +133,8 @@ end
 
 function JBMOD:UpdateCamera ()
 	if (self.isTppEnabled) then
+		self.fppComp.nearPlaneOverride = 0.0
+		self.fppComp.farPlaneOverride = 0.0
 		self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
 		self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
 	end
@@ -192,15 +193,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
 
 		if (timer > 0.0 and not runTppCommand) then
-			--print("run 1")
-
-			slotID = TweakDBID.new('AttachmentSlots.WeaponRight')
-
-			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			itemID = item:GetItemID()
-
-			JbMod.transactionCom:EquipActiveItemInSlot(JbMod.player, slotID)
-
 			slotID = TweakDBID.new('AttachmentSlots.Torso')
 			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
 			itemID = item:GetItemID()
@@ -246,12 +238,6 @@ registerForEvent("onUpdate", function(deltaTime)
 	if (ImGui.IsKeyDown(string.byte('9'))) then
 		JbMod:Zoom(-0.06)
 	end
-
-	--if(switchToFPPInWeaponMode) then
-		if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
-			JbMod:DeactivateTPP()
-	    end
-	--end
 
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
