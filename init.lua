@@ -1,16 +1,4 @@
--- Begin CamView Class
-	CamView = {}
-	CamView.__index = CamView
-
-	function CamView:new (pos, rot, camSwitch)
-	   local obj = {}
-	   setmetatable(obj, CamView)
-	   obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
-	   obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
-	   obj.camSwitch = camSwitch or false
-	   return obj
-	end
--- End Camview Class
+dofile("jb_third_person_mod/parameters.lua")
 
 -- Begin CamView Class
 JBMOD = {}
@@ -180,6 +168,8 @@ end
 -- End JBMOD Class
 
 JbMod = JBMOD:new()
+
+JbMod.weaponOverride = weaponOverride
 
 JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Front Camera
