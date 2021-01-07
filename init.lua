@@ -38,6 +38,8 @@ function JBMOD:new ()
    obj.enterCar = false
    obj.gender = true
    obj.genderOverride = false
+   obj.weaponOverride = true
+   obj.headEquipped = false
    return obj
 end
 
@@ -55,6 +57,7 @@ function JBMOD:CheckForRestoration()
 
 	self:GetComps()
 	self:CheckGender()
+	self:CheckWeapon()
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
@@ -86,6 +89,16 @@ function JBMOD:CheckForRestoration()
 		self:UpdateCamera()
 		self.exitCar = true
 	end
+end
+
+function JBMOD:CheckWeapon()
+	if(self.weaponOverride) then
+		if(self.isTppEnabled) then
+			if(self.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+				self:DeactivateTPP()
+			end
+	    end
+    end
 end
 
 function JBMOD:CheckGender()
@@ -140,6 +153,7 @@ end
 
 function JBMOD:EquipHead()
 	Game.EquipItemOnPlayer(self.headString, "TppHead")
+	self.headEquipped = not self.headEquipped
 end
 
 function JBMOD:ActivateTPP ()
@@ -191,7 +205,16 @@ registerForEvent("onUpdate", function(deltaTime)
 			if(JbMod.isTppEnabled) then
 				JbMod:DeactivateTPP()
 			else
-				JbMod:ActivateTPP()
+				if(JbMod.weaponOverride) then
+					if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+						self.isTppEnabled = false
+						self:RestoreFPPView()
+					else
+						JbMod:ActivateTPP()
+					end
+				else
+					JbMod:ActivateTPP()
+				end
 			end
 		end
 
@@ -225,6 +248,9 @@ registerForEvent("onDraw", function()
 
 	      	ImGui.Text("Well hello there, General Kenobi")
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("headEquipped: " .. tostring(JbMod.headEquipped))
+	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
+	      	ImGui.Text("hasWeaponEquipped: " .. tostring(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
