@@ -276,7 +276,14 @@ registerForEvent("onDraw", function()
 				JbMod:EquipHead()
 			end
 
-	      	ImGui.Text("Well hello there, General Kenobi")
+			slotID = TweakDBID.new('AttachmentSlots.TppHead')
+			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
+			itemID = item:GetItemID()
+			data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
+
+	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
+	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(itemID))
+	      	
 	      	ImGui.Text("timer: " .. tostring(timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
