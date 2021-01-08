@@ -1,48 +1,45 @@
--- Begin CamView Class
-	CamView = {}
-	CamView.__index = CamView
+dofile("jb_third_person_mod/parameters.lua")
 
-	function CamView:new (pos, rot, camSwitch)
-	   local obj = {}
-	   setmetatable(obj, CamView)
-	   obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
-	   obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
-	   obj.camSwitch = camSwitch or false
-	   return obj
-	end
--- End Camview Class
+CamView = {}
+CamView.__index = CamView
 
+function CamView:new (pos, rot, camSwitch)
+   local obj = {}
+   setmetatable(obj, CamView)
+   obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
+   obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
+   obj.camSwitch = camSwitch or false
+   return obj
+end
+	
 -- Begin CamView Class
 JBMOD = {}
 JBMOD.__index = JBMOD
 
 function JBMOD:new ()
-   	local obj = {}
-   	setmetatable(obj, self)
-   	obj.player = Game.GetPlayer()
-   	obj.fppComp = obj.player:GetFPPCameraComponent()
-   	obj.transactionComp = Game.GetTransactionSystem()
-   	obj.inspectionComp = obj.player:GetInspectionComponent()
-   	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
-   	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
-   	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   	obj.headString = "Items.PlayerWaPhotomodeHead"
-   	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
-   	obj.maleHead = "Items.PlayerMaPhotomodeHead"
-   	obj.camViews = {}
-   	obj.isTppEnabled = false
-   	obj.camActive = 1
-   	obj.inCar = false
-  	obj.exitCar = false
-   	obj.timeStamp = 0.0
-   	obj.enterCar = false
-   	obj.gender = true
-   	obj.genderOverride = false
-   	obj.timer = 0.0
-	obj.runTimer = false
-	obj.runTppCommand = false
-	obj.runHeadCommand = false
-	obj.runTppSecCommand = false
+   local obj = {}
+   setmetatable(obj, self)
+   obj.player = Game.GetPlayer()
+   obj.fppComp = obj.player:GetFPPCameraComponent()
+   obj.transactionComp = Game.GetTransactionSystem()
+   obj.inspectionComp = obj.player:GetInspectionComponent()
+   obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
+   obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
+   obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
+   obj.headString = "Items.CharacterCustomizationWaHead"
+   obj.femaleHead = "Items.CharacterCustomizationWaHead"
+   obj.maleHead = "Items.CharacterCustomizationMaHead"
+   obj.camViews = {}
+   obj.isTppEnabled = false
+   obj.camActive = 1
+   obj.inCar = false
+   obj.exitCar = false
+   obj.timeStamp = 0.0
+   obj.enterCar = false
+   obj.gender = true
+   obj.genderOverride = false
+   obj.weaponOverride = true
+   obj.headEquipped = false
    return obj
 end
 
@@ -60,6 +57,7 @@ function JBMOD:CheckForRestoration()
 
 	self:GetComps()
 	self:CheckGender()
+	self:CheckWeapon()
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
@@ -92,6 +90,16 @@ function JBMOD:CheckForRestoration()
 		self:UpdateCamera()
 		self.exitCar = true
 	end
+end
+
+function JBMOD:CheckWeapon()
+	if(self.weaponOverride) then
+		if(self.isTppEnabled) then
+			if(self.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+				self:DeactivateTPP()
+			end
+	    end
+    end
 end
 
 function JBMOD:CheckGender()
@@ -148,6 +156,7 @@ end
 
 function JBMOD:EquipHead()
 	Game.EquipItemOnPlayer(self.headString, "TppHead")
+	self.headEquipped = not self.headEquipped
 end
 
 function JBMOD:ActivateTPP ()
@@ -240,6 +249,8 @@ end
 
 JbMod = JBMOD:new()
 
+JbMod.weaponOverride = weaponOverride
+
 JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Front Camera
 	CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Left Shoulder Camera
@@ -267,7 +278,16 @@ registerForEvent("onUpdate", function(deltaTime)
 				JbMod:SetTppRep(false)
 				JbMod:DeactivateTPP()
 			else
-				JbMod:ActivateTPP()
+				if(JbMod.weaponOverride) then
+					if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+						self.isTppEnabled = false
+						self:RestoreFPPView()
+					else
+						JbMod:ActivateTPP()
+					end
+				else
+					JbMod:ActivateTPP()
+				end
 			end
 		end
 
@@ -307,6 +327,9 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("headEquipped: " .. tostring(JbMod.headEquipped))
+	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
+	      	ImGui.Text("hasWeaponEquipped: " .. tostring(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
