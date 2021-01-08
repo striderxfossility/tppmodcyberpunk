@@ -179,7 +179,12 @@ function JBMOD:RunTimer(deltaTime)
 			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
 			local itemID = item:GetItemID()
 
-			self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
+			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
+				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
+				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
+				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
+			end
+
 			self.runTppCommand = true
 			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
 		end
@@ -196,10 +201,14 @@ function JBMOD:RunTimer(deltaTime)
 
 		if (self.timer > 1.5) then
 			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
 			local itemID = item:GetItemID()
 
-			Game.GetTransactionSystem():ChangeItemAppearance(JbMod.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
+			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
+				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
+				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
+				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
+			end
 			self:EquipHead()
 
 			self.timer = 0.0
@@ -211,6 +220,10 @@ function JBMOD:RunTimer(deltaTime)
 
 		if(self.timer > 2.0) then
 			print("bugged out")
+
+			local slotID = TweakDBID.new('AttachmentSlots.Torso')
+			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
+			local itemID = item:GetItemID()
 		end
 	end
 end
