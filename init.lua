@@ -37,7 +37,6 @@ function JBMOD:new ()
    	obj.camActive = 1
    	obj.timeStamp = 0.0
    	obj.gender = true
-   	obj.genderOverride = false
    	obj.weaponOverride = true
    	obj.headEquipped = false
    	obj.runTimer = false
@@ -99,21 +98,11 @@ function JBMOD:CheckGender()
 	strfound = string.find(gender, "Female") 
 
 	if strfound == nil then
-		if(self.genderOverride == false) then
-	    	self.headString = self.maleHead
-	    	self.tppHeadString = self.tppMaleHead
-	    else
-	    	self.headString = self.femaleHead
-	    	self.tppHeadString = self.tppFemaleHead
-	    end
+    	self.headString = self.maleHead
+    	self.tppHeadString = self.tppMaleHead
 	else
-	    if(self.genderOverride == false) then
-	    	self.headString = self.femaleHead
-	    	self.tppHeadString = self.tppFemaleHead
-	    else
-	    	self.headString = self.maleHead
-	    	self.tppHeadString = self.tppMaleHead
-	    end
+    	self.headString = self.femaleHead
+    	self.tppHeadString = self.tppFemaleHead
 	end
 end
 
@@ -328,14 +317,12 @@ registerForEvent("onDraw", function()
 				JbMod:EquipHead()
 			end
 
-	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(JbMod.GetNameOfObject('TppHead')))
+	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
-	      	ImGui.Text("headEquipped: " .. tostring(JbMod.headEquipped))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
-	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
