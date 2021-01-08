@@ -77,6 +77,7 @@ function JBMOD:CheckForRestoration()
 
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
 		Game.AddToInventory(self.headString, 1)
+		Game.AddToInventory("Items.Jacket_05_old_01", 1)
 	end
 
 	if(self.exitCar and (self.timeStamp + 18.0) <= Game.GetTimeSystem():GetGameTimeStamp()) then
@@ -150,9 +151,14 @@ function JBMOD:EquipHead()
 end
 
 function JBMOD:ActivateTPP ()
-	self.isTppEnabled = true
-	self.runTimer = true
-	self:UpdateCamera()
+	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+		self.isTppEnabled = true
+		self.runTimer = true
+		self:UpdateCamera()
+	else
+		print("JB Third Person Mod Error: you can't activate the mod when you're tits are out at the moment :(")
+		print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+	end
 end
 
 function JBMOD:DeactivateTPP ()
@@ -171,21 +177,23 @@ function JBMOD:SwitchCamTo(cam)
 	end
 end
 
+function JBMOD:HasClothingInSlot(slot)
+	return self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. slot)) ~= nil
+end
+
+function JBMOD:ResetAppearance(slot)
+	local slotID = TweakDBID.new('AttachmentSlots.' .. slot)
+	local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+	local itemID = item:GetItemID()
+
+	self.transactionComp:ResetItemAppearance(self.player, itemID)
+end
+
 function JBMOD:CheckClothing()
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
-		local slotID = TweakDBID.new('AttachmentSlots.Torso')
-		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-		local itemID = item:GetItemID()
-
-		self.transactionComp:ResetItemAppearance(self.player, itemID)
-	end
-
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Chest')) ~= nil) then
-		slotID = TweakDBID.new('AttachmentSlots.Chest')
-		item = self.transactionComp:GetItemInSlot(self.player, slotID)
-		itemID = item:GetItemID()
-
-		self.transactionComp:ResetItemAppearance(self.player, itemID)
+	if(self:HasClothingInSlot('Torso')) then
+		self:ResetAppearance('Torso')
+	elseif(self:HasClothingInSlot('Chest')) then
+		self:ResetAppearance('Chest')
 	end
 end
 
