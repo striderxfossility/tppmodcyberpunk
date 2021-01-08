@@ -17,27 +17,32 @@ JBMOD = {}
 JBMOD.__index = JBMOD
 
 function JBMOD:new ()
-   local obj = {}
-   setmetatable(obj, self)
-   obj.player = Game.GetPlayer()
-   obj.fppComp = obj.player:GetFPPCameraComponent()
-   obj.transactionComp = Game.GetTransactionSystem()
-   obj.inspectionComp = obj.player:GetInspectionComponent()
-   obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
-   obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
-   obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   obj.headString = "Items.PlayerWaPhotomodeHead"
-   obj.femaleHead = "Items.PlayerWaPhotomodeHead"
-   obj.maleHead = "Items.PlayerMaPhotomodeHead"
-   obj.camViews = {}
-   obj.isTppEnabled = false
-   obj.camActive = 1
-   obj.inCar = false
-   obj.exitCar = false
-   obj.timeStamp = 0.0
-   obj.enterCar = false
-   obj.gender = true
-   obj.genderOverride = false
+   	local obj = {}
+   	setmetatable(obj, self)
+   	obj.player = Game.GetPlayer()
+   	obj.fppComp = obj.player:GetFPPCameraComponent()
+   	obj.transactionComp = Game.GetTransactionSystem()
+   	obj.inspectionComp = obj.player:GetInspectionComponent()
+   	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
+   	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
+   	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
+   	obj.headString = "Items.PlayerWaPhotomodeHead"
+   	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
+   	obj.maleHead = "Items.PlayerMaPhotomodeHead"
+   	obj.camViews = {}
+   	obj.isTppEnabled = false
+   	obj.camActive = 1
+   	obj.inCar = false
+  	obj.exitCar = false
+   	obj.timeStamp = 0.0
+   	obj.enterCar = false
+   	obj.gender = true
+   	obj.genderOverride = false
+   	obj.timer = 0.0
+	obj.runTimer = false
+	obj.runTppCommand = false
+	obj.runHeadCommand = false
+	obj.runTppSecCommand = false
    return obj
 end
 
@@ -146,7 +151,7 @@ end
 
 function JBMOD:ActivateTPP ()
 	self.isTppEnabled = true
-	runTimer = true
+	self.runTimer = true
 	self:UpdateCamera()
 end
 
@@ -165,6 +170,50 @@ function JBMOD:SwitchCamTo(cam)
 		self:UpdateCamera()
 	end
 end
+
+function JBMOD:RunTimer(deltaTime)
+	if(self.runTimer) then
+		self.timer = self.timer + deltaTime
+		if (self.timer > 0.0 and not self.runTppCommand) then
+			local slotID = TweakDBID.new('AttachmentSlots.Torso')
+			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
+			local itemID = item:GetItemID()
+
+			self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
+			self.runTppCommand = true
+			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
+		end
+
+		if (self.timer > 0.6 and not self.runHeadCommand) then
+			self:EquipHead()
+			self.runHeadCommand = true
+		end
+
+		if (self.timer > 1.2 and not self.runTppSecCommand) then
+			Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
+			self.runTppSecCommand = true
+		end
+
+		if (self.timer > 1.5) then
+			local slotID = TweakDBID.new('AttachmentSlots.Torso')
+			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local itemID = item:GetItemID()
+
+			Game.GetTransactionSystem():ChangeItemAppearance(JbMod.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
+			self:EquipHead()
+
+			self.timer = 0.0
+			self.runTimer = false
+			self.runTppCommand = false
+			self.runHeadCommand = false
+			self.runTppSecCommand = false
+		end
+
+		if(self.timer > 2.0) then
+			print("bugged out")
+		end
+	end
+end
 -- End JBMOD Class
 
 JbMod = JBMOD:new()
@@ -176,58 +225,11 @@ JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true) -- Read Camera
 }
 
-timer = 0.0
-runTimer = false
-runTppCommand = false
-runHeadCommand = false
-runTppSecCommand = false
-
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
 
 	JbMod:CheckForRestoration()
-
-	if(runTimer) then
-		timer = timer + deltaTime
-		if (timer > 0.0 and not runTppCommand) then
-			slotID = TweakDBID.new('AttachmentSlots.Torso')
-			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			itemID = item:GetItemID()
-
-			Game.GetTransactionSystem():ChangeItemAppearance(JbMod.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
-			runTppCommand = true
-			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
-		end
-
-		if (timer > 0.6 and not runHeadCommand) then
-			--print("run 2")
-			JbMod:EquipHead()
-			runHeadCommand = true
-		end
-
-		if (timer > 1.2 and not runTppSecCommand) then
-			--print("run 3")
-			Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
-			runTppSecCommand = true
-		end
-
-		if (timer > 1.5) then
-			--print("run 4")
-
-			slotID = TweakDBID.new('AttachmentSlots.Torso')
-			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			itemID = item:GetItemID()
-
-			Game.GetTransactionSystem():ChangeItemAppearance(JbMod.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
-			JbMod:EquipHead()
-
-			timer = 0.0
-			runTimer = false
-			runTppCommand = false
-			runHeadCommand = false
-			runTppSecCommand = false
-		end
-	end
+	JbMod:RunTimer(deltaTime)
 
 	if (ImGui.IsKeyDown(string.byte('0'))) then
 		JbMod:Zoom(0.06)
@@ -283,7 +285,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(itemID))
 	      	
-	      	ImGui.Text("timer: " .. tostring(timer))
+	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
