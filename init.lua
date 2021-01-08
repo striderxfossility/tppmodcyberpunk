@@ -197,6 +197,10 @@ function JBMOD:CheckClothing()
 	end
 end
 
+function JBMOD:SetTppRep(bool)
+	Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(bool)
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
@@ -212,7 +216,7 @@ function JBMOD:RunTimer(deltaTime)
 		end
 
 		if (self.timer > 1.2 and not self.runTppSecCommand) then
-			Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
+			self.SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
@@ -260,7 +264,7 @@ registerForEvent("onUpdate", function(deltaTime)
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
-				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+				self.SetTppRep(false)
 				JbMod:DeactivateTPP()
 			else
 				JbMod:ActivateTPP()
@@ -301,8 +305,6 @@ registerForEvent("onDraw", function()
 			data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
 
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
-	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(itemID))
-	      	
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
