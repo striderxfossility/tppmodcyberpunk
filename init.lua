@@ -171,20 +171,19 @@ function JBMOD:SwitchCamTo(cam)
 	end
 end
 
+function JBMOD:CheckClothing()
+	local slotID = TweakDBID.new('AttachmentSlots.Torso')
+	local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
+	local itemID = item:GetItemID()
+
+	self.transactionComp:ResetItemAppearance(self.player, itemID)
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
 		if (self.timer > 0.0 and not self.runTppCommand) then
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
-
-			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
-				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
-				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
-				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
-			end
-
+			self:CheckClothing()
 			self.runTppCommand = true
 			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
 		end
@@ -200,15 +199,7 @@ function JBMOD:RunTimer(deltaTime)
 		end
 
 		if (self.timer > 1.5) then
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
-
-			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
-				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
-				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
-				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
-			end
+			self:CheckClothing()
 			self:EquipHead()
 
 			self.timer = 0.0
