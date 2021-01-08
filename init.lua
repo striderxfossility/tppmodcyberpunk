@@ -68,13 +68,7 @@ function JBMOD:CheckForRestoration()
 		self.isTppEnabled = false
 	end
 
-	slotID = TweakDBID.new('AttachmentSlots.TppHead')
-	item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-	itemID = item:GetItemID()
-	data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
-
-
-	if(self.isTppEnabled and tostring(data:GetName()) == tostring(CName.new('player_fpp_head')) and  not self.runTimer) then
+	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head')) and  not self.runTimer) then
 		JbMod:ActivateTPP()
 	end
 
@@ -84,7 +78,6 @@ function JBMOD:CheckForRestoration()
 
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
 		Game.AddToInventory(self.headString, 1)
-		Game.AddToInventory("Items.Jacket_05_old_01", 1)
 	end
 end
 
@@ -216,6 +209,13 @@ function JBMOD:HasWeaponEquipped()
 	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
 end
 
+function JBMOD:GetNameOfObject(attachmentSlot)
+	slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+	item = self.transactionComp:GetItemInSlot(self.player, slotID)
+	data = self.transactionComp:GetItemData(self.player, item:GetItemID())
+	return data:GetName()
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
@@ -247,7 +247,7 @@ function JBMOD:RunTimer(deltaTime)
 		end
 
 		if(self.timer > 2.0) then
-			print("bugged out")
+			print("JB Third Person Mod -- bugged out, congratulations, you've outdone yourself!")
 		end
 	end
 end
@@ -328,13 +328,7 @@ registerForEvent("onDraw", function()
 				JbMod:EquipHead()
 			end
 
-			slotID = TweakDBID.new('AttachmentSlots.TppHead')
-			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			itemID = item:GetItemID()
-			data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
-
-	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
-	      	ImGui.Text("want to get: " ..  tostring(CName.new('player_fpp_head')))
+	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(JbMod.GetNameOfObject('TppHead')))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
@@ -344,9 +338,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
-	      	--ImGui.Text("inCar: " .. tostring(JbMod.inCar))
-	      	--ImGui.Text("exitCar: " .. tostring(JbMod.exitCar))
-	      	--ImGui.Text("enterCar: " .. tostring(JbMod.enterCar))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
 	      	ImGui.Text("playerAttached: " .. tostring(Game.GetPlayer():IsPlayer()))
 	      	ImGui.Text("Current Cam: x:" .. tostring(JbMod.fppComp:GetLocalPosition().x) .. " y:" .. tostring(JbMod.fppComp:GetLocalPosition().y) .. " z: " .. tostring(JbMod.fppComp:GetLocalPosition().z))
@@ -359,6 +350,3 @@ registerForEvent("onDraw", function()
 	    ImGui.End()
 	end
 end)
-
-
---obj.camViews = {}
