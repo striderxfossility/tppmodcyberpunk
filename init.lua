@@ -167,7 +167,7 @@ function JBMOD:ActivateTPP ()
 		self.runTimer = true
 		self:UpdateCamera()
 	else
-		print("JB Third Person Mod Error: you can't activate the mod when you're tits are out at the moment :(")
+		print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 		print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
 	end
 end
@@ -270,11 +270,11 @@ registerForEvent("onUpdate", function(deltaTime)
 	JbMod:CheckForRestoration()
 	JbMod:RunTimer(deltaTime)
 
-	if (ImGui.IsKeyDown(string.byte('0'))) then
+	if (ImGui.IsKeyDown(zoomInKey)) then
 		JbMod:Zoom(0.06)
 	end
 	
-	if (ImGui.IsKeyDown(string.byte('9'))) then
+	if (ImGui.IsKeyDown(zoomOutKey)) then
 		JbMod:Zoom(-0.06)
 	end
 
@@ -283,36 +283,34 @@ registerForEvent("onUpdate", function(deltaTime)
 		JbMod.switchBackToTpp = false
 	end
 
-	--if(JbMod.inCar == false) then
-		if (ImGui.IsKeyPressed(string.byte('B'))) then
-			if(JbMod.isTppEnabled) then
-				JbMod:SetTppRep(false)
-				JbMod:DeactivateTPP()
-			else
-				if(JbMod.weaponOverride) then
-					if(JbMod:HasWeaponEquipped()) then
-						JbMod.isTppEnabled = false
-						JbMod:RestoreFPPView()
-					else
-						JbMod:ActivateTPP()
-					end
+	if (ImGui.IsKeyPressed(activateTppModeKey, false)) then
+		if(JbMod.isTppEnabled) then
+			JbMod:SetTppRep(false)
+			JbMod:DeactivateTPP()
+		else
+			if(JbMod.weaponOverride) then
+				if(JbMod:HasWeaponEquipped()) then
+					JbMod.isTppEnabled = false
+					JbMod:RestoreFPPView()
 				else
 					JbMod:ActivateTPP()
 				end
+			else
+				JbMod:ActivateTPP()
 			end
 		end
+	end
 
-		if (GetAsyncKeyState(0x71)) then -- F2
-			JbMod:SwitchCamTo(JbMod.camActive + 1)
-		end
-	--end
+	if (ImGui.IsKeyPressed(switchCamKey, false)) then
+		JbMod:SwitchCamTo(JbMod.camActive + 1)
+	end
 
 end)
 
 onOpenDebug = false
 
 registerForEvent("onDraw", function()
-	if (GetAsyncKeyState(0x72)) then -- F3
+	if (ImGui.IsKeyPressed(openDebugMenuKey, false)) then
 	    if(onOpenDebug) then
 	    	onOpenDebug = false
 	    else
