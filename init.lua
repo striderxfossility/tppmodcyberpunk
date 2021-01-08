@@ -17,7 +17,7 @@ JBMOD = {}
 JBMOD.__index = JBMOD
 
 function JBMOD:new ()
-   	local obj = {}
+	local obj = {}
    	setmetatable(obj, self)
    	obj.player = Game.GetPlayer()
    	obj.fppComp = obj.player:GetFPPCameraComponent()
@@ -26,24 +26,26 @@ function JBMOD:new ()
    	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
    	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
    	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   	obj.headString = "Items.PlayerWaPhotomodeHead"
-   	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
-   	obj.maleHead = "Items.PlayerMaPhotomodeHead"
+   	obj.headString = "Items.CharacterCustomizationWaHead"
+   	obj.femaleHead = "Items.CharacterCustomizationWaHead"
+   	obj.maleHead = "Items.CharacterCustomizationMaHead"
    	obj.camViews = {}
    	obj.isTppEnabled = false
    	obj.camActive = 1
    	obj.inCar = false
-  	obj.exitCar = false
+   	obj.exitCar = false
    	obj.timeStamp = 0.0
    	obj.enterCar = false
    	obj.gender = true
    	obj.genderOverride = false
+   	obj.weaponOverride = true
+   	obj.headEquipped = false
+   	obj.runTimer = false
    	obj.timer = 0.0
-	obj.runTimer = false
-	obj.runTppCommand = false
-	obj.runHeadCommand = false
-	obj.runTppSecCommand = false
-   return obj
+   	obj.runTppCommand = false
+   	obj.runHeadCommand = false
+   	obj.runTppSecCommand = false
+   	return obj
 end
 
 function JBMOD:GetComps()
@@ -78,6 +80,7 @@ function JBMOD:CheckForRestoration()
 
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
 		Game.AddToInventory(self.headString, 1)
+		Game.AddToInventory("Items.Jacket_05_old_01", 1)
 	end
 
 	if(self.exitCar and (self.timeStamp + 18.0) <= Game.GetTimeSystem():GetGameTimeStamp()) then
@@ -97,7 +100,8 @@ end
 function JBMOD:CheckWeapon()
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
-			if(self.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+				self:SetTppRep(false)
 				self:DeactivateTPP()
 			end
 	    end
@@ -162,9 +166,14 @@ function JBMOD:EquipHead()
 end
 
 function JBMOD:ActivateTPP ()
-	self.isTppEnabled = true
-	self.runTimer = true
-	self:UpdateCamera()
+	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+		self.isTppEnabled = true
+		self.runTimer = true
+		self:UpdateCamera()
+	else
+		print("JB Third Person Mod Error: you can't activate the mod when you're tits are out at the moment :(")
+		print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+	end
 end
 
 function JBMOD:DeactivateTPP ()
@@ -183,20 +192,35 @@ function JBMOD:SwitchCamTo(cam)
 	end
 end
 
+function JBMOD:HasClothingInSlot(slot)
+	return self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. slot)) ~= nil
+end
+
+function JBMOD:ResetAppearance(slot)
+	local slotID = TweakDBID.new('AttachmentSlots.' .. slot)
+	local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+	local itemID = item:GetItemID()
+
+	self.transactionComp:ResetItemAppearance(self.player, itemID)
+end
+
+function JBMOD:CheckClothing()
+	if(self:HasClothingInSlot('Torso')) then
+		self:ResetAppearance('Torso')
+	elseif(self:HasClothingInSlot('Chest')) then
+		self:ResetAppearance('Chest')
+	end
+end
+
+function JBMOD:SetTppRep(setBool)
+	Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(setBool)
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
 		if (self.timer > 0.0 and not self.runTppCommand) then
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
-
-			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
-				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
-				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
-				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
-			end
-
+			self:CheckClothing()
 			self.runTppCommand = true
 			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
 		end
@@ -207,20 +231,12 @@ function JBMOD:RunTimer(deltaTime)
 		end
 
 		if (self.timer > 1.2 and not self.runTppSecCommand) then
-			Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
+			self:SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
 		if (self.timer > 1.5) then
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
-
-			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
-				local jacket = self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')):GetItemID())
-				self.transactionComp:ChangeItemAppearance(self.player, itemID, CName.new(tostring(jacket) .. "&TPP"), false)
-				--local str = string.match(tostring(jacket), "--[[ (%a+) --]] }")
-			end
+			self:CheckClothing()
 			self:EquipHead()
 
 			self.timer = 0.0
@@ -232,10 +248,6 @@ function JBMOD:RunTimer(deltaTime)
 
 		if(self.timer > 2.0) then
 			print("bugged out")
-
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
 		end
 	end
 end
@@ -269,13 +281,13 @@ registerForEvent("onUpdate", function(deltaTime)
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
-				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+				JbMod:SetTppRep(false)
 				JbMod:DeactivateTPP()
 			else
 				if(JbMod.weaponOverride) then
 					if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
-						self.isTppEnabled = false
-						self:RestoreFPPView()
+						JbMod.isTppEnabled = false
+						JbMod:RestoreFPPView()
 					else
 						JbMod:ActivateTPP()
 					end
@@ -319,8 +331,6 @@ registerForEvent("onDraw", function()
 			data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
 
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
-	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(itemID))
-	      	
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("headEquipped: " .. tostring(JbMod.headEquipped))

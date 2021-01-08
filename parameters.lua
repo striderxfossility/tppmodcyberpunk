@@ -1,1 +1,1 @@
-weaponOverride = false
+weaponOverride = true
