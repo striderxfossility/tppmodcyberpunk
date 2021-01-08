@@ -189,9 +189,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
 	if(runTimer) then
 		timer = timer + deltaTime
-
-
-
 		if (timer > 0.0 and not runTppCommand) then
 			slotID = TweakDBID.new('AttachmentSlots.Torso')
 			item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
@@ -199,6 +196,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
 			Game.GetTransactionSystem():ChangeItemAppearance(JbMod.player, itemID, CName.new("t2_jacket_05_old_01_&Female&TPP"), false)
 			runTppCommand = true
+			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
 		end
 
 		if (timer > 0.6 and not runHeadCommand) then
@@ -213,7 +211,7 @@ registerForEvent("onUpdate", function(deltaTime)
 			runTppSecCommand = true
 		end
 
-		if (timer > 2.0) then
+		if (timer > 1.5) then
 			--print("run 4")
 
 			slotID = TweakDBID.new('AttachmentSlots.Torso')
@@ -242,6 +240,7 @@ registerForEvent("onUpdate", function(deltaTime)
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
+				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
 				JbMod:DeactivateTPP()
 			else
 				JbMod:ActivateTPP()
