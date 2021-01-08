@@ -3,12 +3,13 @@ dofile("jb_third_person_mod/parameters.lua")
 CamView = {}
 CamView.__index = CamView
 
-function CamView:new (pos, rot, camSwitch)
+function CamView:new (pos, rot, camSwitch, freeform)
    local obj = {}
    setmetatable(obj, CamView)
    obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
    obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
    obj.camSwitch = camSwitch or false
+   obj.freeform = freeform or false
    return obj
 end
 	
@@ -48,7 +49,6 @@ function JBMOD:new ()
    	obj.switchBackToTpp = false
    	obj.carCheckOnce = false
    	obj.isWalking = false
-   	obj.switchBackToTppAfterCar = false
    	return obj
 end
 
@@ -106,7 +106,6 @@ function JBMOD:CheckCar()
 
 	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
 		self.carCheckOnce = true
-		--self.switchBackToTppAfterCar = true
 		self:SetCarView()
 	end
 
@@ -210,9 +209,14 @@ end
 function JBMOD:SwitchCamTo(cam)
 	if self.camViews[cam] ~= nil then
 		self.camActive = cam
+		if(self.camViews[cam].freeform) then
+			self.inspectionComp:SetIsPlayerInspecting(true)
+		else 
+			self.inspectionComp:SetIsPlayerInspecting(false)
+		end
 		self:UpdateCamera()
 	else
-		self.camActive = 1
+		self.camActive = 0
 		self:UpdateCamera()
 	end
 end
@@ -294,10 +298,11 @@ JbMod = JBMOD:new()
 JbMod.weaponOverride = weaponOverride
 
 JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
-	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Front Camera
-	CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Left Shoulder Camera
-	CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false), -- Right Shoulder Camera
-	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true) -- Read Camera
+	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
+	CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Left Shoulder Camera
+	CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Right Shoulder Camera
+	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
+	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
 }
 
 JbMod.camCar = CamView:new(Vector4:new(0.0, -14.0, 5.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
@@ -323,11 +328,6 @@ registerForEvent("onUpdate", function(deltaTime)
 			JbMod:Zoom(-0.06)
 		end
 		
-	end
-
-	if(JbMod.switchBackToTppAfterCar and not JbMod.inCar) then
-		JbMod:ActivateTPP()
-		JbMod.switchBackToTppAfterCar = false
 	end
 
 	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
@@ -382,7 +382,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
-	      	ImGui.Text("switchBackToTppAfterCar: " .. tostring(JbMod.switchBackToTpp))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
