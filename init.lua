@@ -1,5 +1,17 @@
 dofile("jb_third_person_mod/parameters.lua")
 
+CamView = {}
+CamView.__index = CamView
+
+function CamView:new (pos, rot, camSwitch)
+   local obj = {}
+   setmetatable(obj, CamView)
+   obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
+   obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
+   obj.camSwitch = camSwitch or false
+   return obj
+end
+	
 -- Begin CamView Class
 JBMOD = {}
 JBMOD.__index = JBMOD
