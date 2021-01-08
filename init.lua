@@ -33,6 +33,7 @@ function JBMOD:new ()
    	obj.tppFemaleHead = "Items.PlayerWaTppHead"
    	obj.tppMaleHead = "Items.PlayerMaTppHead"
    	obj.camViews = {}
+   	obj.camCar = nil
    	obj.isTppEnabled = false
    	obj.camActive = 1
    	obj.timeStamp = 0.0
@@ -45,6 +46,9 @@ function JBMOD:new ()
    	obj.runHeadCommand = false
    	obj.runTppSecCommand = false
    	obj.switchBackToTpp = false
+   	obj.carCheckOnce = false
+   	obj.isWalking = false
+   	obj.switchBackToTppAfterCar = false
    	return obj
 end
 
@@ -62,12 +66,13 @@ function JBMOD:CheckForRestoration()
 	self:GetComps()
 	self:CheckGender()
 	self:CheckWeapon()
+	self:CheckCar()
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
 	end
 
-	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head')) and  not self.runTimer) then
+	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head')) and not self.runTimer and not self.inCar) then
 		JbMod:ActivateTPP()
 	end
 
@@ -90,6 +95,24 @@ function JBMOD:CheckWeapon()
 			end
 	    end
     end
+end
+
+function JBMOD:CheckCar()
+	self.inCar = WorkspotGameSystem:IsActorInWorkspot(player)
+
+	if(self.inCar and self.isTppEnabled) then
+		self.fppComp:Activate(0.0, true)
+	end
+
+	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
+		self.carCheckOnce = true
+		--self.switchBackToTppAfterCar = true
+		self:SetCarView()
+	end
+
+	if(not self.inCar and self.carCheckOnce) then
+		self.carCheckOnce = false
+	end
 end
 
 function JBMOD:CheckGender()
@@ -122,19 +145,43 @@ function JBMOD:Zoom(z)
 	self:UpdateCamera()
 end
 
+function JBMOD:ZoomCar(z)
+	self.camCar.pos.y = self.camCar.pos.y + z
+
+	if(self.camCar.pos.y >= -1.5) then
+		self.camCar.pos.y = -1.5
+	end
+
+	self:UpdateCamera()
+end
+
 function JBMOD:RestoreFPPView()
 	if (self.isTppEnabled == false) then
+		self.player:DisableCameraBobbing(false)
 		self.fppComp:SetLocalPosition(Vector4:new(0.0, 0.0, 0.0, 1.0))
 		self.fppComp:SetLocalOrientation(Quaternion:new(0.0, 0.0, 0.0, 1.0))
 	end
 end
 
+function JBMOD:SetCarView()
+	self.player:DisableCameraBobbing(true)
+	self.fppComp:SetLocalPosition(self.camCar.pos)
+	self.fppComp:SetLocalOrientation(self.camCar.rot)
+end
+
 function JBMOD:UpdateCamera ()
 	if (self.isTppEnabled) then
-		self.fppComp.nearPlaneOverride = 0.0
-		self.fppComp.farPlaneOverride = 0.0
-		self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
-		self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
+		if(self.inCar) then
+			self.player:DisableCameraBobbing(true)
+			self.fppComp:SetLocalPosition(self.camCar.pos)
+			self.fppComp:SetLocalOrientation(self.camCar.rot)
+			self.fppComp:Activate(0.0, false)
+		else
+			self.player:DisableCameraBobbing(true)
+			self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
+			self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
+			self.fppComp:Activate(0.0, false)
+		end
 	end
 end
 
@@ -253,6 +300,8 @@ JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true) -- Read Camera
 }
 
+JbMod.camCar = CamView:new(Vector4:new(0.0, -14.0, 5.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
+
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
 
@@ -260,11 +309,25 @@ registerForEvent("onUpdate", function(deltaTime)
 	JbMod:RunTimer(deltaTime)
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
-		JbMod:Zoom(0.06)
+		if(JbMod.inCar and JbMod.isTppEnabled) then
+			JbMod:ZoomCar(0.06)
+		else
+			JbMod:Zoom(0.06)
+		end
 	end
 	
 	if (ImGui.IsKeyDown(zoomOutKey)) then
-		JbMod:Zoom(-0.06)
+		if(JbMod.inCar and JbMod.isTppEnabled) then
+			JbMod:ZoomCar(-0.06)
+		else
+			JbMod:Zoom(-0.06)
+		end
+		
+	end
+
+	if(JbMod.switchBackToTppAfterCar and not JbMod.inCar) then
+		JbMod:ActivateTPP()
+		JbMod.switchBackToTppAfterCar = false
 	end
 
 	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
@@ -311,18 +374,15 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 	    if (ImGui.Begin("JB Third Person Mod")) then
-
-	    	clicked = ImGui.Button("Equip / unequip head")
-			if (clicked) then
-				JbMod:EquipHead()
-			end
-
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
+	      	ImGui.Text("carCheckOnce: " .. tostring(JbMod.carCheckOnce))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
+	      	ImGui.Text("switchBackToTppAfterCar: " .. tostring(JbMod.switchBackToTpp))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
@@ -332,6 +392,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("CAM2: x:" .. tostring(JbMod.camViews[2].pos.x) .. " y:" .. tostring(JbMod.camViews[2].pos.y) .. " z: " .. tostring(JbMod.camViews[2].pos.z))
 	      	ImGui.Text("CAM3: x:" .. tostring(JbMod.camViews[3].pos.x) .. " y:" .. tostring(JbMod.camViews[3].pos.y) .. " z: " .. tostring(JbMod.camViews[3].pos.z))
 	      	ImGui.Text("CAM4: x:" .. tostring(JbMod.camViews[4].pos.x) .. " y:" .. tostring(JbMod.camViews[4].pos.y) .. " z: " .. tostring(JbMod.camViews[4].pos.z))	
+	      	ImGui.Text("CAMCAR: x:" .. tostring(JbMod.camCar.pos.x) .. " y:" .. tostring(JbMod.camCar.pos.y) .. " z: " .. tostring(JbMod.camCar.pos.z))	
 	    end
 
 	    ImGui.End()
