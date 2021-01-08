@@ -172,11 +172,21 @@ function JBMOD:SwitchCamTo(cam)
 end
 
 function JBMOD:CheckClothing()
-	local slotID = TweakDBID.new('AttachmentSlots.Torso')
-	local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-	local itemID = item:GetItemID()
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Torso')) ~= nil) then
+		local slotID = TweakDBID.new('AttachmentSlots.Torso')
+		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+		local itemID = item:GetItemID()
 
-	self.transactionComp:ResetItemAppearance(self.player, itemID)
+		self.transactionComp:ResetItemAppearance(self.player, itemID)
+	end
+
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.Chest')) ~= nil) then
+		slotID = TweakDBID.new('AttachmentSlots.Chest')
+		item = self.transactionComp:GetItemInSlot(self.player, slotID)
+		itemID = item:GetItemID()
+
+		self.transactionComp:ResetItemAppearance(self.player, itemID)
+	end
 end
 
 function JBMOD:RunTimer(deltaTime)
@@ -211,10 +221,6 @@ function JBMOD:RunTimer(deltaTime)
 
 		if(self.timer > 2.0) then
 			print("bugged out")
-
-			local slotID = TweakDBID.new('AttachmentSlots.Torso')
-			local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-			local itemID = item:GetItemID()
 		end
 	end
 end
