@@ -197,8 +197,8 @@ function JBMOD:CheckClothing()
 	end
 end
 
-function JBMOD:SetTppRep(bool)
-	Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(bool)
+function JBMOD:SetTppRep(setBool)
+	Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(setBool)
 end
 
 function JBMOD:RunTimer(deltaTime)
@@ -216,7 +216,7 @@ function JBMOD:RunTimer(deltaTime)
 		end
 
 		if (self.timer > 1.2 and not self.runTppSecCommand) then
-			self.SetTppRep(true)
+			self:SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
@@ -264,7 +264,7 @@ registerForEvent("onUpdate", function(deltaTime)
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
-				self.SetTppRep(false)
+				JbMod:SetTppRep(false)
 				JbMod:DeactivateTPP()
 			else
 				JbMod:ActivateTPP()
