@@ -40,6 +40,11 @@ function JBMOD:new ()
    obj.genderOverride = false
    obj.weaponOverride = true
    obj.headEquipped = false
+   obj.runTimer = false
+   obj.timer = 0.0
+   obj.runTppCommand = false
+   obj.runHeadCommand = false
+   obj.runTppSecCommand = false
    return obj
 end
 
@@ -95,7 +100,8 @@ end
 function JBMOD:CheckWeapon()
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
-			if(self.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+				self:SetTppRep(false)
 				self:DeactivateTPP()
 			end
 	    end
@@ -280,8 +286,8 @@ registerForEvent("onUpdate", function(deltaTime)
 			else
 				if(JbMod.weaponOverride) then
 					if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
-						self.isTppEnabled = false
-						self:RestoreFPPView()
+						JbMod.isTppEnabled = false
+						JbMod:RestoreFPPView()
 					else
 						JbMod:ActivateTPP()
 					end
