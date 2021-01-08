@@ -35,10 +35,7 @@ function JBMOD:new ()
    	obj.camViews = {}
    	obj.isTppEnabled = false
    	obj.camActive = 1
-   	obj.inCar = false
-   	obj.exitCar = false
    	obj.timeStamp = 0.0
-   	obj.enterCar = false
    	obj.gender = true
    	obj.genderOverride = false
    	obj.weaponOverride = true
@@ -70,11 +67,15 @@ function JBMOD:CheckForRestoration()
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
 	end
-	
-	self.inCar = self.vehicleCameraComp:IsTPPActive()
 
-	if(self.inCar) then
-		self.enterCar = true
+	slotID = TweakDBID.new('AttachmentSlots.TppHead')
+	item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
+	itemID = item:GetItemID()
+	data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
+
+
+	if(self.isTppEnabled and tostring(data:GetName()) == tostring(CName.new('player_fpp_head')) and  not self.runTimer) then
+		JbMod:ActivateTPP()
 	end
 
 	local gameItemID = GetSingleton('gameItemID')
@@ -84,19 +85,6 @@ function JBMOD:CheckForRestoration()
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
 		Game.AddToInventory(self.headString, 1)
 		Game.AddToInventory("Items.Jacket_05_old_01", 1)
-	end
-
-	if(self.exitCar and (self.timeStamp + 18.0) <= Game.GetTimeSystem():GetGameTimeStamp()) then
-		self:EquipHead()
-		self.exitCar = false
-		self.enterCar = false
-	end
-
-	if(self.enterCar and self.inCar == false and self.isTppEnabled and self.exitCar == false) then
-		self.timeStamp = Game.GetTimeSystem():GetGameTimeStamp()
-		self:EquipHead()
-		self:UpdateCamera()
-		self.exitCar = true
 	end
 end
 
@@ -117,7 +105,7 @@ function JBMOD:CheckGender()
 	gender = tostring(gender) 
 	strfound = string.find(gender, "Female") 
 
-	if strfound == nil then -- male
+	if strfound == nil then
 		if(self.genderOverride == false) then
 	    	self.headString = self.maleHead
 	    	self.tppHeadString = self.tppMaleHead
@@ -125,7 +113,7 @@ function JBMOD:CheckGender()
 	    	self.headString = self.femaleHead
 	    	self.tppHeadString = self.tppFemaleHead
 	    end
-	else -- female
+	else
 	    if(self.genderOverride == false) then
 	    	self.headString = self.femaleHead
 	    	self.tppHeadString = self.tppFemaleHead
@@ -295,7 +283,7 @@ registerForEvent("onUpdate", function(deltaTime)
 		JbMod.switchBackToTpp = false
 	end
 
-	if(JbMod.inCar == false) then
+	--if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
 				JbMod:SetTppRep(false)
@@ -317,7 +305,7 @@ registerForEvent("onUpdate", function(deltaTime)
 		if (GetAsyncKeyState(0x71)) then -- F2
 			JbMod:SwitchCamTo(JbMod.camActive + 1)
 		end
-	end
+	--end
 
 end)
 
@@ -348,6 +336,7 @@ registerForEvent("onDraw", function()
 			data = JbMod.transactionComp:GetItemData(JbMod.player, itemID)
 
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
+	      	ImGui.Text("want to get: " ..  tostring(CName.new('player_fpp_head')))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
@@ -357,9 +346,9 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
-	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
-	      	ImGui.Text("exitCar: " .. tostring(JbMod.exitCar))
-	      	ImGui.Text("enterCar: " .. tostring(JbMod.enterCar))
+	      	--ImGui.Text("inCar: " .. tostring(JbMod.inCar))
+	      	--ImGui.Text("exitCar: " .. tostring(JbMod.exitCar))
+	      	--ImGui.Text("enterCar: " .. tostring(JbMod.enterCar))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
 	      	ImGui.Text("playerAttached: " .. tostring(Game.GetPlayer():IsPlayer()))
 	      	ImGui.Text("Current Cam: x:" .. tostring(JbMod.fppComp:GetLocalPosition().x) .. " y:" .. tostring(JbMod.fppComp:GetLocalPosition().y) .. " z: " .. tostring(JbMod.fppComp:GetLocalPosition().z))
