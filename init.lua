@@ -29,6 +29,9 @@ function JBMOD:new ()
    	obj.headString = "Items.CharacterCustomizationWaHead"
    	obj.femaleHead = "Items.CharacterCustomizationWaHead"
    	obj.maleHead = "Items.CharacterCustomizationMaHead"
+   	obj.tppHeadString = "Items.PlayerWaTppHead"
+   	obj.tppFemaleHead = "Items.PlayerWaTppHead"
+   	obj.tppMaleHead = "Items.PlayerMaTppHead"
    	obj.camViews = {}
    	obj.isTppEnabled = false
    	obj.camActive = 1
@@ -45,6 +48,7 @@ function JBMOD:new ()
    	obj.runTppCommand = false
    	obj.runHeadCommand = false
    	obj.runTppSecCommand = false
+   	obj.switchBackToTpp = false
    	return obj
 end
 
@@ -59,7 +63,6 @@ function JBMOD:GetComps()
 end
 
 function JBMOD:CheckForRestoration()
-
 	self:GetComps()
 	self:CheckGender()
 	self:CheckWeapon()
@@ -102,6 +105,7 @@ function JBMOD:CheckWeapon()
 		if(self.isTppEnabled) then
 			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
 				self:SetTppRep(false)
+				self.switchBackToTpp = true
 				self:DeactivateTPP()
 			end
 	    end
@@ -116,14 +120,18 @@ function JBMOD:CheckGender()
 	if strfound == nil then -- male
 		if(self.genderOverride == false) then
 	    	self.headString = self.maleHead
+	    	self.tppHeadString = self.tppMaleHead
 	    else
 	    	self.headString = self.femaleHead
+	    	self.tppHeadString = self.tppFemaleHead
 	    end
 	else -- female
 	    if(self.genderOverride == false) then
 	    	self.headString = self.femaleHead
+	    	self.tppHeadString = self.tppFemaleHead
 	    else
 	    	self.headString = self.maleHead
+	    	self.tppHeadString = self.tppMaleHead
 	    end
 	end
 end
@@ -216,13 +224,17 @@ function JBMOD:SetTppRep(setBool)
 	Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(setBool)
 end
 
+function JBMOD:HasWeaponEquipped()
+	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
 		if (self.timer > 0.0 and not self.runTppCommand) then
 			self:CheckClothing()
 			self.runTppCommand = true
-			Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
+			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		end
 
 		if (self.timer > 0.6 and not self.runHeadCommand) then
@@ -278,6 +290,11 @@ registerForEvent("onUpdate", function(deltaTime)
 		JbMod:Zoom(-0.06)
 	end
 
+	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
+		JbMod:ActivateTPP()
+		JbMod.switchBackToTpp = false
+	end
+
 	if(JbMod.inCar == false) then
 		if (ImGui.IsKeyPressed(string.byte('B'))) then
 			if(JbMod.isTppEnabled) then
@@ -285,7 +302,7 @@ registerForEvent("onUpdate", function(deltaTime)
 				JbMod:DeactivateTPP()
 			else
 				if(JbMod.weaponOverride) then
-					if(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
+					if(JbMod:HasWeaponEquipped()) then
 						JbMod.isTppEnabled = false
 						JbMod:RestoreFPPView()
 					else
@@ -333,9 +350,10 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(data:GetName()))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("headEquipped: " .. tostring(JbMod.headEquipped))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
-	      	ImGui.Text("hasWeaponEquipped: " .. tostring(JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil))
+	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
 	      	ImGui.Text("genderOverride: " .. tostring(JbMod.genderOverride))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
