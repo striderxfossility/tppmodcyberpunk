@@ -206,21 +206,19 @@ function JBMOD:ResetZoom()
 end
 
 function JBMOD:Zoom(z)
-	if(not self.localPlayerControlledGameObjectComp:IsMoving()) then
-		self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
+	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 
-		if(self.camViews[self.camActive].camSwitch == false) then
-			if(self.camViews[self.camActive].pos.y >= -1.5) then
-				self.camViews[self.camActive].pos.y = -1.5
-			end
-		else
-			if(self.camViews[self.camActive].pos.y <= 1.5) then
-				self.camViews[self.camActive].pos.y = 1.5
-			end
+	if(self.camViews[self.camActive].camSwitch == false) then
+		if(self.camViews[self.camActive].pos.y >= -1.5) then
+			self.camViews[self.camActive].pos.y = -1.5
 		end
-
-		self:UpdateCamera()
+	else
+		if(self.camViews[self.camActive].pos.y <= 1.5) then
+			self.camViews[self.camActive].pos.y = 1.5
+		end
 	end
+
+	self:UpdateCamera()
 end
 
 function JBMOD:ZoomCar(z)
@@ -470,7 +468,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
-	      	ImGui.Text("isMoving: " .. tostring(JbMod.localPlayerControlledGameObjectComp:IsMoving()))
 	      	ImGui.Text("timerCheckClothes: " .. tostring(JbMod.timerCheckClothes))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
 	      	ImGui.Text("waitTimer: " .. tostring(JbMod.waitTimer))
