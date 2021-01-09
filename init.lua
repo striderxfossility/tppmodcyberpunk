@@ -6,6 +6,7 @@ CamView.__index = CamView
 function CamView:new (pos, rot, camSwitch, freeform)
    local obj = {}
    setmetatable(obj, CamView)
+   obj.defaultZoomLevel = pos.y
    obj.pos = pos or Vector4:new(0.0, 0.0, 0.0, 1.0)
    obj.rot = rot or Quaternion:new(0.0, 0.0, 0.0, 1.0)
    obj.camSwitch = camSwitch or false
@@ -127,6 +128,11 @@ function JBMOD:CheckGender()
     	self.headString = self.femaleHead
     	self.tppHeadString = self.tppFemaleHead
 	end
+end
+
+function JBMOD:ResetZoom()
+	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].defaultZoomLevel
+	self:UpdateCamera()
 end
 
 function JBMOD:Zoom(z)
@@ -334,6 +340,10 @@ registerForEvent("onUpdate", function(deltaTime)
 			JbMod:Zoom(-0.06)
 		end
 		
+	end
+
+	if (ImGui.IsKeyDown(string.byte('8'))) then
+		JbMod:ResetZoom()
 	end
 
 	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
