@@ -43,7 +43,6 @@ function JBMOD:new ()
    	obj.timeStamp = 0.0
    	obj.gender = true
    	obj.weaponOverride = true
-   	obj.headEquipped = false
    	obj.runTimer = false
    	obj.timer = 0.0
    	obj.runTppCommand = false
@@ -209,7 +208,6 @@ end
 
 function JBMOD:EquipHead()
 	Game.EquipItemOnPlayer(self.headString, "TppHead")
-	self.headEquipped = not self.headEquipped
 end
 
 function JBMOD:ActivateTPP ()
