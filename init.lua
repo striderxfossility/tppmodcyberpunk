@@ -285,23 +285,23 @@ end
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
-		if (self.timer > 0.0 and not self.runTppCommand) then
+		if (self.timer > 0.1 and not self.runTppCommand) then
 			self:CheckClothing()
 			self.runTppCommand = true
 			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		end
 
-		if (self.timer > 0.1 and not self.runHeadCommand) then
+		if (self.timer > 0.2 and not self.runHeadCommand) then
 			self:EquipHead()
 			self.runHeadCommand = true
 		end
 
-		if (self.timer > 1.2 and not self.runTppSecCommand) then
+		if (self.timer > 1.3 and not self.runTppSecCommand) then
 			self:SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
-		if (self.timer > 1.4) then
+		if (self.timer > 1.5) then
 			self:CheckClothing()
 			self:EquipHead()
 
