@@ -43,8 +43,6 @@ function JBMOD:new ()
    	obj.timeStamp = 0.0
    	obj.gender = true
    	obj.weaponOverride = true
-   	obj.runTimer = false
-   	obj.timer = 0.0
    	obj.runTppCommand = false
    	obj.runHeadCommand = false
    	obj.runTppSecCommand = false
@@ -75,8 +73,7 @@ function JBMOD:CheckForRestoration()
 		self.isTppEnabled = false
 	end
 
-	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head')) and not self.runTimer and not self.inCar) then
-		self.runTimer = true
+	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head'))) then
 		self:UpdateCamera()
 		self:ActivateTPP()
 	end
@@ -99,7 +96,6 @@ function JBMOD:CheckWeapon()
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
 			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
-				--self:SetTppRep(false)
 				self.switchBackToTpp = true
 				self:DeactivateTPP()
 			end
@@ -215,7 +211,6 @@ function JBMOD:ActivateTPP ()
 	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 		self.isTppEnabled = true
 		self:SetTppRep(true)
-		self.runTimer = true
 		self:UpdateCamera()
 	else
 		print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
@@ -291,42 +286,6 @@ function JBMOD:RemoveCrouchBug()
 		JbMod:EquipHead()
 	end
 end
-
-function JBMOD:RunTimer(deltaTime)
-	if(self.runTimer) then
-		self.timer = self.timer + deltaTime
-		if (self.timer > 0.2 and not self.runTppCommand) then
-			self:CheckClothing()
-			self.runTppCommand = true
-			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
-		end
-
-		if (self.timer > 0.3 and not self.runHeadCommand) then
-			self:EquipHead()
-			self.runHeadCommand = true
-		end
-
-		if (self.timer > 1.4 and not self.runTppSecCommand) then
-			self:SetTppRep(true)
-			self.runTppSecCommand = true
-		end
-
-		if (self.timer > 1.6) then
-			self:CheckClothing()
-			self:EquipHead()
-
-			self.timer = 0.0
-			self.runTimer = false
-			self.runTppCommand = false
-			self.runHeadCommand = false
-			self.runTppSecCommand = Wfalse
-		end
-
-		if(self.timer > 2.0) then
-			print("JB Third Person Mod -- bugged out, congratulations, you've outdone yourself!")
-		end
-	end
-end
 -- End JBMOD Class
 
 JbMod = JBMOD:new()
@@ -373,7 +332,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
 	if (ImGui.IsKeyPressed(activateTppModeKey, false)) then
 		if(JbMod.isTppEnabled) then
-			--JbMod:SetTppRep(false)
 			JbMod:DeactivateTPP()
 		else
 			if(JbMod.weaponOverride) then
@@ -419,8 +377,6 @@ registerForEvent("onDraw", function()
 
 	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
-	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
-	      	ImGui.Text("runTimer: " .. tostring(JbMod.runTimer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
 	      	ImGui.Text("isHeadOn " .. tostring(tostring(JbMod:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head'))))
