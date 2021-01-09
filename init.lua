@@ -285,23 +285,23 @@ end
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
-		if (self.timer > 0.1 and not self.runTppCommand) then
+		if (self.timer > 0.2 and not self.runTppCommand) then
 			self:CheckClothing()
 			self.runTppCommand = true
 			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		end
 
-		if (self.timer > 0.2 and not self.runHeadCommand) then
+		if (self.timer > 0.3 and not self.runHeadCommand) then
 			self:EquipHead()
 			self.runHeadCommand = true
 		end
 
-		if (self.timer > 1.3 and not self.runTppSecCommand) then
+		if (self.timer > 1.4 and not self.runTppSecCommand) then
 			self:SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
-		if (self.timer > 1.5) then
+		if (self.timer > 1.6) then
 			self:CheckClothing()
 			self:EquipHead()
 
@@ -428,6 +428,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
 	      	ImGui.Text("playerAttached: " .. tostring(JbMod.player:IsPlayer()))
+	      	ImGui.Text("Camera: " .. tostring(JbMod.fppComp:GetName()))
 	      	ImGui.Text("Current Cam: x:" .. tostring(JbMod.fppComp:GetLocalPosition().x) .. " y:" .. tostring(JbMod.fppComp:GetLocalPosition().y) .. " z: " .. tostring(JbMod.fppComp:GetLocalPosition().z))
 	      	ImGui.Text("CAM1: x:" .. tostring(JbMod.camViews[1].pos.x) .. " y:" .. tostring(JbMod.camViews[1].pos.y) .. " z: " .. tostring(JbMod.camViews[1].pos.z))
 	      	ImGui.Text("CAM2: x:" .. tostring(JbMod.camViews[2].pos.x) .. " y:" .. tostring(JbMod.camViews[2].pos.y) .. " z: " .. tostring(JbMod.camViews[2].pos.z))
