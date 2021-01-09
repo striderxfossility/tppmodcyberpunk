@@ -48,7 +48,6 @@ function JBMOD:new ()
    	obj.runTppSecCommand = false
    	obj.switchBackToTpp = false
    	obj.carCheckOnce = false
-   	obj.isWalking = false
    	return obj
 end
 
@@ -73,7 +72,9 @@ function JBMOD:CheckForRestoration()
 	end
 
 	if(self.isTppEnabled and tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head')) and not self.runTimer and not self.inCar) then
-		JbMod:ActivateTPP()
+		self.runTimer = true
+		self:UpdateCamera()
+		self:ActivateTPP()
 	end
 
 	local gameItemID = GetSingleton('gameItemID')
@@ -98,7 +99,7 @@ function JBMOD:CheckWeapon()
 end
 
 function JBMOD:CheckCar()
-	self.inCar = WorkspotGameSystem:IsActorInWorkspot(player)
+	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
 	if(self.inCar and self.isTppEnabled) then
 		self.fppComp:Activate(0.0, true)
@@ -250,10 +251,15 @@ function JBMOD:HasWeaponEquipped()
 end
 
 function JBMOD:GetNameOfObject(attachmentSlot)
-	slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-	item = self.transactionComp:GetItemInSlot(self.player, slotID)
-	data = self.transactionComp:GetItemData(self.player, item:GetItemID())
-	return data:GetName()
+
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+		slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+		item = self.transactionComp:GetItemInSlot(self.player, slotID)
+		data = self.transactionComp:GetItemData(self.player, item:GetItemID())
+		return data:GetName()
+	end
+
+	return ''
 end
 
 function JBMOD:RunTimer(deltaTime)
@@ -265,17 +271,17 @@ function JBMOD:RunTimer(deltaTime)
 			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		end
 
-		if (self.timer > 0.6 and not self.runHeadCommand) then
+		if (self.timer > 0.1 and not self.runHeadCommand) then
 			self:EquipHead()
 			self.runHeadCommand = true
 		end
 
-		if (self.timer > 1.2 and not self.runTppSecCommand) then
+		if (self.timer > 0.2 and not self.runTppSecCommand) then
 			self:SetTppRep(true)
 			self.runTppSecCommand = true
 		end
 
-		if (self.timer > 1.5) then
+		if (self.timer > 0.3) then
 			self:CheckClothing()
 			self:EquipHead()
 
@@ -283,7 +289,7 @@ function JBMOD:RunTimer(deltaTime)
 			self.runTimer = false
 			self.runTppCommand = false
 			self.runHeadCommand = false
-			self.runTppSecCommand = false
+			self.runTppSecCommand = Wfalse
 		end
 
 		if(self.timer > 2.0) then
@@ -305,7 +311,7 @@ JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
 }
 
-JbMod.camCar = CamView:new(Vector4:new(0.0, -14.0, 5.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
+JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
@@ -374,10 +380,13 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 	    if (ImGui.Begin("JB Third Person Mod")) then
-	      	ImGui.Text("CURRENT EQUIPPED: " ..  tostring(JbMod:GetNameOfObject('TppHead')))
+	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
+	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
+	      	ImGui.Text("runTimer: " .. tostring(JbMod.runTimer))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
+	      	ImGui.Text("isHeadOn " .. tostring(tostring(JbMod:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("carCheckOnce: " .. tostring(JbMod.carCheckOnce))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
@@ -385,7 +394,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
-	      	ImGui.Text("playerAttached: " .. tostring(Game.GetPlayer():IsPlayer()))
+	      	ImGui.Text("playerAttached: " .. tostring(JbMod.player:IsPlayer()))
 	      	ImGui.Text("Current Cam: x:" .. tostring(JbMod.fppComp:GetLocalPosition().x) .. " y:" .. tostring(JbMod.fppComp:GetLocalPosition().y) .. " z: " .. tostring(JbMod.fppComp:GetLocalPosition().z))
 	      	ImGui.Text("CAM1: x:" .. tostring(JbMod.camViews[1].pos.x) .. " y:" .. tostring(JbMod.camViews[1].pos.y) .. " z: " .. tostring(JbMod.camViews[1].pos.z))
 	      	ImGui.Text("CAM2: x:" .. tostring(JbMod.camViews[2].pos.x) .. " y:" .. tostring(JbMod.camViews[2].pos.y) .. " z: " .. tostring(JbMod.camViews[2].pos.z))
