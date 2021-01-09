@@ -348,33 +348,32 @@ function JBMOD:RemoveCrouchBug()
 end
 
 function JBMOD:CarTimer(deltaTime)
-	if(JbMod.waitTimer > 0.5) then
-		if(JbMod:HasClothingInSlot('Torso') or JbMod:HasClothingInSlot('Chest')) then
-			JbMod.isTppEnabled = true
-			JbMod:SetTppRep(true)
-			JbMod:UpdateCamera()
+	if(self.waitTimer > 0.8) then
+		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+			self.isTppEnabled = true
+			self:SetTppRep(true)
+			self:UpdateCamera()
 		else
 			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
 		end
 	end
 
-	if(JbMod.waitTimer > 1.0) then
-		if(JbMod:HasClothingInSlot('Torso') or JbMod:HasClothingInSlot('Chest')) then
-			JbMod.isTppEnabled = true
-			JbMod:SetTppRep(true)
-			JbMod:UpdateCamera()
+	if(self.waitTimer > 1.6) then
+		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+			self:SetTppRep(true)
+			self:RestoreClothing('Torso')
 		else
 			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
 		end
-		JbMod.waitTimer = 0.0
-		JbMod.waitForCar = false
+		self.waitTimer = 0.0
+		self.waitForCar = false
 	end
 
-	if(JbMod.waitForCar) then
-		JbMod.carCheckOnce = false
-		JbMod.waitTimer = JbMod.waitTimer + deltaTime
+	if(self.waitForCar) then
+		self.carCheckOnce = false
+		self.waitTimer = self.waitTimer + deltaTime
 	end
 end
 -- End JBMOD Class
