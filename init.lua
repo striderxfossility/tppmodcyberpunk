@@ -343,10 +343,6 @@ registerForEvent("onUpdate", function(deltaTime)
 		
 	end
 
-	if (ImGui.IsKeyDown(string.byte('8'))) then
-		JbMod:ResetZoom()
-	end
-
 	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
 		JbMod:ActivateTPP()
 		JbMod.switchBackToTpp = false
@@ -395,6 +391,13 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 	    if (ImGui.Begin("JB Third Person Mod")) then
+
+	    	clicked = ImGui.Button("Reset zoom")
+	    	if (clicked) then
+	    		JbMod:ResetZoom()
+			end
+	    	
+
 	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("timer: " .. tostring(JbMod.timer))
