@@ -66,6 +66,7 @@ end
 
 function JBMOD:CheckForRestoration()
 	self:GetComps()
+	self:RemoveCrouchBug()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
@@ -98,7 +99,7 @@ function JBMOD:CheckWeapon()
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
 			if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil) then
-				self:SetTppRep(false)
+				--self:SetTppRep(false)
 				self.switchBackToTpp = true
 				self:DeactivateTPP()
 			end
@@ -213,6 +214,7 @@ end
 function JBMOD:ActivateTPP ()
 	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 		self.isTppEnabled = true
+		self:SetTppRep(true)
 		self.runTimer = true
 		self:UpdateCamera()
 	else
@@ -282,6 +284,14 @@ function JBMOD:GetNameOfObject(attachmentSlot)
 	return ''
 end
 
+function JBMOD:RemoveCrouchBug()
+	if(tostring(JbMod:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not JbMod.isTppEnabled) then
+		JbMod.transactionComp:RemoveItemFromSlot(JbMod.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+	else
+		JbMod:EquipHead()
+	end
+end
+
 function JBMOD:RunTimer(deltaTime)
 	if(self.runTimer) then
 		self.timer = self.timer + deltaTime
@@ -338,7 +348,6 @@ JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1
 registerForEvent("onUpdate", function(deltaTime)
 
 	JbMod:CheckForRestoration()
-	JbMod:RunTimer(deltaTime)
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
 		if(JbMod.inCar and JbMod.isTppEnabled) then
@@ -363,23 +372,19 @@ registerForEvent("onUpdate", function(deltaTime)
 	end
 
 	if (ImGui.IsKeyPressed(activateTppModeKey, false)) then
-		if(JbMod.runTimer) then
-			print("JB Third Person Mod: you cant press B all the time, it will clitch out")
+		if(JbMod.isTppEnabled) then
+			--JbMod:SetTppRep(false)
+			JbMod:DeactivateTPP()
 		else
-			if(JbMod.isTppEnabled) then
-				JbMod:SetTppRep(false)
-				JbMod:DeactivateTPP()
-			else
-				if(JbMod.weaponOverride) then
-					if(JbMod:HasWeaponEquipped()) then
-						JbMod.isTppEnabled = false
-						JbMod:RestoreFPPView()
-					else
-						JbMod:ActivateTPP()
-					end
+			if(JbMod.weaponOverride) then
+				if(JbMod:HasWeaponEquipped()) then
+					JbMod.isTppEnabled = false
+					JbMod:RestoreFPPView()
 				else
 					JbMod:ActivateTPP()
 				end
+			else
+				JbMod:ActivateTPP()
 			end
 		end
 	end
