@@ -67,6 +67,8 @@ function JBMOD:new ()
    	obj.switchBackToTpp = false
    	obj.carCheckOnce = false
    	obj.animatedFace = false
+   	obj.waitForCar = false
+   	obj.waitTimer = 0.0
    	return obj
 end
 
@@ -157,11 +159,14 @@ function JBMOD:CheckCar()
 
 	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
 		self.carCheckOnce = true
+		self:SetTppRep(false)
 		self:SetCarView()
 	end
 
 	if(not self.inCar and self.carCheckOnce) then
 		self.carCheckOnce = false
+		self.waitForCar = true
+		self.waitTimer = 0.0
 	end
 end
 
@@ -341,11 +346,44 @@ function JBMOD:RemoveCrouchBug()
 		end
 	end
 end
+
+function JBMOD:CarTimer()
+
+end
 -- End JBMOD Class
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
 	JbMod:CheckForRestoration()
+
+	if(JbMod.waitTimer > 0.5) then
+		if(JbMod:HasClothingInSlot('Torso') or JbMod:HasClothingInSlot('Chest')) then
+			JbMod.isTppEnabled = true
+			JbMod:SetTppRep(true)
+			JbMod:UpdateCamera()
+		else
+			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
+			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+		end
+	end
+
+	if(JbMod.waitTimer > 1.0) then
+		if(JbMod:HasClothingInSlot('Torso') or JbMod:HasClothingInSlot('Chest')) then
+			JbMod.isTppEnabled = true
+			JbMod:SetTppRep(true)
+			JbMod:UpdateCamera()
+		else
+			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
+			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+		end
+		JbMod.waitTimer = 0.0
+		JbMod.waitForCar = false
+	end
+
+	if(JbMod.waitForCar) then
+		JbMod.carCheckOnce = false
+		JbMod.waitTimer = JbMod.waitTimer + deltaTime
+	end
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
 		if(JbMod.inCar and JbMod.isTppEnabled) then
@@ -418,6 +456,8 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
+	      	ImGui.Text("waitTimer: " .. tostring(JbMod.waitTimer))
+	      	ImGui.Text("waitForCar: " .. tostring(JbMod.waitForCar))
 	      	ImGui.Text("isHeadOn " .. tostring(tostring(JbMod:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("carCheckOnce: " .. tostring(JbMod.carCheckOnce))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
