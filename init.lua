@@ -28,10 +28,11 @@ function JBMOD:new ()
    	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
    	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
    	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   	-- CharacterCustomizationWaHead
    	obj.headString = "Items.PlayerWaPhotomodeHead"
    	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
    	obj.maleHead = "Items.PlayerMaPhotomodeHead"
+   	obj.animFemaleHead = "Items.CharacterCustomizationWaHead"
+   	obj.animMaleHead = "Items.CharacterCustomizationMaHead"
    	obj.tppHeadString = "Items.PlayerWaTppHead"
    	obj.tppFemaleHead = "Items.PlayerWaTppHead"
    	obj.tppMaleHead = "Items.PlayerMaTppHead"
@@ -50,6 +51,7 @@ function JBMOD:new ()
    	obj.runTppSecCommand = false
    	obj.switchBackToTpp = false
    	obj.carCheckOnce = false
+   	obj.animatedFace = false
    	return obj
 end
 
@@ -79,12 +81,17 @@ function JBMOD:CheckForRestoration()
 		self:ActivateTPP()
 	end
 
+	self:AddToInventory(self.headString)
+	self:AddToInventory(self.tppHeadString)
+end
+
+function JBMOD:AddToInventory(nameString)
 	local gameItemID = GetSingleton('gameItemID')
-	local tdbid = TweakDBID.new(self.headString)
+	local tdbid = TweakDBID.new(nameString)
 	local itemID = gameItemID:FromTDBID(tdbid)
 
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
-		Game.AddToInventory(self.headString, 1)
+		Game.AddToInventory(nameString, 1)
 	end
 end
 
@@ -123,10 +130,18 @@ function JBMOD:CheckGender()
 	strfound = string.find(gender, "Female") 
 
 	if strfound == nil then
-    	self.headString = self.maleHead
+		if(self.animatedFace) then
+			self.headString = self.animMaleHead
+		else
+			self.headString = self.maleHead
+		end
     	self.tppHeadString = self.tppMaleHead
 	else
-    	self.headString = self.femaleHead
+		if(self.animatedFace) then
+			self.headString = self.animFemaleHead
+		else
+			self.headString = self.femaleHead
+		end
     	self.tppHeadString = self.tppFemaleHead
 	end
 end
@@ -309,6 +324,7 @@ end
 JbMod = JBMOD:new()
 
 JbMod.weaponOverride = weaponOverride
+JbMod.animatedFace = animatedFace
 
 JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
@@ -408,6 +424,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("carCheckOnce: " .. tostring(JbMod.carCheckOnce))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("weaponOverride: " .. tostring(JbMod.weaponOverride))
+	      	ImGui.Text("animatedFace: " .. tostring(JbMod.animatedFace))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
 	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
