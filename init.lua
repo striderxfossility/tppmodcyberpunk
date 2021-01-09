@@ -278,7 +278,7 @@ function JBMOD:RunTimer(deltaTime)
 			Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		end
 
-		if (self.timer > 0.6 and not self.runHeadCommand) then
+		if (self.timer > 0.1 and not self.runHeadCommand) then
 			self:EquipHead()
 			self.runHeadCommand = true
 		end
@@ -288,7 +288,7 @@ function JBMOD:RunTimer(deltaTime)
 			self.runTppSecCommand = true
 		end
 
-		if (self.timer > 1.5) then
+		if (self.timer > 1.4) then
 			self:CheckClothing()
 			self:EquipHead()
 
@@ -353,19 +353,23 @@ registerForEvent("onUpdate", function(deltaTime)
 	end
 
 	if (ImGui.IsKeyPressed(activateTppModeKey, false)) then
-		if(JbMod.isTppEnabled) then
-			JbMod:SetTppRep(false)
-			JbMod:DeactivateTPP()
+		if(JbMod.runTimer) then
+			print("JB Third Person Mod: you cant press B all the time, it will clitch out")
 		else
-			if(JbMod.weaponOverride) then
-				if(JbMod:HasWeaponEquipped()) then
-					JbMod.isTppEnabled = false
-					JbMod:RestoreFPPView()
+			if(JbMod.isTppEnabled) then
+				JbMod:SetTppRep(false)
+				JbMod:DeactivateTPP()
+			else
+				if(JbMod.weaponOverride) then
+					if(JbMod:HasWeaponEquipped()) then
+						JbMod.isTppEnabled = false
+						JbMod:RestoreFPPView()
+					else
+						JbMod:ActivateTPP()
+					end
 				else
 					JbMod:ActivateTPP()
 				end
-			else
-				JbMod:ActivateTPP()
 			end
 		end
 	end
