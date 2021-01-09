@@ -28,9 +28,10 @@ function JBMOD:new ()
    	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
    	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
    	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   	obj.headString = "Items.CharacterCustomizationWaHead"
-   	obj.femaleHead = "Items.CharacterCustomizationWaHead"
-   	obj.maleHead = "Items.CharacterCustomizationMaHead"
+   	-- CharacterCustomizationWaHead
+   	obj.headString = "Items.PlayerWaPhotomodeHead"
+   	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
+   	obj.maleHead = "Items.PlayerMaPhotomodeHead"
    	obj.tppHeadString = "Items.PlayerWaTppHead"
    	obj.tppFemaleHead = "Items.PlayerWaTppHead"
    	obj.tppMaleHead = "Items.PlayerMaTppHead"
@@ -287,7 +288,7 @@ function JBMOD:RunTimer(deltaTime)
 			self.runTppSecCommand = true
 		end
 
-		if (self.timer > 1.8) then
+		if (self.timer > 1.5) then
 			self:CheckClothing()
 			self:EquipHead()
 
