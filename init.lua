@@ -118,7 +118,6 @@ function JBMOD:RestoreClothing(attachmentSlot)
 
 		itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
 		if (string.find(itemName, "&FPP") and self.isTppEnabled) then
-			print("what")
 			itemName = tostring(itemName:match("%[(.-)%]"))
 			itemName = tostring(string.sub(itemName, 3, -14))
 
