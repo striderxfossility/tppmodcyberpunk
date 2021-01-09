@@ -68,6 +68,7 @@ function JBMOD:CheckForRestoration()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
+	self:CheckIfClothingMatch('Torso')
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
@@ -80,6 +81,16 @@ function JBMOD:CheckForRestoration()
 
 	self:AddToInventory(self.headString)
 	self:AddToInventory(self.tppHeadString)
+end
+
+function JBMOD:CheckIfClothingMatch(attachmentSlot)
+	if(self.isTppEnabled) then
+		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+			local stringName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
+			if (string.find(stringName, "&FPP")) then
+			end
+		end
+	end
 end
 
 function JBMOD:AddToInventory(nameString)
@@ -270,20 +281,31 @@ end
 function JBMOD:GetNameOfObject(attachmentSlot)
 
 	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-		slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-		item = self.transactionComp:GetItemInSlot(self.player, slotID)
-		data = self.transactionComp:GetItemData(self.player, item:GetItemID())
+		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+		local data = self.transactionComp:GetItemData(self.player, item:GetItemID())
+
 		return data:GetName()
 	end
 
 	return ''
 end
 
+function JBMOD:RestoreAttachment(attachmentSlot)
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+		self.transactionComp:ResetItemAppearance(self.player, item:GetItemID())
+	end
+end
+
 function JBMOD:RemoveCrouchBug()
-	if(tostring(JbMod:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not JbMod.isTppEnabled) then
-		JbMod.transactionComp:RemoveItemFromSlot(JbMod.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
+		self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 	else
-		JbMod:EquipHead()
+		if(self.isTppEnabled) then
+			self:EquipHead()
+		end
 	end
 end
 -- End JBMOD Class
