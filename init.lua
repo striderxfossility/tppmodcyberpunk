@@ -347,15 +347,7 @@ function JBMOD:RemoveCrouchBug()
 	end
 end
 
-function JBMOD:CarTimer()
-
-end
--- End JBMOD Class
-
--- GAME RUNNING
-registerForEvent("onUpdate", function(deltaTime)
-	JbMod:CheckForRestoration()
-
+function JBMOD:CarTimer(deltaTime)
 	if(JbMod.waitTimer > 0.5) then
 		if(JbMod:HasClothingInSlot('Torso') or JbMod:HasClothingInSlot('Chest')) then
 			JbMod.isTppEnabled = true
@@ -384,6 +376,14 @@ registerForEvent("onUpdate", function(deltaTime)
 		JbMod.carCheckOnce = false
 		JbMod.waitTimer = JbMod.waitTimer + deltaTime
 	end
+end
+-- End JBMOD Class
+
+-- GAME RUNNING
+registerForEvent("onUpdate", function(deltaTime)
+	JbMod:CheckForRestoration()
+
+	JbMod:CarTimer(deltaTime)
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
 		if(JbMod.inCar and JbMod.isTppEnabled) then
