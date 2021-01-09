@@ -1,5 +1,23 @@
 dofile("jb_third_person_mod/parameters.lua")
 
+registerForEvent("onInit", function()
+	JbMod = JBMOD:new()
+
+	JbMod.weaponOverride = weaponOverride
+	JbMod.animatedFace = animatedFace
+
+	JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
+		CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
+		CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Left Shoulder Camera
+		CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Right Shoulder Camera
+		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
+		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
+	}
+
+	JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
+	print('Jb Third Person Mod Loaded')
+end)
+
 CamView = {}
 CamView.__index = CamView
 
@@ -68,7 +86,7 @@ function JBMOD:CheckForRestoration()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
-	self:CheckIfClothingMatch('Torso')
+	self:RestoreClothing('Torso')
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
@@ -83,16 +101,6 @@ function JBMOD:CheckForRestoration()
 	self:AddToInventory(self.tppHeadString)
 end
 
-function JBMOD:CheckIfClothingMatch(attachmentSlot)
-	if(self.isTppEnabled) then
-		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-			local stringName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
-			if (string.find(stringName, "&FPP")) then
-			end
-		end
-	end
-end
-
 function JBMOD:AddToInventory(nameString)
 	local gameItemID = GetSingleton('gameItemID')
 	local tdbid = TweakDBID.new(nameString)
@@ -101,6 +109,33 @@ function JBMOD:AddToInventory(nameString)
 	if(self.transactionComp:HasItem(self.player, itemID) == false) then
 		Game.AddToInventory(nameString, 1)
 	end
+end
+
+function JBMOD:RestoreClothing(attachmentSlot)
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+
+		itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
+		if (string.find(itemName, "&FPP") and self.isTppEnabled) then
+			print("what")
+			itemName = tostring(itemName:match("%[(.-)%]"))
+			itemName = tostring(string.sub(itemName, 3, -14))
+
+			gender = self.player:GetResolvedGenderName() 
+			gender = tostring(gender) 
+			strfound = string.find(gender, "Female") 
+
+			if (strfound == nil) then
+				itemName = itemName .. "Male&TPP"
+			else
+				itemName = itemName .. "Female&TPP"
+			end
+
+			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
+		end
+	end
+	
 end
 
 function JBMOD:CheckWeapon()
@@ -279,7 +314,6 @@ function JBMOD:HasWeaponEquipped()
 end
 
 function JBMOD:GetNameOfObject(attachmentSlot)
-
 	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
 		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
 		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
@@ -310,24 +344,8 @@ function JBMOD:RemoveCrouchBug()
 end
 -- End JBMOD Class
 
-JbMod = JBMOD:new()
-
-JbMod.weaponOverride = weaponOverride
-JbMod.animatedFace = animatedFace
-
-JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
-	CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
-	CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Left Shoulder Camera
-	CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Right Shoulder Camera
-	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
-	CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
-}
-
-JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
-
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
-
 	JbMod:CheckForRestoration()
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
