@@ -348,7 +348,7 @@ function JBMOD:RemoveCrouchBug()
 end
 
 function JBMOD:CarTimer(deltaTime)
-	if(self.waitTimer > 0.8) then
+	if(self.waitTimer > 0.4) then
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self.isTppEnabled = true
 			self:SetTppRep(true)
@@ -359,7 +359,7 @@ function JBMOD:CarTimer(deltaTime)
 		end
 	end
 
-	if(self.waitTimer > 1.6) then
+	if(self.waitTimer > 1.0) then
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
@@ -450,6 +450,10 @@ registerForEvent("onDraw", function()
 	    		JbMod:ResetZoom()
 			end
 	    	
+	    	clicked = ImGui.Button("Forced Fix Collar")
+	    	if (clicked) then
+	    		JbMod:SetTppRep(true)
+			end
 
 	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
