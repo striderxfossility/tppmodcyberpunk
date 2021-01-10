@@ -46,6 +46,7 @@ function JBMOD:new ()
    	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
    	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
    	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
+   	obj.script = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
    	obj.headString = "Items.PlayerWaPhotomodeHead"
    	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
    	obj.maleHead = "Items.PlayerMaPhotomodeHead"
@@ -81,6 +82,7 @@ function JBMOD:GetComps()
    	self.pSystemComp = self.inspectionComp:GetPlayerSystem()
    	self.localPlayerControlledGameObjectComp = self.pSystemComp:GetLocalPlayerControlledGameObject()
    	self.vehicleCameraComp = self.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
+   	self.script = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
 end
 
 function JBMOD:CheckForRestoration()
@@ -89,10 +91,12 @@ function JBMOD:CheckForRestoration()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
+	self:CheckPhotoMode()
 
 	if(self.timerCheckClothes > 10.0) then
 		self:RestoreClothing('Chest')
 		self:RestoreClothing('Torso')
+		self:RestoreClothing('Head')
 		self.timerCheckClothes = 0.0	
 	end
 
@@ -282,6 +286,7 @@ function JBMOD:ActivateTPP ()
 	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 		self:RestoreClothing('Chest')
 		self:RestoreClothing('Torso')
+		self:RestoreClothing('Head')
 		self.isTppEnabled = true
 		self:SetTppRep(true)
 		self:UpdateCamera()
@@ -371,6 +376,16 @@ function JBMOD:RemoveCrouchBug()
 	end
 end
 
+function JBMOD:CheckPhotoMode()
+	if(self.isTppEnabled) then
+		local photoMode = JbMod.script:GetPhotoModeSystem(JbMod.script)
+
+		if(photoMode:IsPhotoModeActive(true)) then
+			self:SetTppRep(false)
+		end
+	end
+end
+
 function JBMOD:CarTimer(deltaTime)
 	if(self.waitTimer > 0.4) then
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
@@ -388,6 +403,7 @@ function JBMOD:CarTimer(deltaTime)
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
 			self:RestoreClothing('Chest')
+			self:RestoreClothing('Head')
 		else
 			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
