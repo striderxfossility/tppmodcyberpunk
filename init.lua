@@ -93,13 +93,6 @@ function JBMOD:CheckForRestoration()
 	self:CheckCar()
 	self:CheckPhotoMode()
 
-	if(self.timerCheckClothes > 10.0) then
-		self:RestoreClothing('Chest')
-		self:RestoreClothing('Torso')
-		self:RestoreClothing('Head')
-		self.timerCheckClothes = 0.0	
-	end
-
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
 	end
@@ -373,6 +366,13 @@ function JBMOD:CheckPhotoMode()
 
 		if(photoMode:IsPhotoModeActive(true)) then
 			self:SetTppRep(false)
+		else 
+			if(self.timerCheckClothes > 10.0) then
+				self:RestoreClothing('Chest')
+				self:RestoreClothing('Torso')
+				self:RestoreClothing('Head')
+				self.timerCheckClothes = 0.0	
+			end
 		end
 	end
 end
