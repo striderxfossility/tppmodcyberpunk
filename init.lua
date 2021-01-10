@@ -276,8 +276,7 @@ function JBMOD:ActivateTPP ()
 		self:SetTppRep(true)
 		self:UpdateCamera()
 	else
-		print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
-		print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+		self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
 	end
 end
 
@@ -377,7 +376,6 @@ function JBMOD:CheckPhotoMode()
 			if(self.timerCheckClothes > 10.0) then
 				self:RestoreClothing('Chest')
 				self:RestoreClothing('Torso')
-				self:RestoreClothing('Head')
 				self.timerCheckClothes = 0.0	
 			end
 		end
@@ -391,8 +389,7 @@ function JBMOD:CarTimer(deltaTime)
 			self:SetTppRep(true)
 			self:UpdateCamera()
 		else
-			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
-			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
+			self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
 		end
 	end
 
@@ -401,10 +398,6 @@ function JBMOD:CarTimer(deltaTime)
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
 			self:RestoreClothing('Chest')
-			self:RestoreClothing('Head')
-		else
-			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
-			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
 		end
 		self.waitTimer = 0.0
 		self.waitForCar = false
