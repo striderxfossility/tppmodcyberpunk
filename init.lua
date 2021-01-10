@@ -14,7 +14,7 @@ registerForEvent("onInit", function()
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
 	}
 
-	JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false, false)
+	JbMod.camCar = CamView:new(Vector4:new(0.0, -3.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false)
 	print('Jb Third Person Mod Loaded')
 end)
 
@@ -225,15 +225,6 @@ end
 function JBMOD:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 
-	if(self.camViews[self.camActive].camSwitch == false) then
-		if(self.camViews[self.camActive].pos.y >= -1.5) then
-			self.camViews[self.camActive].pos.y = -1.5
-		end
-	else
-		if(self.camViews[self.camActive].pos.y <= 1.5) then
-			self.camViews[self.camActive].pos.y = 1.5
-		end
-	end
 
 	self:UpdateCamera()
 end
