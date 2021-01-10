@@ -388,8 +388,6 @@ function JBMOD:CarTimer(deltaTime)
 			self.isTppEnabled = true
 			self:SetTppRep(true)
 			self:UpdateCamera()
-		else
-			self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
 		end
 	end
 
