@@ -5,6 +5,7 @@ registerForEvent("onInit", function()
 
 	JbMod.weaponOverride = weaponOverride
 	JbMod.animatedFace = animatedFace
+	JbMod.allowNudity = allowNudity
 
 	JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 		CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
@@ -71,6 +72,7 @@ function JBMOD:new ()
    	obj.animatedFace = false
    	obj.waitForCar = false
    	obj.waitTimer = 0.0
+   	obj.allowNudity = false
    	obj.timerCheckClothes = 0.0
    	return obj
 end
@@ -175,6 +177,12 @@ function JBMOD:CheckCar()
 	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
 		self.carCheckOnce = true
 		self:SetTppRep(false)
+
+		--local tppHeadBDID = TweakDBID.new(0x5782BD36, 0x15) -- TPP HEAD
+		--local slotID = TweakDBID.new('AttachmentSlots.TppHead')
+		--local item = ts:GetItemInSlot(player, slotID)
+
+		--self.transactionComp:AddItemToSlot(self.player, slotID, GetSingleton("gameItemID"):FromTDBID(fppHeadDBID), false, nil, 'RPl_Scene', false, false)
 		self:SetCarView()
 	end
 
@@ -214,8 +222,6 @@ end
 
 function JBMOD:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
-
-
 	self:UpdateCamera()
 end
 
@@ -272,7 +278,14 @@ function JBMOD:ActivateTPP ()
 		self:SetTppRep(true)
 		self:UpdateCamera()
 	else
-		self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
+		if(self.allowNudity) then
+			self.isTppEnabled = true
+			self:SetTppRep(true)
+			self:UpdateCamera()
+		else
+			self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
+		end
+		
 	end
 end
 
@@ -406,6 +419,13 @@ end
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
+
+	--JbMod.fppComp.pitchMin = -100.0
+	--JbMod.fppComp.pitchMax = 150.0
+	--JbMod.fppComp.yawMaxLeft = 359.9999
+	--JbMod.fppComp.yawMaxRight = -359.9999
+	--JbMod.fppComp.headingLocked = false
+
 	JbMod.timerCheckClothes = JbMod.timerCheckClothes + deltaTime
 	JbMod:CheckForRestoration()
 
