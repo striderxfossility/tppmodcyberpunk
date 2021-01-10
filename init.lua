@@ -14,7 +14,7 @@ registerForEvent("onInit", function()
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
 	}
 
-	JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false)
+	JbMod.camCar = CamView:new(Vector4:new(0.0, -5.0, 2.0, 1.0), Quaternion:new(-0.1, 0.0, 0.0, 1.0), false, false)
 	print('Jb Third Person Mod Loaded')
 end)
 
@@ -300,14 +300,15 @@ end
 function JBMOD:SwitchCamTo(cam)
 	if self.camViews[cam] ~= nil then
 		self.camActive = cam
+		self:UpdateCamera()
 		if(self.camViews[cam].freeform) then
 			self.inspectionComp:SetIsPlayerInspecting(true)
 		else 
 			self.inspectionComp:SetIsPlayerInspecting(false)
 		end
-		self:UpdateCamera()
 	else
-		self.camActive = 0
+		self.camActive = 1
+		self.inspectionComp:SetIsPlayerInspecting(false)
 		self:UpdateCamera()
 	end
 end
