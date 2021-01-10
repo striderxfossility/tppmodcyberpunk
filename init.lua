@@ -69,6 +69,7 @@ function JBMOD:new ()
    	obj.animatedFace = false
    	obj.waitForCar = false
    	obj.waitTimer = 0.0
+   	obj.timerCheckClothes = 0.0
    	return obj
 end
 
@@ -89,6 +90,10 @@ function JBMOD:CheckForRestoration()
 	self:CheckWeapon()
 	self:CheckCar()
 	self:RestoreClothing('Torso')
+	if(self.timerCheckClothes > 10.0) then
+		self:RestoreClothing('Chest')
+		self.timerCheckClothes = 0.0
+	end
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
@@ -134,9 +139,12 @@ function JBMOD:RestoreClothing(attachmentSlot)
 			end
 
 			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
+		else 
+			itemName = tostring(itemName:match("%[(.-)%]"))
+			itemName = tostring(string.sub(itemName, 3, -4))
+			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
 		end
 	end
-	
 end
 
 function JBMOD:CheckWeapon()
@@ -365,6 +373,7 @@ function JBMOD:CarTimer(deltaTime)
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
+			self:RestoreClothing('Chest')
 		else
 			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
@@ -382,6 +391,7 @@ end
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
+	JbMod.timerCheckClothes = JbMod.timerCheckClothes + deltaTime
 	JbMod:CheckForRestoration()
 
 	JbMod:CarTimer(deltaTime)
@@ -457,6 +467,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
 	      	ImGui.Text("isMoving: " .. tostring(JbMod.localPlayerControlledGameObjectComp:IsMoving()))
+	      	ImGui.Text("timerCheckClothes: " .. tostring(JbMod.timerCheckClothes))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
 	      	ImGui.Text("waitTimer: " .. tostring(JbMod.waitTimer))
 	      	ImGui.Text("waitForCar: " .. tostring(JbMod.waitForCar))
