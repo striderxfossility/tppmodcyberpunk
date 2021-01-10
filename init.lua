@@ -214,18 +214,11 @@ end
 
 function JBMOD:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
-
-
 	self:UpdateCamera()
 end
 
 function JBMOD:ZoomCar(z)
 	self.camCar.pos.y = self.camCar.pos.y + z
-
-	if(self.camCar.pos.y >= -1.5) then
-		self.camCar.pos.y = -1.5
-	end
-
 	self:UpdateCamera()
 end
 
