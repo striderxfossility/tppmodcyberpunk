@@ -90,7 +90,7 @@ function JBMOD:CheckForRestoration()
 	self:CheckWeapon()
 	self:CheckCar()
 	if(self.timerCheckClothes > 10.0) then
-		--self:RestoreClothing('Chest')
+		self:RestoreClothing('Chest')
 		self:RestoreClothing('Torso')
 		self.timerCheckClothes = 0.0	
 	end
@@ -119,36 +119,45 @@ function JBMOD:AddToInventory(nameString)
 end
 
 function JBMOD:RestoreClothing(attachmentSlot)
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+	if(attachmentSlot == "Torso") then
+		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
+			
+			if (string.find(itemName, "&FPP") and self.isTppEnabled) then
+				print("find")
+				itemName = tostring(itemName:match("%[(.-)%]"))
 
-		itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
-		if (string.find(itemName, "&FPP") and self.isTppEnabled) then
-			itemName = tostring(itemName:match("%[(.-)%]"))
+				gender = self.player:GetResolvedGenderName() 
+				gender = tostring(gender) 
+				strfound = string.find(gender, "Female") 
 
-			gender = self.player:GetResolvedGenderName() 
-			gender = tostring(gender) 
-			strfound = string.find(gender, "Female") 
+				if (strfound == nil) then
+					
+					itemName = tostring(string.sub(itemName, 3, -12))
+					itemName = itemName .. "Male&TPP"
+					print(itemName)
+				else
+					itemName = tostring(string.sub(itemName, 3, -14))
+					itemName = itemName .. "Female&TPP"
+					print(itemName)
+				end
 
-			if (strfound == nil) then
-				
-				itemName = tostring(string.sub(itemName, 3, -12))
-				itemName = itemName .. "Male&TPP"
-				print(itemName)
-			else
-				itemName = tostring(string.sub(itemName, 3, -14))
-				itemName = itemName .. "Female&TPP"
-			end
+				self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
+	 		end
+		end
+	else
+		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
 
-			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
-		else 
+			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
 			itemName = tostring(itemName:match("%[(.-)%]"))
 			itemName = tostring(string.sub(itemName, 3, -4))
  			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
- 		end
+		end
 	end
-	
 end
 
 function JBMOD:CheckWeapon()
@@ -375,7 +384,7 @@ function JBMOD:CarTimer(deltaTime)
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
-			--self:RestoreClothing('Chest')
+			self:RestoreClothing('Chest')
 		else
 			print("JB Third Person Mod Error: you can't activate the mod when you're tits/manboobs are out at the moment :(")
 			print("Equip a torso item, enter Third person, unequip the torso item. Flasher")
