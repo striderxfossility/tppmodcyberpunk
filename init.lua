@@ -55,6 +55,7 @@ function JBMOD:new ()
    	obj.tppHeadString = "Items.PlayerWaTppHead"
    	obj.tppFemaleHead = "Items.PlayerWaTppHead"
    	obj.tppMaleHead = "Items.PlayerMaTppHead"
+   	obj.photoModeBeenActive = false
    	obj.camViews = {}
    	obj.camCar = nil
    	obj.isTppEnabled = false
@@ -365,8 +366,14 @@ function JBMOD:CheckPhotoMode()
 		local photoMode = JbMod.script:GetPhotoModeSystem(JbMod.script)
 
 		if(photoMode:IsPhotoModeActive(true)) then
+			self.photoModeBeenActive = true
 			self:SetTppRep(false)
 		else 
+			if(self.photoModeBeenActive) then
+				self.photoModeBeenActive = false
+				self:SetTppRep(true)
+			end
+
 			if(self.timerCheckClothes > 10.0) then
 				self:RestoreClothing('Chest')
 				self:RestoreClothing('Torso')
