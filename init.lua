@@ -89,10 +89,11 @@ function JBMOD:CheckForRestoration()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
-	self:RestoreClothing('Torso')
+
 	if(self.timerCheckClothes > 10.0) then
 		self:RestoreClothing('Chest')
-		self.timerCheckClothes = 0.0
+		self:RestoreClothing('Torso')
+		self.timerCheckClothes = 0.0	
 	end
 
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
@@ -119,30 +120,42 @@ function JBMOD:AddToInventory(nameString)
 end
 
 function JBMOD:RestoreClothing(attachmentSlot)
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+	if(attachmentSlot == "Torso") then
+		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
+			
+			if (string.find(itemName, "&FPP") and self.isTppEnabled) then
+				print("find")
+				itemName = tostring(itemName:match("%[(.-)%]"))
 
-		itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
-		if (string.find(itemName, "&FPP") and self.isTppEnabled) then
-			itemName = tostring(itemName:match("%[(.-)%]"))
-			itemName = tostring(string.sub(itemName, 3, -14))
+				gender = self.player:GetResolvedGenderName() 
+				gender = tostring(gender) 
+				strfound = string.find(gender, "Female") 
 
-			gender = self.player:GetResolvedGenderName() 
-			gender = tostring(gender) 
-			strfound = string.find(gender, "Female") 
+				if (strfound == nil) then
+					
+					itemName = tostring(string.sub(itemName, 3, -12))
+					itemName = itemName .. "Male&TPP"
+					print(itemName)
+				else
+					itemName = tostring(string.sub(itemName, 3, -14))
+					itemName = itemName .. "Female&TPP"
+					print(itemName)
+				end
 
-			if (strfound == nil) then
-				itemName = itemName .. "Male&TPP"
-			else
-				itemName = itemName .. "Female&TPP"
-			end
-
-			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
-		else 
+				self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
+	 		end
+		end
+	else
+		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
+			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
+			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
 			itemName = tostring(itemName:match("%[(.-)%]"))
 			itemName = tostring(string.sub(itemName, 3, -4))
-			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
+ 			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
 		end
 	end
 end
@@ -267,6 +280,8 @@ end
 
 function JBMOD:ActivateTPP ()
 	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+		self:RestoreClothing('Chest')
+		self:RestoreClothing('Torso')
 		self.isTppEnabled = true
 		self:SetTppRep(true)
 		self:UpdateCamera()
@@ -468,6 +483,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text(tostring(JbMod:GetNameOfObject('TppHead')))
 	      	ImGui.Text(tostring(tostring(CName.new('player_fpp_head'))))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JbMod.isTppEnabled))
+	      	ImGui.Text("isMoving: " .. tostring(JbMod.localPlayerControlledGameObjectComp:IsMoving()))
 	      	ImGui.Text("timerCheckClothes: " .. tostring(JbMod.timerCheckClothes))
 	      	ImGui.Text("inCar: " .. tostring(JbMod.inCar))
 	      	ImGui.Text("waitTimer: " .. tostring(JbMod.waitTimer))
