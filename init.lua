@@ -125,7 +125,6 @@ function JBMOD:RestoreClothing(attachmentSlot)
 			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
 			
 			if (string.find(itemName, "&FPP") and self.isTppEnabled) then
-				print("find")
 				itemName = tostring(itemName:match("%[(.-)%]"))
 
 				gender = self.player:GetResolvedGenderName() 
@@ -133,14 +132,11 @@ function JBMOD:RestoreClothing(attachmentSlot)
 				strfound = string.find(gender, "Female") 
 
 				if (strfound == nil) then
-					
 					itemName = tostring(string.sub(itemName, 3, -12))
 					itemName = itemName .. "Male&TPP"
-					print(itemName)
 				else
 					itemName = tostring(string.sub(itemName, 3, -14))
 					itemName = itemName .. "Female&TPP"
-					print(itemName)
 				end
 
 				self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
@@ -443,6 +439,7 @@ registerForEvent("onUpdate", function(deltaTime)
 		else
 			if(JbMod.weaponOverride) then
 				if(JbMod:HasWeaponEquipped()) then
+					JbMod.player:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
 					JbMod.isTppEnabled = false
 					JbMod:RestoreFPPView()
 				else
