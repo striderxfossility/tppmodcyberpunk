@@ -280,6 +280,8 @@ end
 
 function JBMOD:ActivateTPP ()
 	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+		self:RestoreClothing('Chest')
+		self:RestoreClothing('Torso')
 		self.isTppEnabled = true
 		self:SetTppRep(true)
 		self:UpdateCamera()
