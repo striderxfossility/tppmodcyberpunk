@@ -370,23 +370,21 @@ function JBMOD:RemoveCrouchBug()
 end
 
 function JBMOD:CheckPhotoMode()
-	if(self.isTppEnabled) then
-		local photoMode = JbMod.script:GetPhotoModeSystem(JbMod.script)
+	local photoMode = JbMod.script:GetPhotoModeSystem(JbMod.script)
 
-		if(photoMode:IsPhotoModeActive(true)) then
-			self.photoModeBeenActive = true
-			self:SetTppRep(false)
-		else 
-			if(self.photoModeBeenActive) then
-				self.photoModeBeenActive = false
-				self:SetTppRep(true)
-			end
+	if(photoMode:IsPhotoModeActive(true)) then
+		self.photoModeBeenActive = true
+		self:SetTppRep(false)
+	else 
+		if(self.photoModeBeenActive) then
+			self.photoModeBeenActive = false
+			self:SetTppRep(true)
+		end
 
-			if(self.timerCheckClothes > 10.0) then
-				self:RestoreClothing('Chest')
-				self:RestoreClothing('Torso')
-				self.timerCheckClothes = 0.0	
-			end
+		if(self.timerCheckClothes > 10.0) then
+			self:RestoreClothing('Chest')
+			self:RestoreClothing('Torso')
+			self.timerCheckClothes = 0.0	
 		end
 	end
 end
