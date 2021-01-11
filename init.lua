@@ -171,7 +171,7 @@ function JBMOD:CheckCar()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
 	if(self.inCar and self.isTppEnabled) then
-		self.fppComp:Activate(0.0, true)
+		--self.fppComp:Activate(0.0, true)
 	end
 
 	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
@@ -255,12 +255,12 @@ function JBMOD:UpdateCamera ()
 			self.player:DisableCameraBobbing(true)
 			self.fppComp:SetLocalPosition(self.camCar.pos)
 			self.fppComp:SetLocalOrientation(self.camCar.rot)
-			self.fppComp:Activate(0.0, false)
+			--self.fppComp:Activate(0.0, false)
 		else
 			self.player:DisableCameraBobbing(true)
 			self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
 			self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
-			self.fppComp:Activate(0.0, false)
+			--self.fppComp:Activate(0.0, false)
 		end
 	end
 end
@@ -415,8 +415,39 @@ function JBMOD:CarTimer(deltaTime)
 end
 -- End JBMOD Class
 
+running = true
+
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
+	--JbMod.fppComp:Activate(0.0, false)
+	--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):Deactivate(2.0, true)
+
+	if(running) then
+		JbMod.fppComp:Activate(2.0, true)
+		JbMod.fppComp:SetIsHighPriority(true)
+		JbMod.fppComp:Toggle(true)
+		running = false
+	end
+
+
+	if(JbMod.inCar) then
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):Activate(20.0, true)
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):SetIsHighPriority(true)
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):Toggle(true)
+		--JbMod.fppComp:Deactivate(2.0, true)
+		--JbMod.fppComp:SetIsHighPriority(false)
+		--JbMod.fppComp:Toggle(false)
+		--JbMod.fppComp.headingLocked = true
+		--JbMod:SetTppRep(false)
+	else
+		--JbMod.fppComp:Activate(2.0, true)
+		--JbMod.fppComp:SetIsHighPriority(true)
+		--JbMod.fppComp:Toggle(true)
+		--JbMod.fppComp.headingLocked = true
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):Deactivate(20.0, true)
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):SetIsHighPriority(false)
+		--JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera")):Toggle(false)
+	end
 
 	--JbMod.fppComp.pitchMin = -100.0
 	--JbMod.fppComp.pitchMax = 150.0
