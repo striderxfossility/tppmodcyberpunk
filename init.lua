@@ -6,6 +6,7 @@ registerForEvent("onInit", function()
 	JbMod.weaponOverride = weaponOverride
 	JbMod.animatedFace = animatedFace
 	JbMod.allowNudity = allowNudity
+	JbMod.allowCameraBobbing = allowCameraBobbing
 
 	JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
 		CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Front Camera
@@ -74,6 +75,7 @@ function JBMOD:new ()
    	obj.waitTimer = 0.0
    	obj.allowNudity = false
    	obj.timerCheckClothes = 0.0
+   	obj.allowCameraBobbing = false
    	return obj
 end
 
@@ -237,14 +239,18 @@ end
 
 function JBMOD:RestoreFPPView()
 	if (self.isTppEnabled == false) then
-		self.player:DisableCameraBobbing(false)
+		if not self.allowCameraBobbing then
+			self.player:DisableCameraBobbing(false)
+		end
 		self.fppComp:SetLocalPosition(Vector4:new(0.0, 0.0, 0.0, 1.0))
 		self.fppComp:SetLocalOrientation(Quaternion:new(0.0, 0.0, 0.0, 1.0))
 	end
 end
 
 function JBMOD:SetCarView()
-	self.player:DisableCameraBobbing(true)
+	if not self.allowCameraBobbing then
+		self.player:DisableCameraBobbing(true)
+	end
 	self.fppComp:SetLocalPosition(self.camCar.pos)
 	self.fppComp:SetLocalOrientation(self.camCar.rot)
 end
@@ -252,12 +258,16 @@ end
 function JBMOD:UpdateCamera ()
 	if (self.isTppEnabled) then
 		if(self.inCar) then
-			self.player:DisableCameraBobbing(true)
+			if not self.allowCameraBobbing then
+				self.player:DisableCameraBobbing(true)
+			end
 			self.fppComp:SetLocalPosition(self.camCar.pos)
 			self.fppComp:SetLocalOrientation(self.camCar.rot)
 			self.fppComp:Activate(0.0, false)
 		else
-			self.player:DisableCameraBobbing(true)
+			if not self.allowCameraBobbing then
+				self.player:DisableCameraBobbing(true)
+			end
 			self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
 			self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
 			self.fppComp:Activate(0.0, false)
