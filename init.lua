@@ -5,7 +5,6 @@ registerForEvent("onInit", function()
 
 	JbMod.weaponOverride = weaponOverride
 	JbMod.animatedFace = animatedFace
-	JbMod.allowNudity = allowNudity
 	JbMod.allowCameraBobbing = allowCameraBobbing
 
 	JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
@@ -73,7 +72,6 @@ function JBMOD:new ()
    	obj.animatedFace = false
    	obj.waitForCar = false
    	obj.waitTimer = 0.0
-   	obj.allowNudity = false
    	obj.timerCheckClothes = 0.0
    	obj.allowCameraBobbing = false
    	return obj
@@ -269,7 +267,6 @@ function JBMOD:UpdateCamera ()
 end
 
 function JBMOD:EquipHead()
-	print("equip")
 	Game.EquipItemOnPlayer(self.headString, "TppHead")
 end
 
@@ -282,13 +279,9 @@ function JBMOD:ActivateTPP ()
 		self:SetTppRep(true)
 		self:UpdateCamera()
 	else
-		if(self.allowNudity) then
-			self.isTppEnabled = true
-			self:SetTppRep(true)
-			self:UpdateCamera()
-		else
-			self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
-		end
+		self.isTppEnabled = true
+		self:SetTppRep(true)
+		self:UpdateCamera()
 	end
 	self:EquipHead()
 end
@@ -366,11 +359,6 @@ end
 function JBMOD:RemoveCrouchBug()
 	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) and not self.inCar and self.waitTimer >= 1.0 or not self.isTppEnabled) then
 		self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-		--self:EquipHead()
-	else
-		if(self.isTppEnabled and not self.inCar) then
-			--self:EquipHead()
-		end
 	end
 end
 
