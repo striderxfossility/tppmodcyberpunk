@@ -390,20 +390,11 @@ registerForEvent("onUpdate", function(deltaTime)
 	JbMod:CarTimer(deltaTime)
 
 	if (ImGui.IsKeyDown(zoomInKey)) then
-		if(JbMod.inCar and JbMod.isTppEnabled) then
-			JbMod:ZoomCar(0.06)
-		else
-			JbMod:Zoom(0.06)
-		end
+		JbMod:Zoom(0.06)
 	end
 	
 	if (ImGui.IsKeyDown(zoomOutKey)) then
-		if(JbMod.inCar and JbMod.isTppEnabled) then
-			JbMod:ZoomCar(-0.06)
-		else
-			JbMod:Zoom(-0.06)
-		end
-		
+		JbMod:Zoom(-0.06)
 	end
 
 	if(JbMod.switchBackToTpp and not JbMod.HasWeaponEquipped()) then
@@ -412,19 +403,21 @@ registerForEvent("onUpdate", function(deltaTime)
 	end
 
 	if (ImGui.IsKeyPressed(activateTppModeKey, false)) then
-		if(JbMod.isTppEnabled) then
-			JbMod:DeactivateTPP()
-		else
-			if(JbMod.weaponOverride) then
-				if(JbMod:HasWeaponEquipped()) then
-					JbMod.player:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
-					JbMod.isTppEnabled = false
-					JbMod:RestoreFPPView()
+		if(not JbMod.inCar) then
+			if(JbMod.isTppEnabled) then
+				JbMod:DeactivateTPP()
+			else
+				if(JbMod.weaponOverride) then
+					if(JbMod:HasWeaponEquipped()) then
+						JbMod.player:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
+						JbMod.isTppEnabled = false
+						JbMod:RestoreFPPView()
+					else
+						JbMod:ActivateTPP()
+					end
 				else
 					JbMod:ActivateTPP()
 				end
-			else
-				JbMod:ActivateTPP()
 			end
 		end
 	end
