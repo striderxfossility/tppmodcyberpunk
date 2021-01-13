@@ -172,20 +172,15 @@ end
 function JBMOD:CheckCar()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
-	if(self.inCar and self.isTppEnabled) then
-		self.fppComp:Activate(0.0, true)
+	if self.inCar then
+		if tostring(self:GetNameOfObject('TppHead')) ~= tostring(CName.new("player_tpp_head")) then
+			Game.EquipItemOnPlayer('Items.PlayerWaTppHead', 'TppHead')
+		end
 	end
 
 	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
 		self.carCheckOnce = true
 		self:SetTppRep(false)
-
-		--local tppHeadBDID = TweakDBID.new(0x5782BD36, 0x15) -- TPP HEAD
-		--local slotID = TweakDBID.new('AttachmentSlots.TppHead')
-		--local item = ts:GetItemInSlot(player, slotID)
-
-		--self.transactionComp:AddItemToSlot(self.player, slotID, GetSingleton("gameItemID"):FromTDBID(fppHeadDBID), false, nil, 'RPl_Scene', false, false)
-		self:SetCarView()
 	end
 
 	if(not self.inCar and self.carCheckOnce) then
@@ -263,14 +258,12 @@ function JBMOD:UpdateCamera ()
 			end
 			self.fppComp:SetLocalPosition(self.camCar.pos)
 			self.fppComp:SetLocalOrientation(self.camCar.rot)
-			self.fppComp:Activate(0.0, false)
 		else
 			if not self.allowCameraBobbing then
 				self.player:DisableCameraBobbing(true)
 			end
 			self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
 			self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
-			self.fppComp:Activate(0.0, false)
 		end
 	end
 end
@@ -350,15 +343,15 @@ function JBMOD:HasWeaponEquipped()
 end
 
 function JBMOD:GetNameOfObject(attachmentSlot)
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
+	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) == nil) then
+		return nil
+	else
 		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
 		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
 		local data = self.transactionComp:GetItemData(self.player, item:GetItemID())
 
 		return data:GetName()
 	end
-
-	return ''
 end
 
 function JBMOD:RestoreAttachment(attachmentSlot)
@@ -371,7 +364,7 @@ end
 
 function JBMOD:RemoveCrouchBug()
 	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
-		self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+		--self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 	else
 		if(self.isTppEnabled) then
 			self:EquipHead()
@@ -427,12 +420,6 @@ end
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
-
-	--JbMod.fppComp.pitchMin = -100.0
-	--JbMod.fppComp.pitchMax = 150.0
-	--JbMod.fppComp.yawMaxLeft = 359.9999
-	--JbMod.fppComp.yawMaxRight = -359.9999
-	--JbMod.fppComp.headingLocked = false
 
 	JbMod.timerCheckClothes = JbMod.timerCheckClothes + deltaTime
 	JbMod:CheckForRestoration()
