@@ -14,8 +14,6 @@ registerForEvent("onInit", function()
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
 	}
-
-	JbMod.camCar = CamView:new(Vector4:new(0.0, -3.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false)
 	print('Jb Third Person Mod Loaded')
 end)
 
@@ -58,7 +56,6 @@ function JBMOD:new ()
    	obj.tppMaleHead = "Items.PlayerMaTppHead"
    	obj.photoModeBeenActive = false
    	obj.camViews = {}
-   	obj.camCar = nil
    	obj.isTppEnabled = false
    	obj.camActive = 1
    	obj.timeStamp = 0.0
@@ -220,16 +217,6 @@ function JBMOD:Zoom(z)
 	self:UpdateCamera()
 end
 
-function JBMOD:ZoomCar(z)
-	self.camCar.pos.y = self.camCar.pos.y + z
-
-	if(self.camCar.pos.y >= -1.5) then
-		self.camCar.pos.y = -1.5
-	end
-
-	self:UpdateCamera()
-end
-
 function JBMOD:RestoreFPPView()
 	if (self.isTppEnabled == false) then
 		if not self.allowCameraBobbing then
@@ -240,29 +227,13 @@ function JBMOD:RestoreFPPView()
 	end
 end
 
-function JBMOD:SetCarView()
-	if not self.allowCameraBobbing then
-		self.player:DisableCameraBobbing(true)
-	end
-	self.fppComp:SetLocalPosition(self.camCar.pos)
-	self.fppComp:SetLocalOrientation(self.camCar.rot)
-end
-
 function JBMOD:UpdateCamera ()
-	if (self.isTppEnabled) then
-		if(self.inCar) then
-			if not self.allowCameraBobbing then
-				self.player:DisableCameraBobbing(true)
-			end
-			self.fppComp:SetLocalPosition(self.camCar.pos)
-			self.fppComp:SetLocalOrientation(self.camCar.rot)
-		else
-			if not self.allowCameraBobbing then
-				self.player:DisableCameraBobbing(true)
-			end
-			self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
-			self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
+	if (self.isTppEnabled and not self.inCar) then
+		if not self.allowCameraBobbing then
+			self.player:DisableCameraBobbing(true)
 		end
+		self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
+		self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
 	end
 end
 
@@ -514,7 +485,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("CAM2: x:" .. tostring(JbMod.camViews[2].pos.x) .. " y:" .. tostring(JbMod.camViews[2].pos.y) .. " z: " .. tostring(JbMod.camViews[2].pos.z))
 	      	ImGui.Text("CAM3: x:" .. tostring(JbMod.camViews[3].pos.x) .. " y:" .. tostring(JbMod.camViews[3].pos.y) .. " z: " .. tostring(JbMod.camViews[3].pos.z))
 	      	ImGui.Text("CAM4: x:" .. tostring(JbMod.camViews[4].pos.x) .. " y:" .. tostring(JbMod.camViews[4].pos.y) .. " z: " .. tostring(JbMod.camViews[4].pos.z))	
-	      	ImGui.Text("CAMCAR: x:" .. tostring(JbMod.camCar.pos.x) .. " y:" .. tostring(JbMod.camCar.pos.y) .. " z: " .. tostring(JbMod.camCar.pos.z))	
 	    end
 
 	    ImGui.End()
