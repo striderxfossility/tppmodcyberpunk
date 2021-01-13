@@ -269,6 +269,7 @@ function JBMOD:UpdateCamera ()
 end
 
 function JBMOD:EquipHead()
+	print("equip")
 	Game.EquipItemOnPlayer(self.headString, "TppHead")
 end
 
@@ -288,8 +289,8 @@ function JBMOD:ActivateTPP ()
 		else
 			self.player:SetWarningMessage("Cant go into Third person when naked, sorry!")
 		end
-		
 	end
+	self:EquipHead()
 end
 
 function JBMOD:DeactivateTPP ()
@@ -363,9 +364,9 @@ function JBMOD:RestoreAttachment(attachmentSlot)
 end
 
 function JBMOD:RemoveCrouchBug()
-	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) and not self.inCar or not self.isTppEnabled) then
-		print("deleteHEAD")
-		--self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) and not self.inCar and self.waitTimer >= 1.0 or not self.isTppEnabled) then
+		self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+		--self:EquipHead()
 	else
 		if(self.isTppEnabled and not self.inCar) then
 			--self:EquipHead()
@@ -402,7 +403,7 @@ function JBMOD:CarTimer(deltaTime)
 		end
 	end
 
-	if(self.waitTimer > 1.0) then
+	if(self.waitTimer > 1.2) then
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
