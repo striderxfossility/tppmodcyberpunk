@@ -363,11 +363,12 @@ function JBMOD:RestoreAttachment(attachmentSlot)
 end
 
 function JBMOD:RemoveCrouchBug()
-	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
+	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) and not self.inCar or not self.isTppEnabled) then
+		print("deleteHEAD")
 		--self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 	else
-		if(self.isTppEnabled) then
-			self:EquipHead()
+		if(self.isTppEnabled and not self.inCar) then
+			--self:EquipHead()
 		end
 	end
 end
@@ -406,9 +407,11 @@ function JBMOD:CarTimer(deltaTime)
 			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
 			self:RestoreClothing('Chest')
+			self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 		end
 		self.waitTimer = 0.0
 		self.waitForCar = false
+		self:EquipHead()
 	end
 
 	if(self.waitForCar) then
