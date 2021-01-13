@@ -172,7 +172,7 @@ function JBMOD:CheckCar()
 
 	if self.inCar then
 		if tostring(self:GetNameOfObject('TppHead')) ~= tostring(CName.new("player_tpp_head")) then
-			Game.EquipItemOnPlayer('Items.PlayerWaTppHead', 'TppHead')
+			Game.EquipItemOnPlayer(self.tppHeadString, 'TppHead')
 		end
 	end
 
