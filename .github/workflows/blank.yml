@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download content
-        uses: actions/JB Third Person Mod@v2
+        uses: actions/checkout@v2
         
       - name: Archive site content
         uses: TheDoctor0/zip-release@0.4.1
