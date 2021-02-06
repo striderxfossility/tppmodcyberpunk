@@ -24,7 +24,7 @@ jobs:
       
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
-          zip my-artifact *
+          zip my-artifact testing/haha/init.lua
         
       - name: Archive site content
         uses: TheDoctor0/zip-release@0.4.1
