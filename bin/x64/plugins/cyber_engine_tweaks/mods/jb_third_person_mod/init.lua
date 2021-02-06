@@ -313,11 +313,11 @@ function JBMOD:RestoreAttachment(attachmentSlot)
 end
 
 function JBMOD:RemoveCrouchBug()
-	if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
-		if(not self.tppHeadActivated) then
-			self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), false, false, false)
-		end
-	end
+	--if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
+		--if(not self.tppHeadActivated) then
+			--self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), false, false, false)
+		--end
+	--end
 end
 
 function JBMOD:CheckPhotoMode()
