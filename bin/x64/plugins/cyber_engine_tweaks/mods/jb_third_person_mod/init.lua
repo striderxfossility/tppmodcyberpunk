@@ -265,14 +265,6 @@ function JBMOD:HasClothingInSlot(slot)
 	return self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. slot)) ~= nil
 end
 
-function JBMOD:ResetAppearance(slot)
-	local slotID = TweakDBID.new('AttachmentSlots.' .. slot)
-	local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-	local itemID = item:GetItemID()
-
-	self.transactionComp:ResetItemAppearance(self.player, itemID)
-end
-
 function JBMOD:HasWeaponEquipped()
 	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
 end
