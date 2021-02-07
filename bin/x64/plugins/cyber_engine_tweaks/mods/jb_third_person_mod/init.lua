@@ -408,23 +408,6 @@ registerForEvent("onDraw", function()
 		ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 		if (ImGui.Begin("JB Third Person Mod")) then
-			
-			clicked = ImGui.Button("Event")
-			if (clicked) then
-				local slotID = TweakDBID.new('AttachmentSlots.Head')
-				local item = JbMod.transactionComp:GetItemInSlot(JbMod.player, slotID)
-
-				local go = NewObject('GameObject')
-
-				print(go)
-
-				go.StartEffectEvent(item, CName.new("camera_mask"));
-            end
-            
-            clicked = ImGui.Button("Equip Head")
-	    	if (clicked) then
-	    		jb.EquipHead()
-			end
 
 	    	clicked = ImGui.Button("Cam to player")
 	    	if (clicked) then
