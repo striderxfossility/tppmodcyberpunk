@@ -273,14 +273,6 @@ function JBMOD:ResetAppearance(slot)
 	self.transactionComp:ResetItemAppearance(self.player, itemID)
 end
 
-function JBMOD:CheckClothing()
-	if(self:HasClothingInSlot('Torso')) then
-		self:ResetAppearance('Torso')
-	elseif(self:HasClothingInSlot('Chest')) then
-		self:ResetAppearance('Chest')
-	end
-end
-
 function JBMOD:HasWeaponEquipped()
 	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
 end
