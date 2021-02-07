@@ -140,20 +140,16 @@ function JBMOD:UpdateCamera ()
 	end
 end
 
-function JBMOD:EquipHead()
-	Gender:AddHead(self.animatedFace)
-end
-
 function JBMOD:ActivateTPP ()
     if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
 		self.isTppEnabled = true
 		self:UpdateCamera()
-		self:EquipHead()
+		Gender:AddHead(self.animatedFace)
 	else
 		self.isTppEnabled = true
 		self:UpdateCamera()
-		self:EquipHead()
+		Gender:AddHead(self.animatedFace)
 	end
 end
 
@@ -232,7 +228,7 @@ function JBMOD:CarTimer(deltaTime)
 		self.tppHeadActivated = false
         self.isTppEnabled = true
         self:UpdateCamera()
-        self:EquipHead()
+        Gender:AddHead(self.animatedFace)
 	end
 
 	if(self.waitTimer > 1.0) then
