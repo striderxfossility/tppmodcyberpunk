@@ -88,7 +88,6 @@ end
 
 function JBMOD:CheckForRestoration()
 	self:GetComps()
-	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
 	self:CheckPhotoMode()
@@ -158,28 +157,6 @@ function JBMOD:CheckCar()
 		self.carCheckOnce = false
 		self.waitForCar = true
 		self.waitTimer = 0.0
-	end
-end
-
-function JBMOD:CheckGender()
-	gender = self.player:GetResolvedGenderName() 
-	gender = tostring(gender) 
-	strfound = string.find(gender, "Female") 
-
-	if strfound == nil then
-		if(self.animatedFace) then
-			self.headString = self.animMaleHead
-		else
-			self.headString = self.maleHead
-		end
-    	self.tppHeadString = self.tppMaleHead
-	else
-		if(self.animatedFace) then
-			self.headString = self.animFemaleHead
-		else
-			self.headString = self.femaleHead
-		end
-    	self.tppHeadString = self.tppFemaleHead
 	end
 end
 
