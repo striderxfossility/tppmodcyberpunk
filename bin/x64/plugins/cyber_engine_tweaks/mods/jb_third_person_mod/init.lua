@@ -1,4 +1,7 @@
+local Gender = require("classes/Gender.lua")
+
 registerForEvent("onInit", function()
+    
 	JbMod = JBMOD:new()
 
 	JbMod.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
@@ -7,9 +10,10 @@ registerForEvent("onInit", function()
 		CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false), -- Right Shoulder Camera
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
-	}
+    }
 
-	print('Jb Third Person Mod Loaded')
+    Gender.AddHead(false)
+    print('Jb Third Person Mod Loaded')
 end)
 
 CamView = {}
@@ -68,7 +72,7 @@ function JBMOD:new ()
    	obj.waitTimer = 0.0
    	obj.timerCheckClothes = 0.0
    	obj.carActivated = false
-   	obj.tppHeadActivated = false
+    obj.tppHeadActivated = false
    	return obj
 end
 
