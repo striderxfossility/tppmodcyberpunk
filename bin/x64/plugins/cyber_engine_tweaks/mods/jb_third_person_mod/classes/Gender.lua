@@ -19,6 +19,14 @@ function Gender:IsFemale()
     return not Gender:IsMale()
 end
 
+function Gender:AddTppHead()
+    if Gender:IsMale() then
+        Item:Equip("Items.PlayerMaTppHead", "TppHead")
+    else
+        Item:Equip("Items.PlayerWaTppHead", "TppHead")
+    end
+end
+
 function Gender:AddHead(animated)
     if Gender:IsMale() then
         if animated then

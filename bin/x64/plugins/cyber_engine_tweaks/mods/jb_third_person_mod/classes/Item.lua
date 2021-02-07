@@ -3,7 +3,6 @@ Item.__index = Item
 
 function Item:new()
     local class = {}
-    print("test")
 
     ----------VARIABLES-------------
 
@@ -28,6 +27,7 @@ function Item:AddToInventory(name)
 end
 
 function Item:Equip(name, slot)
+    spdlog.info("ITEM: item " .. name .. " equipped on " .. slot)
     Item:AddToInventory(name)
     Game.EquipItemOnPlayer(name, slot)
 end

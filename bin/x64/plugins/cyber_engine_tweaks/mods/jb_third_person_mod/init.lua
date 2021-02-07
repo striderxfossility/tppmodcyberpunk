@@ -12,7 +12,6 @@ registerForEvent("onInit", function()
 		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
     }
 
-    Gender.AddHead(false)
     print('Jb Third Person Mod Loaded')
 end)
 
@@ -97,19 +96,6 @@ function JBMOD:CheckForRestoration()
 	if(self.fppComp:GetLocalPosition().x == 0.0 and self.fppComp:GetLocalPosition().y == 0.0 and self.fppComp:GetLocalPosition().z == 0.0) then
 		self.isTppEnabled = false
 	end
-
-	self:AddToInventory(self.headString)
-	self:AddToInventory(self.tppHeadString)
-end
-
-function JBMOD:AddToInventory(nameString)
-	local gameItemID = GetSingleton('gameItemID')
-	local tdbid = TweakDBID.new(nameString)
-	local itemID = gameItemID:FromTDBID(tdbid)
-
-	if(self.transactionComp:HasItem(self.player, itemID) == false) then
-		Game.AddToInventory(nameString, 1)
-	end
 end
 
 function JBMOD:RestoreClothing(attachmentSlot)
@@ -164,7 +150,7 @@ function JBMOD:CheckCar()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
+        Gender.AddTppHead()
 		self.carCheckOnce = true
 	end
 
@@ -222,7 +208,7 @@ function JBMOD:UpdateCamera ()
 end
 
 function JBMOD:EquipHead()
-	Game.EquipItemOnPlayer(self.headString, "TppHead")
+	Gender.AddHead()
 end
 
 function JBMOD:ActivateTPP ()
