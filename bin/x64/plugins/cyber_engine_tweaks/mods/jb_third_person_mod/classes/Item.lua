@@ -6,11 +6,21 @@ function Item:new()
 
     ----------VARIABLES-------------
 
-
     ----------VARIABLES-------------
 
     setmetatable( class, Item )
     return class
+end
+
+function Item:IsEquipped(slot)
+    local ts = Game.GetTransactionSystem()
+    local pl = Game.GetPlayer()
+
+    if(ts:GetItemInSlot(pl, TweakDBID.new(slot)) ~= nil) then
+        return true
+    end
+
+    return false
 end
 
 function Item:AddToInventory(name)

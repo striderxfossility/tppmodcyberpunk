@@ -8,7 +8,6 @@ function Gender:new()
 
     ----------VARIABLES-------------
 
-
     ----------VARIABLES-------------
 
     setmetatable( class, Gender )

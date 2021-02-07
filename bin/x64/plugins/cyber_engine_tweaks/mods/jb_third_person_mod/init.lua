@@ -1,4 +1,5 @@
 local Gender = require("classes/Gender.lua")
+local Attachment = require("classes/Attachment.lua")
 
 registerForEvent("onInit", function()
     
@@ -89,43 +90,6 @@ function JBMOD:CheckForRestoration()
 	end
 end
 
-function JBMOD:RestoreClothing(attachmentSlot)
-	if(attachmentSlot == "Torso") then
-		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
-			
-			if (string.find(itemName, "&FPP") and self.isTppEnabled) then
-				itemName = tostring(itemName:match("%[(.-)%]"))
-
-				gender = self.player:GetResolvedGenderName() 
-				gender = tostring(gender) 
-				strfound = string.find(gender, "Female") 
-
-				if (strfound == nil) then
-					itemName = tostring(string.sub(itemName, 3, -12))
-					itemName = itemName .. "Male&TPP"
-				else
-					itemName = tostring(string.sub(itemName, 3, -14))
-					itemName = itemName .. "Female&TPP"
-				end
-
-				self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
-	 		end
-		end
-	else
-		if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-			local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-			local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-			local itemName = tostring(self.transactionComp:GetItemAppearance(self.player, self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)):GetItemID()))
-			itemName = tostring(itemName:match("%[(.-)%]"))
-			itemName = tostring(string.sub(itemName, 3, -4))
- 			self.transactionComp:ChangeItemAppearance(self.player, item:GetItemID(), CName.new(itemName), false)
-		end
-	end
-end
-
 function JBMOD:CheckWeapon()
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
@@ -181,10 +145,8 @@ function JBMOD:EquipHead()
 end
 
 function JBMOD:ActivateTPP ()
-	if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
-		self:RestoreClothing('Chest')
-		self:RestoreClothing('Torso')
-		self:RestoreClothing('Head')
+    if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
+        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
 		self.isTppEnabled = true
 		self:UpdateCamera()
 		self:EquipHead()
@@ -259,8 +221,8 @@ function JBMOD:CheckPhotoMode()
             end
         end
 
-        self:RestoreClothing('Chest')
-        self:RestoreClothing('Torso')
+        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+
         self.timerCheckClothes = 0.0	
     end
 end
@@ -268,18 +230,13 @@ end
 function JBMOD:CarTimer(deltaTime)
 	if(self.waitTimer > 0.4) then
 		self.tppHeadActivated = false
-		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
-			self.isTppEnabled = true
-			self:UpdateCamera()
-			self:EquipHead()
-		end
+        self.isTppEnabled = true
+        self:UpdateCamera()
+        self:EquipHead()
 	end
 
 	if(self.waitTimer > 1.0) then
-		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
-			self:RestoreClothing('Torso')
-			self:RestoreClothing('Chest')
-		end
+		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
 		self.waitTimer = 0.0
 		self.waitForCar = false
 	end
