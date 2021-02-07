@@ -44,14 +44,6 @@ function JBMOD:new ()
    	obj.localPlayerControlledGameObjectComp = nil
    	obj.vehicleCameraComp = nil
    	obj.script = nil
-   	obj.headString = "Items.PlayerWaPhotomodeHead"
-   	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
-   	obj.maleHead = "Items.PlayerMaPhotomodeHead"
-   	obj.animFemaleHead = "Items.CharacterCustomizationWaHead"
-   	obj.animMaleHead = "Items.CharacterCustomizationMaHead"
-   	obj.tppHeadString = "Items.PlayerWaTppHead"
-   	obj.tppFemaleHead = "Items.PlayerWaTppHead"
-   	obj.tppMaleHead = "Items.PlayerMaTppHead"
    	obj.photoModeBeenActive = false
    	obj.camViews = {}
    	obj.isTppEnabled = false
@@ -185,7 +177,7 @@ function JBMOD:UpdateCamera ()
 end
 
 function JBMOD:EquipHead()
-	Gender.AddHead()
+	Gender:AddHead(self.animatedFace)
 end
 
 function JBMOD:ActivateTPP ()
@@ -355,7 +347,7 @@ registerForEvent("onUpdate", function(deltaTime)
             if JbMod.inCar then
                 carCam = JbMod.fppComp:FindComponentByName(CName.new("vehicleTPPCamera"))
                 carCam:Activate(2.0, true)
-                Game.EquipItemOnPlayer(JbMod.tppHeadString, "TppHead")
+                Gender.AddTppHead()
                 JbMod.tppHeadActivated = true
                 JbMod.carActivated = false
             end
@@ -426,7 +418,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("carCheckOnce: " .. tostring(JbMod.carCheckOnce))
 	      	ImGui.Text("HasWeaponEquipped: " .. tostring(JbMod.HasWeaponEquipped()))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JbMod.switchBackToTpp))
-	      	ImGui.Text("headString: " .. tostring(JbMod.headString))
 	      	ImGui.Text("camActive: " .. tostring(JbMod.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JbMod.timeStamp))
 	      	ImGui.Text("playerAttached: " .. tostring(JbMod.player:IsPlayer()))
