@@ -34,8 +34,6 @@ function Attachment:TurnToPerspective(slot, perspective)
             other = "TPP"
         end
 
-        print(itemName)
-
         if (string.find(itemName, "&" .. other, nil, true) or 0) - 1 then
             local prefixes = Conversion:StringSplit(itemName, "&")
             local newItemName = ""

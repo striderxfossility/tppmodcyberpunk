@@ -141,16 +141,10 @@ function JBMOD:UpdateCamera ()
 end
 
 function JBMOD:ActivateTPP ()
-    if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
-        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
-		self.isTppEnabled = true
-		self:UpdateCamera()
-		Gender:AddHead(self.animatedFace)
-	else
-		self.isTppEnabled = true
-		self:UpdateCamera()
-		Gender:AddHead(self.animatedFace)
-	end
+    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+    self.isTppEnabled = true
+    self:UpdateCamera()
+    Gender:AddHead(self.animatedFace)
 end
 
 function JBMOD:DeactivateTPP ()
