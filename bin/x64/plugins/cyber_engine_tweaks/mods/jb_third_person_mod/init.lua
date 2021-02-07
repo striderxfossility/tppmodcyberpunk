@@ -160,7 +160,7 @@ function JBMOD:CheckCar()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        print("in car")
+        Game.EquipItemOnPlayer(self.tppHeadString, "TppHead")
 		self.carCheckOnce = true
 	end
 
