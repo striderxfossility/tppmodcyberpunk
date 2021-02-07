@@ -33,14 +33,14 @@ JBMOD.__index = JBMOD
 function JBMOD:new ()
 	local obj = {}
    	setmetatable(obj, self)
-   	obj.player = Game.GetPlayer()
-   	obj.fppComp = obj.player:GetFPPCameraComponent()
-   	obj.transactionComp = Game.GetTransactionSystem()
-   	obj.inspectionComp = obj.player:GetInspectionComponent()
-   	obj.pSystemComp = obj.inspectionComp:GetPlayerSystem()
-   	obj.localPlayerControlledGameObjectComp = obj.pSystemComp:GetLocalPlayerControlledGameObject()
-   	obj.vehicleCameraComp = obj.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-   	obj.script = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
+   	obj.player = nil
+   	obj.fppComp = nil
+   	obj.transactionComp = nil
+   	obj.inspectionComp = nil
+   	obj.pSystemComp = nil
+   	obj.localPlayerControlledGameObjectComp = nil
+   	obj.vehicleCameraComp = nil
+   	obj.script = nil
    	obj.headString = "Items.PlayerWaPhotomodeHead"
    	obj.femaleHead = "Items.PlayerWaPhotomodeHead"
    	obj.maleHead = "Items.PlayerMaPhotomodeHead"
@@ -48,7 +48,7 @@ function JBMOD:new ()
    	obj.animMaleHead = "Items.CharacterCustomizationMaHead"
    	obj.tppHeadString = "Items.PlayerWaTppHead"
    	obj.tppFemaleHead = "Items.PlayerWaTppHead"
-   	obj.tppMaleHead = "Items.PlayerMaTppHead" Game.EquipItemOnPlayer("Items.PlayerWaTppHead", "TppHead")
+   	obj.tppMaleHead = "Items.PlayerMaTppHead"
    	obj.photoModeBeenActive = false
    	obj.camViews = {}
    	obj.isTppEnabled = false
@@ -85,7 +85,6 @@ end
 
 function JBMOD:CheckForRestoration()
 	self:GetComps()
-	self:RemoveCrouchBug()
 	self:CheckGender()
 	self:CheckWeapon()
 	self:CheckCar()
@@ -160,9 +159,9 @@ end
 function JBMOD:CheckCar()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(self.player)
 
-	if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
+    if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
+        print("in car")
 		self.carCheckOnce = true
-		self:SetTppRep(false)
 	end
 
 	if(not self.inCar and self.carCheckOnce) then
@@ -228,12 +227,10 @@ function JBMOD:ActivateTPP ()
 		self:RestoreClothing('Torso')
 		self:RestoreClothing('Head')
 		self.isTppEnabled = true
-		self:SetTppRep(true)
 		self:UpdateCamera()
 		self:EquipHead()
 	else
 		self.isTppEnabled = true
-		self:SetTppRep(true)
 		self:UpdateCamera()
 		self:EquipHead()
 	end
@@ -284,10 +281,6 @@ function JBMOD:CheckClothing()
 	end
 end
 
-function JBMOD:SetTppRep(setBool)
-	--Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(setBool)
-end
-
 function JBMOD:HasWeaponEquipped()
 	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
 end
@@ -312,41 +305,21 @@ function JBMOD:RestoreAttachment(attachmentSlot)
 	end
 end
 
-function JBMOD:RemoveCrouchBug()
-	--if(tostring(self:GetNameOfObject('TppHead')) == tostring(CName.new('player_tpp_head')) or not self.isTppEnabled) then
-		--if(not self.tppHeadActivated) then
-			--self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), false, false, false)
-		--end
-	--end
-end
-
 function JBMOD:CheckPhotoMode()
-	local photoMode = JbMod.script:GetPhotoModeSystem(JbMod.script)
+    if(self.timerCheckClothes > 10.0) then
 
-	if(photoMode:IsPhotoModeActive(true)) then
-		self.photoModeBeenActive = true
-		self:SetTppRep(false)
-	else 
-		if(self.photoModeBeenActive) then
-			self.photoModeBeenActive = false
-			self:SetTppRep(true)
-		end
+        if not self.inCar then
+            if JbMod.allowCameraBobbing then
+                JbMod.player:DisableCameraBobbing(false)
+            else
+                JbMod.player:DisableCameraBobbing(true)
+            end
+        end
 
-		if(self.timerCheckClothes > 10.0) then
-
-			if not self.inCar then
-				if JbMod.allowCameraBobbing then
-					JbMod.player:DisableCameraBobbing(false)
-				else
-					JbMod.player:DisableCameraBobbing(true)
-				end
-			end
-
-			self:RestoreClothing('Chest')
-			self:RestoreClothing('Torso')
-			self.timerCheckClothes = 0.0	
-		end
-	end
+        self:RestoreClothing('Chest')
+        self:RestoreClothing('Torso')
+        self.timerCheckClothes = 0.0	
+    end
 end
 
 function JBMOD:CarTimer(deltaTime)
@@ -354,7 +327,6 @@ function JBMOD:CarTimer(deltaTime)
 		self.tppHeadActivated = false
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
 			self.isTppEnabled = true
-			self:SetTppRep(true)
 			self:UpdateCamera()
 			self:EquipHead()
 		end
@@ -362,7 +334,6 @@ function JBMOD:CarTimer(deltaTime)
 
 	if(self.waitTimer > 1.0) then
 		if(self:HasClothingInSlot('Torso') or self:HasClothingInSlot('Chest')) then
-			self:SetTppRep(true)
 			self:RestoreClothing('Torso')
 			self:RestoreClothing('Chest')
 		end
@@ -464,6 +435,11 @@ registerForEvent("onDraw", function()
 				print(go)
 
 				go.StartEffectEvent(item, CName.new("camera_mask"));
+            end
+            
+            clicked = ImGui.Button("Equip Head")
+	    	if (clicked) then
+	    		jb.EquipHead()
 			end
 
 	    	clicked = ImGui.Button("Cam to player")
@@ -481,11 +457,6 @@ registerForEvent("onDraw", function()
 	    	clicked = ImGui.Button("Reset zoom")
 	    	if (clicked) then
 	    		JbMod:ResetZoom()
-			end
-	    	
-	    	clicked = ImGui.Button("Forced Fix Collar")
-	    	if (clicked) then
-	    		JbMod:SetTppRep(true)
 			end
 
 			clicked = ImGui.Button("weaponOverride true/false")
