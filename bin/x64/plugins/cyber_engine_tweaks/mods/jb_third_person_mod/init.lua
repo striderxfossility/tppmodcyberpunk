@@ -123,8 +123,10 @@ registerForEvent("onDraw", function()
 				local PlayerSystem = Game.GetPlayerSystem()
 				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 				local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-				local carCam       = fppCam:FindComponentByName(JB.new("vehicleTPPCamera"))
+				local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
 				carCam:Deactivate(2.0, true)
+
+                print(Dump(fppCam, false))
 			end
 
 			clicked = ImGui.Button("Cam to car")
@@ -132,7 +134,7 @@ registerForEvent("onDraw", function()
 	    		local PlayerSystem = Game.GetPlayerSystem()
 	    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 	    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-	    		local carCam       = fppCam:FindComponentByName(JB.new("vehicleTPPCamera"))
+	    		local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
 				carCam:Activate(2.0, true)
 			end
 
@@ -160,7 +162,6 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 	      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
 	      	ImGui.Text("---------------------------------------")
-	      	ImGui.Text(tostring(Attachment:GetNameOfObject('TppHead')))
 	      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
 	      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
 	      	ImGui.Text("inCar: " .. tostring(JB.inCar))
