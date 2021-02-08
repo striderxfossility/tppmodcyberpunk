@@ -15,6 +15,10 @@ function Attachment:new()
     return class
 end
 
+function Attachment:HasWeaponActive()
+    return Item.IsEquipped('AttachmentSlots.WeaponRight')
+end
+
 function Attachment:TurnArrayToPerspective(arr, perspective)
     for index, value in ipairs(arr) do
         self:TurnToPerspective(value, perspective)
@@ -61,6 +65,21 @@ function Attachment:TurnToPerspective(slot, perspective)
     else
         spdlog.warning("ATTACHMENT: Attachment " .. slot .. " is not equipped")
     end
+end
+
+function Attachment:GetNameOfObject(slot)
+    local pl = Game.GetPlayer()
+    local ts = Game.GetTransactionSystem()
+
+    if(Item.IsEquipped(slot)) then
+		local slotID = TweakDBID.new(slot)
+		local item = ts:GetItemInSlot(pl, slotID)
+		local data = ts:GetItemData(pl, item:GetItemID())
+
+		return data:GetName()
+	end
+
+	return ''
 end
 
 return Attachment:new()

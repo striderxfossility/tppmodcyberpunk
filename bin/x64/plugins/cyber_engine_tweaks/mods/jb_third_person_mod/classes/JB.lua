@@ -64,6 +64,10 @@ function JB:DeactivateTPP ()
 	self:RestoreFPPView()
 end
 
+function JB:NextCam()
+    self:SwitchCamTo(self.camActive + 1)
+end
+
 function JB:SwitchCamTo(cam)
     local ts = Game.GetTransactionSystem()
 

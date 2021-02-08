@@ -37,17 +37,6 @@ JBMOD.__index = JBMOD
 function JBMOD:new ()
 	local obj = {}
    	setmetatable(obj, self)
-   	obj.player = nil
-   	obj.fppComp = nil
-   	obj.transactionComp = nil
-   	obj.inspectionComp = nil
-   	obj.pSystemComp = nil
-   	obj.localPlayerControlledGameObjectComp = nil
-   	obj.vehicleCameraComp = nil
-   	obj.script = nil
-   	obj.photoModeBeenActive = false
-   	obj.camViews = {}
-   	obj.isTppEnabled = false
    	obj.inCar = false
    	obj.camActive = 1
    	obj.timeStamp = 0.0
@@ -66,17 +55,6 @@ function JBMOD:new ()
    	obj.carActivated = false
     obj.tppHeadActivated = false
    	return obj
-end
-
-function JBMOD:GetComps()
-    self.player = Game.GetPlayer()
-    self.fppComp = self.player:GetFPPCameraComponent()
-    self.transactionComp = Game.GetTransactionSystem()
-    self.inspectionComp = self.player:GetInspectionComponent()
-    self.pSystemComp = self.inspectionComp:GetPlayerSystem()
-    self.localPlayerControlledGameObjectComp = self.pSystemComp:GetLocalPlayerControlledGameObject()
-    self.vehicleCameraComp = self.localPlayerControlledGameObjectComp:FindVehicleCameraManager()
-    self.script = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
 end
 
 function JBMOD:CheckForRestoration()
@@ -114,38 +92,6 @@ function JBMOD:CheckCar()
 		self.waitForCar = true
 		self.waitTimer = 0.0
 	end
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-function JBMOD:HasClothingInSlot(slot)
-	return self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. slot)) ~= nil
-end
-
-function JBMOD:HasWeaponEquipped()
-	return JbMod.transactionComp:GetItemInSlot(JbMod.player, TweakDBID.new('AttachmentSlots.WeaponRight')) ~= nil
-end
-
-function JBMOD:GetNameOfObject(attachmentSlot)
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-		local data = self.transactionComp:GetItemData(self.player, item:GetItemID())
-
-		return data:GetName()
-	end
-
-	return ''
 end
 
 function JBMOD:CheckPhotoMode()
@@ -208,15 +154,15 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 end)
 
 registerHotkey("jb_zoom_in", "Zoom in (no continues press)", function()
-	JbMod:Zoom(0.50)
+	JB:Zoom(0.50)
 end)
 
 registerHotkey("jb_zoom_out", "Zoom out (no continues press)", function()
-	JbMod:Zoom(-0.50)
+	JB:Zoom(-0.50)
 end)
 	
 registerHotkey("jb_switch_cam", "To next Camera view", function()
-	JbMod:SwitchCamTo(JbMod.camActive + 1)
+	JB:NextCam()
 end)
 
 registerHotkey("jb_open_debug", "Open Debug menu", function()
