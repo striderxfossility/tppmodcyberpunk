@@ -116,61 +116,17 @@ function JBMOD:CheckCar()
 	end
 end
 
-function JBMOD:ResetZoom()
-	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].defaultZoomLevel
-	self:UpdateCamera()
-end
 
-function JBMOD:Zoom(z)
-	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
-	self:UpdateCamera()
-end
 
-function JBMOD:RestoreFPPView()
-	if not self.isTppEnabled then
-		self.fppComp:SetLocalPosition(Vector4:new(0.0, 0.0, 0.0, 1.0))
-		self.fppComp:SetLocalOrientation(Quaternion:new(0.0, 0.0, 0.0, 1.0))
-	end
-end
 
-function JBMOD:UpdateCamera ()
-	if self.isTppEnabled then
-		self.fppComp:SetLocalPosition(self.camViews[self.camActive].pos)
-		self.fppComp:SetLocalOrientation(self.camViews[self.camActive].rot)
-	end
-end
 
-function JBMOD:ActivateTPP ()
-    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
-    self.isTppEnabled = true
-    self:UpdateCamera()
-    Gender:AddHead(self.animatedFace)
-end
 
-function JBMOD:DeactivateTPP ()
-	if self.isTppEnabled then
-		self.transactionComp:RemoveItemFromSlot(self.player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-	end
 
-	self.isTppEnabled = false
-	self:RestoreFPPView()
-end
 
-function JBMOD:SwitchCamTo(cam)
-	if self.camViews[cam] ~= nil then
-		self.camActive = cam
-		if(self.camViews[cam].freeform) then
-			self.inspectionComp:SetIsPlayerInspecting(true)
-		else 
-			self.inspectionComp:SetIsPlayerInspecting(false)
-		end
-		self:UpdateCamera()
-	else
-		self.camActive = 1
-		self.inspectionComp:SetIsPlayerInspecting(false)
-		self:UpdateCamera()
-	end
-end
+
+
+
+
 
 function JBMOD:HasClothingInSlot(slot)
 	return self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. slot)) ~= nil
@@ -190,14 +146,6 @@ function JBMOD:GetNameOfObject(attachmentSlot)
 	end
 
 	return ''
-end
-
-function JBMOD:RestoreAttachment(attachmentSlot)
-	if(self.transactionComp:GetItemInSlot(self.player, TweakDBID.new('AttachmentSlots.' .. attachmentSlot)) ~= nil) then
-		local slotID = TweakDBID.new('AttachmentSlots.' .. attachmentSlot)
-		local item = self.transactionComp:GetItemInSlot(self.player, slotID)
-		self.transactionComp:ResetItemAppearance(self.player, item:GetItemID())
-	end
 end
 
 function JBMOD:CheckPhotoMode()
