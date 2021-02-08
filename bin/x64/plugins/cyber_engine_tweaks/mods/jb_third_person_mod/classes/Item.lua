@@ -16,7 +16,7 @@ function Item:IsEquipped(slot)
     local ts = Game.GetTransactionSystem()
     local pl = Game.GetPlayer()
 
-    if(ts:GetItemInSlot(pl, TweakDBID.new(slot)) ~= nil) then
+    if(ts:GetItemInSlot(pl, TweakDBID:new(slot)) ~= nil) then
         return true
     end
 
@@ -25,7 +25,7 @@ end
 
 function Item:AddToInventory(name)
     local gameItemID = GetSingleton('gameItemID')
-    local tdbid      = TweakDBID.new(name)
+    local tdbid      = TweakDBID:new(name)
     local itemID     = gameItemID:FromTDBID(tdbid)
     local player     = Game.GetPlayer()
     local ts         = Game.GetTransactionSystem()

@@ -16,7 +16,7 @@ function Attachment:new()
 end
 
 function Attachment:HasWeaponActive()
-    return Item.IsEquipped('AttachmentSlots.WeaponRight')
+    return Item:IsEquipped('AttachmentSlots.WeaponRight')
 end
 
 function Attachment:TurnArrayToPerspective(arr, perspective)
@@ -29,9 +29,9 @@ function Attachment:TurnToPerspective(slot, perspective)
 if       Item:IsEquipped(slot) then
         local pl       = Game.GetPlayer()
         local ts       = Game.GetTransactionSystem()
-        local slotID   = TweakDBID.new(slot)
+        local slotID   = TweakDBID:new(slot)
         local item     = ts:GetItemInSlot(pl, slotID)
-        local itemName = Conversion:CNameToNameString(tostring(ts:GetItemAppearance(pl, ts:GetItemInSlot(pl, TweakDBID.new(slot)):GetItemID())))
+        local itemName = Conversion:CNameToNameString(tostring(ts:GetItemAppearance(pl, ts:GetItemInSlot(pl, TweakDBID:new(slot)):GetItemID())))
         local other    = "FPP"
 
         if perspective == "FPP" then
@@ -72,7 +72,7 @@ function Attachment:GetNameOfObject(slot)
     local ts = Game.GetTransactionSystem()
 
     if(Item.IsEquipped(slot)) then
-		local slotID = TweakDBID.new(slot)
+		local slotID = TweakDBID:new(slot)
 		local item   = ts:GetItemInSlot(pl, slotID)
 		local data   = ts:GetItemData(pl, item:GetItemID())
 

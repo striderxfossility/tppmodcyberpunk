@@ -9,7 +9,7 @@ function JB:new()
 
     ----------VARIABLES-------------
     class.camViews           = {}
-    class.camActive          = 0
+    class.camActive          = 1
     class.isTppEnabled       = false
     class.inCar              = false
     class.timeStamp          = 0.0
@@ -116,7 +116,7 @@ function JB:RestoreFPPView()
 	end
 end
 
-function JB:UpdateCamera ()
+function JB:UpdateCamera()
 	if self.isTppEnabled then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
@@ -127,7 +127,7 @@ function JB:UpdateCamera ()
 	end
 end
 
-function JB:ActivateTPP ()
+function JB:ActivateTPP()
     Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
     self.isTppEnabled = true
     self:UpdateCamera()
@@ -150,21 +150,23 @@ function JB:NextCam()
 end
 
 function JB:SwitchCamTo(cam)
-    local ts = Game.GetTransactionSystem()
+    local ps     = Game.GetPlayerSystem()
+    local puppet = ps:GetLocalPlayerMainGameObject()
+    local ic     = puppet:GetInspectionComponent()
 
 	if self.camViews[cam] ~= nil then
 	   self.camActive       = cam
 
 		if(self.camViews[cam].freeform) then
-			ts:SetIsPlayerInspecting(true)
+			ic:SetIsPlayerInspecting(true)
 		else 
-			ts:SetIsPlayerInspecting(false)
+			ic:SetIsPlayerInspecting(false)
 		end
 
 		self:UpdateCamera()
 	else
 		self.camActive = 1
-		ts:SetIsPlayerInspecting(false)
+		ic:SetIsPlayerInspecting(false)
 		self:UpdateCamera()
 	end
 end
