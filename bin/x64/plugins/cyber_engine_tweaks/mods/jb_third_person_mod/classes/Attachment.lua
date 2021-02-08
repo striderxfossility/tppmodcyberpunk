@@ -1,8 +1,8 @@
-local Item = require("classes/Item.lua")
+local Item       = require("classes/Item.lua")
 local Conversion = require("classes/Conversion.lua")
 
-local Attachment = {}
-Attachment.__index = Attachment
+local Attachment         = {}
+      Attachment.__index = Attachment
 
 function Attachment:new()
     local class = {}
@@ -26,29 +26,29 @@ function Attachment:TurnArrayToPerspective(arr, perspective)
 end
 
 function Attachment:TurnToPerspective(slot, perspective)
-    if Item:IsEquipped(slot) then
-        local pl = Game.GetPlayer()
-        local ts = Game.GetTransactionSystem()
-        local slotID = TweakDBID.new(slot)
-		local item = ts:GetItemInSlot(pl, slotID)
+if       Item:IsEquipped(slot) then
+        local pl       = Game.GetPlayer()
+        local ts       = Game.GetTransactionSystem()
+        local slotID   = TweakDBID.new(slot)
+        local item     = ts:GetItemInSlot(pl, slotID)
         local itemName = Conversion:CNameToNameString(tostring(ts:GetItemAppearance(pl, ts:GetItemInSlot(pl, TweakDBID.new(slot)):GetItemID())))
-        local other = "FPP"
+        local other    = "FPP"
 
         if perspective == "FPP" then
-            other = "TPP"
+           other = "TPP"
         end
 
         if (string.find(itemName, "&" .. other, nil, true) or 0) - 1 then
-            local prefixes = Conversion:StringSplit(itemName, "&")
+            local prefixes    = Conversion:StringSplit(itemName, "&")
             local newItemName = ""
-            local first = true
+            local first       = true
 
             for key, element in pairs(prefixes) do
                 if element == other then
-                    newItemName = tostring(newItemName) .. ("&" .. perspective)
+                   newItemName = tostring(newItemName) .. ("&" .. perspective)
                 else
                     if first then
-                        first = false
+                        first       = false
                         newItemName = tostring(newItemName) .. tostring(element)
                     else
                         newItemName = tostring(newItemName) .. ("&" .. element)
@@ -73,8 +73,8 @@ function Attachment:GetNameOfObject(slot)
 
     if(Item.IsEquipped(slot)) then
 		local slotID = TweakDBID.new(slot)
-		local item = ts:GetItemInSlot(pl, slotID)
-		local data = ts:GetItemData(pl, item:GetItemID())
+		local item   = ts:GetItemInSlot(pl, slotID)
+		local data   = ts:GetItemData(pl, item:GetItemID())
 
 		return data:GetName()
 	end

@@ -1,7 +1,7 @@
 local Item = require("classes/Item.lua")
 
-local Gender = {}
-Gender.__index = Gender
+local Gender         = {}
+      Gender.__index = Gender
 
 function Gender:new()
     local class = {}
@@ -14,13 +14,13 @@ function Gender:new()
     return class
 end
 
-function Gender:IsFemale() 
+function Gender:IsFemale()
     return not Gender:IsMale()
 end
 
 function Gender:AddTppHead()
     if Gender:IsMale() then
-        Item:Equip("Items.PlayerMaTppHead", "TppHead")
+         Item:Equip("Items.PlayerMaTppHead", "TppHead")
     else
         Item:Equip("Items.PlayerWaTppHead", "TppHead")
     end
@@ -43,9 +43,9 @@ function Gender:AddHead(animated)
 end
 
 function Gender:IsMale()
-    local player = Game.GetPlayer()
-    local gender = tostring(player:GetResolvedGenderName())
-    local strfound = string.find(gender, "Female") 
+    local player   = Game.GetPlayer()
+    local gender   = tostring(player:GetResolvedGenderName())
+    local strfound = string.find(gender, "Female")
 
     spdlog.info("Gender: found gender string = " .. gender .. " RESULTS = " .. strfound)
 

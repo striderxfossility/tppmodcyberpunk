@@ -1,17 +1,98 @@
-local JB = {}
-JB.__index = JB
+local Gender     = require("classes/Gender.lua")
+local Attachment = require("classes/Attachment.lua")
+
+local JB         = {}
+      JB.__index = JB
 
 function JB:new()
     local class = {}
 
     ----------VARIABLES-------------
-    class.camViews = {}
-    class.camActive = 0
-    class.isTppEnabled = false
+    class.camViews           = {}
+    class.camActive          = 0
+    class.isTppEnabled       = false
+    class.inCar              = false
+    class.timeStamp          = 0.0
+    class.weaponOverride     = true
+    class.animatedFace       = false
+    class.allowCameraBobbing = false
+    class.switchBackToTpp    = false
+    class.carCheckOnce       = false
+    class.waitForCar         = false
+    class.waitTimer          = 0.0
+    class.timerCheckClothes  = 0.0
+    class.carActivated       = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
     return class
+end
+
+function JB:CheckForRestoration()
+    local PlayerSystem = Game.GetPlayerSystem()
+    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+	if(self.weaponOverride) then
+		if(self.isTppEnabled) then
+			if(Attachment:HasWeaponActive()) then
+				self.switchBackToTpp = true
+				self:DeactivateTPP()
+			end
+	    end
+    end
+
+	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
+
+    if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
+        Gender.AddTppHead()
+		self.carCheckOnce = true
+	end
+
+	if(not self.inCar and self.carCheckOnce) then
+		self.carCheckOnce = false
+		self.waitForCar   = true
+		self.waitTimer    = 0.0
+	end
+
+	if(self.timerCheckClothes > 10.0) then
+
+        if not self.inCar then
+            if self.allowCameraBobbing then
+                PlayerPuppet:DisableCameraBobbing(false)
+            else
+                PlayerPuppet:DisableCameraBobbing(true)
+            end
+        end
+
+        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+
+        self.timerCheckClothes = 0.0
+    end
+
+	if(fppCam:GetLocalPosition().x == 0.0 and fppCam:GetLocalPosition().y == 0.0 and fppCam:GetLocalPosition().z == 0.0) then
+		self.isTppEnabled = false
+	end
+end
+
+function JB:CarTimer(deltaTime)
+	if(self.waitTimer > 0.4) then
+		self.tppHeadActivated = false
+		self.isTppEnabled     = true
+        self:UpdateCamera()
+        Gender:AddHead(self.animatedFace)
+	end
+
+	if(self.waitTimer > 1.0) then
+		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+		self.waitTimer  = 0.0
+		self.waitForCar = false
+	end
+
+	if(self.waitForCar) then
+		self.carCheckOnce = false
+		self.waitTimer    = self.waitTimer + deltaTime
+	end
 end
 
 function JB:ResetZoom()
@@ -65,14 +146,14 @@ function JB:DeactivateTPP ()
 end
 
 function JB:NextCam()
-    self:SwitchCamTo(self.camActive + 1)
+         self:SwitchCamTo(self.camActive + 1)
 end
 
 function JB:SwitchCamTo(cam)
     local ts = Game.GetTransactionSystem()
 
 	if self.camViews[cam] ~= nil then
-        self.camActive = cam
+	   self.camActive       = cam
 
 		if(self.camViews[cam].freeform) then
 			ts:SetIsPlayerInspecting(true)
