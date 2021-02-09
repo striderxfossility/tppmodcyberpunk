@@ -135,6 +135,7 @@ end
 function JB:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 	self:UpdateCamera()
+	db.exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive)
 end
 
 function JB:RestoreFPPView()
