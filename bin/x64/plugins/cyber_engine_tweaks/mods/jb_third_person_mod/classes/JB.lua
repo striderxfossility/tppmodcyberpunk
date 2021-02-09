@@ -7,32 +7,60 @@ local JB         = {}
 function JB:new()
     local class = {}
 
-	db.exec[=[
-		CREATE TABLE cameras(id, x, y, z, w, rx, ry, rz, rw, camSwitch, freeForm);
-		INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
-		INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
-		INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
-		INSERT INTO cameras VALUES(3, 0, 4, 0, 0, 50, 0, 4000, 0, true, false);
-		INSERT INTO cameras VALUES(4, 0, 4, 0, 0, 50, 0, 4000, 0, true, true);
-	]=]
+    db:exec[=[
+        CREATE TABLE cameras(id, x, y, z, w, rx, ry, rz, rw, camSwitch, freeForm);
+        INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
+        INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
+        INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
+        INSERT INTO cameras VALUES(3, 0, 4, 0, 0, 50, 0, 4000, 0, true, false);
+        INSERT INTO cameras VALUES(4, 0, 4, 0, 0, 50, 0, 4000, 0, true, true);
+    ]=]
 
-	db.exec[=[
-		CREATE TABLE settings(id, name, value);
-		INSERT INTO settings VALUES(0, isTppEnabled, false);
-		INSERT INTO settings VALUES(1, weaponOverride, true);
-		INSERT INTO settings VALUES(2, animatedFace, false);
-		INSERT INTO settings VALUES(3, allowCameraBobbing, false);
-	]=]
+    db:exec[=[
+        CREATE TABLE settings(id, name, value);
+        INSERT INTO settings VALUES(0, "isTppEnabled", false);
+        INSERT INTO settings VALUES(1, "weaponOverride", true);
+        INSERT INTO settings VALUES(2, "animatedFace", false);
+        INSERT INTO settings VALUES(3, "allowCameraBobbing", false);
+    ]=]
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
+        if(index[1] == 0) then
+            class.weaponOverride = false
+        else
+            class.weaponOverride = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'isTppEnabled'") do
+        if(index[1] == 0) then
+            class.isTppEnabled = false
+        else
+            class.isTppEnabled = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'animatedFace'") do
+        if(index[1] == 0) then
+            class.animatedFace = false
+        else
+            class.animatedFace = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'allowCameraBobbing'") do
+        if(index[1] == 0) then
+            class.allowCameraBobbing = false
+        else
+            class.allowCameraBobbing = true
+        end
+    end
 
     ----------VARIABLES-------------
     class.camViews            = {}
     class.camActive           = 1
-    class.isTppEnabled        = db.rows("SELECT value FROM settings WHERE name = 'isTppEnabled'")[0].value or false
     class.inCar               = false
     class.timeStamp           = 0.0
-    class.weaponOverride      = db.rows("SELECT value FROM settings WHERE name = 'weaponOverride'")[0].value or true
-    class.animatedFace        = db.rows("SELECT value FROM settings WHERE name = 'animatedFace'")[0].value or false
-    class.allowCameraBobbing  = db.rows("SELECT value FROM settings WHERE name = 'allowCameraBobbing'")[0].value or false
     class.switchBackToTpp     = false
     class.carCheckOnce        = false
     class.waitForCar          = false
@@ -42,10 +70,13 @@ function JB:new()
     class.photoModeBeenActive = false
     ----------VARIABLES-------------
 
-
-
     setmetatable( class, JB )
     return class
+end
+
+function JB:SetEnableTPPValue(value)
+    self.isTppEnabled = value
+    db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
 end
 
 function JB:CheckForRestoration()
@@ -55,15 +86,17 @@ function JB:CheckForRestoration()
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
-	if(photoMode:IsPhotoModeActive(true)) then
-		self.photoModeBeenActive = true
-		Attachment.TurnArrayToPerspective({'AttachmentSlots.Chest', 'AttachmentSlots.Torso', 'AttachmentSlots.Head'}, 'FPP')
-	else
-		if self.photoModeBeenActive then
-			self.photoModeBeenActive = false
-			Attachment.TurnArrayToPerspective({'AttachmentSlots.Chest', 'AttachmentSlots.Torso', 'AttachmentSlots.Head'}, 'TPP')
-		end
-	end
+    if JB.isTppEnabled then
+        if(photoMode:IsPhotoModeActive(true)) then
+            self.photoModeBeenActive = true
+            JB:DeactivateTPP()
+        else
+            if self.photoModeBeenActive then
+                self.photoModeBeenActive = false
+                JB:ActivateTPP()
+            end
+        end
+    end
 
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
@@ -103,14 +136,14 @@ function JB:CheckForRestoration()
     end
 
 	if(fppCam:GetLocalPosition().x == 0.0 and fppCam:GetLocalPosition().y == 0.0 and fppCam:GetLocalPosition().z == 0.0) then
-		self.isTppEnabled = false
+        self:SetEnableTPPValue(false)
 	end
 end
 
 function JB:CarTimer(deltaTime)
 	if(self.waitTimer > 0.4) then
 		self.tppHeadActivated = false
-		self.isTppEnabled     = true
+		self:SetEnableTPPValue(true)
         self:UpdateCamera()
         Gender:AddHead(self.animatedFace)
 	end
@@ -135,7 +168,7 @@ end
 function JB:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 	self:UpdateCamera()
-	db.exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive)
+	db:exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive)
 end
 
 function JB:RestoreFPPView()
@@ -162,7 +195,7 @@ end
 
 function JB:ActivateTPP()
     Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
-    self.isTppEnabled = true
+    self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
 end
@@ -174,7 +207,7 @@ function JB:DeactivateTPP ()
 		ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 	end
 
-	self.isTppEnabled = false
+	self:SetEnableTPPValue(false)
 	self:RestoreFPPView()
 end
 
@@ -191,6 +224,7 @@ function JB:SwitchCamTo(cam)
 	   self.camActive       = cam
 
 		if(self.camViews[cam].freeform) then
+            print("INSPECTION")
 			ic:SetIsPlayerInspecting(true)
 		else 
 			ic:SetIsPlayerInspecting(false)

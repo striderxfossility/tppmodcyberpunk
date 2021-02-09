@@ -47,8 +47,6 @@ function Gender:IsMale()
     local gender   = tostring(player:GetResolvedGenderName())
     local strfound = string.find(gender, "Female")
 
-    spdlog.info("Gender: found gender string = " .. gender .. " RESULTS = " .. strfound)
-
     if strfound == nil then
         return true
     end

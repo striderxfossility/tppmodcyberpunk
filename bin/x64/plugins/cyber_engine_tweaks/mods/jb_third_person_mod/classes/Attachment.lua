@@ -56,14 +56,8 @@ function Attachment:TurnToPerspective(slot, perspective)
                 end
             end
 
-            spdlog.info("ATTACHMENT: Trying to change " .. slot .. " to " .. perspective .. " with item " .. itemName)
             ts:ChangeItemAppearance(pl,item:GetItemID(),CName.new(newItemName),false)
-
-        else
-            spdlog.warning("ATTACHMENT: Attachment is already TPP OR could not find slot " .. slot)
         end
-    else
-        spdlog.warning("ATTACHMENT: Attachment " .. slot .. " is not equipped")
     end
 end
 
