@@ -125,8 +125,6 @@ registerForEvent("onDraw", function()
 				local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 				local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
 				carCam:Deactivate(2.0, true)
-
-                print(Dump(fppCam, false))
 			end
 
 			clicked = ImGui.Button("Cam to car")
