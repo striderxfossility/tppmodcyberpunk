@@ -7,7 +7,7 @@ local JB         = {}
 function JB:new()
     local class = {}
 
-	db:exec[=[
+	db.exec[=[
 		CREATE TABLE cameras(id, x, y, z, w, rx, ry, rz, rw, camSwitch, freeForm);
 		INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
 		INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
@@ -16,7 +16,7 @@ function JB:new()
 		INSERT INTO cameras VALUES(4, 0, 4, 0, 0, 50, 0, 4000, 0, true, true);
 	]=]
 
-	db:exec[=[
+	db.exec[=[
 		CREATE TABLE settings(id, name, value);
 		INSERT INTO settings VALUES(0, isTppEnabled, false);
 		INSERT INTO settings VALUES(1, weaponOverride, true);

@@ -21,13 +21,13 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
-	JB.camViews = { -- JUST REMOVE OR ADD CAMS TO YOUR LIKING!
-		CamView:new(Vector4:new(0.0, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false),   -- Front Camera
-		CamView:new(Vector4:new(0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false),   -- Left Shoulder Camera
-		CamView:new(Vector4:new(-0.5, -2.0, 0.0, 1.0), Quaternion:new(0.0, 0.0, 0.0, 1.0), false, false),  -- Right Shoulder Camera
-		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, false), -- Read Camera
-		CamView:new(Vector4:new(0.0, 4.0, 0.0, 1.0), Quaternion:new(50.0, 0.0, 4000.0, 1.0), true, true) -- FreeForm Camera
-    }
+	for key, row in pairs(db.rows("SELECT * FROM cameras")) do
+		local vec4 = Vector4.new(row[2], row[3], row[4], 1.0)
+		local quat = Quaternion.new(row[6], row[7], row[8], 1.0)
+		local cam  = CamView:new(vec4, quat, row[10], row[11])
+
+		table.insert(JB.camViews, cam)
+	end
 
     print('Jb Third Person Mod Loaded')
 end)
