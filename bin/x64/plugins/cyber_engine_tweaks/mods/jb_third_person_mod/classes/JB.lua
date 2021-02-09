@@ -58,7 +58,7 @@ function JB:CheckForRestoration()
 	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        Gender.AddTppHead()
+        --Gender.AddTppHead()
 		self.carCheckOnce = true
 	end
 
