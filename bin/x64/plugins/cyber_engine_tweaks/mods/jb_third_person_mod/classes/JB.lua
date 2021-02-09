@@ -8,20 +8,21 @@ function JB:new()
     local class = {}
 
     ----------VARIABLES-------------
-    class.camViews           = {}
-    class.camActive          = 1
-    class.isTppEnabled       = false
-    class.inCar              = false
-    class.timeStamp          = 0.0
-    class.weaponOverride     = true
-    class.animatedFace       = false
-    class.allowCameraBobbing = false
-    class.switchBackToTpp    = false
-    class.carCheckOnce       = false
-    class.waitForCar         = false
-    class.waitTimer          = 0.0
-    class.timerCheckClothes  = 0.0
-    class.carActivated       = false
+    class.camViews            = {}
+    class.camActive           = 1
+    class.isTppEnabled        = false
+    class.inCar               = false
+    class.timeStamp           = 0.0
+    class.weaponOverride      = true
+    class.animatedFace        = false
+    class.allowCameraBobbing  = false
+    class.switchBackToTpp     = false
+    class.carCheckOnce        = false
+    class.waitForCar          = false
+    class.waitTimer           = 0.0
+    class.timerCheckClothes   = 0.0
+    class.carActivated        = false
+    class.photoModeBeenActive = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -32,6 +33,18 @@ function JB:CheckForRestoration()
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
+    local photoMode    = script:GetPhotoModeSystem(script)
+
+	if(photoMode:IsPhotoModeActive(true)) then
+		self.photoModeBeenActive = true
+		Attachment.TurnArrayToPerspective({'AttachmentSlots.Chest', 'AttachmentSlots.Torso', 'AttachmentSlots.Head'}, 'FPP')
+	else
+		if self.photoModeBeenActive then
+			self.photoModeBeenActive = false
+			Attachment.TurnArrayToPerspective({'AttachmentSlots.Chest', 'AttachmentSlots.Torso', 'AttachmentSlots.Head'}, 'TPP')
+		end
+	end
 
 	if(self.weaponOverride) then
 		if(self.isTppEnabled) then
