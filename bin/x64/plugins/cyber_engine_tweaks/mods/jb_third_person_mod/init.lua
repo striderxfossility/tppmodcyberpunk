@@ -21,10 +21,7 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
-    print('something')
-
-
-
+    
 	for row in db:rows("SELECT * FROM cameras") do
 		local vec4 = Vector4.new(tonumber(row[2]), tonumber(row[3]), tonumber(row[4]), 1.0)
 		local quat = Quaternion.new(tonumber(row[6]), tonumber(row[7]), tonumber(row[8]), 1.0)

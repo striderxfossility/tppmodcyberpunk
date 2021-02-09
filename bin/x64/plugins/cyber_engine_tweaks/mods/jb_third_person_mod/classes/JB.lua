@@ -24,6 +24,8 @@ function JB:new()
         INSERT INTO settings VALUES(3, "allowCameraBobbing", false);
     ]=]
 
+    db:exec("INSERT INTO settings SELECT 4, 'camActive', 1 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 4);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -56,9 +58,13 @@ function JB:new()
         end
     end
 
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'camActive'") do
+        class.camActive = tonumber(index[1])
+        print(class.camActive)
+    end
+
     ----------VARIABLES-------------
     class.camViews            = {}
-    class.camActive           = 1
     class.inCar               = false
     class.timeStamp           = 0.0
     class.switchBackToTpp     = false
@@ -221,10 +227,11 @@ function JB:SwitchCamTo(cam)
     local ic     = puppet:GetInspectionComponent()
 
 	if self.camViews[cam] ~= nil then
-	   self.camActive       = cam
+	    self.camActive       = cam
+        db:exec("UPDATE settings SET value = " .. tostring(self.camActive) .. " WHERE name = 'camActive'")
+
 
 		if(self.camViews[cam].freeform) then
-            print("INSPECTION")
 			ic:SetIsPlayerInspecting(true)
 		else 
 			ic:SetIsPlayerInspecting(false)
