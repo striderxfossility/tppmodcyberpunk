@@ -144,16 +144,19 @@ registerForEvent("onDraw", function()
 			clicked = ImGui.Button("weaponOverride true/false")
 	    	if (clicked) then
 	    		JB.weaponOverride = not JB.weaponOverride
+				db:exec("UPDATE settings SET value = " .. JB.weaponOverride .. " WHERE name = 'weaponOverride'")
 			end
 
 			clicked = ImGui.Button("animatedFace true/false")
 	    	if (clicked) then
 	    		JB.animatedFace = not JB.animatedFace
+				db:exec("UPDATE settings SET value = " .. JB.animatedFace .. " WHERE name = 'animatedFace'")
 			end
 
 			clicked = ImGui.Button("allowCameraBobbing true/false")
 	    	if (clicked) then
 	    		JB.allowCameraBobbing = not JB.allowCameraBobbing
+				db:exec("UPDATE settings SET value = " .. JB.allowCameraBobbing .. " WHERE name = 'allowCameraBobbing'")
 			end
 
 			ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))

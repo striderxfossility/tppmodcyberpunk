@@ -7,15 +7,32 @@ local JB         = {}
 function JB:new()
     local class = {}
 
+	db:exec[=[
+		CREATE TABLE cameras(id, x, y, z, w, rx, ry, rz, rw, camSwitch, freeForm);
+		INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
+		INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
+		INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
+		INSERT INTO cameras VALUES(3, 0, 4, 0, 0, 50, 0, 4000, 0, true, false);
+		INSERT INTO cameras VALUES(4, 0, 4, 0, 0, 50, 0, 4000, 0, true, true);
+	]=]
+
+	db:exec[=[
+		CREATE TABLE settings(id, name, value);
+		INSERT INTO settings VALUES(0, isTppEnabled, false);
+		INSERT INTO settings VALUES(1, weaponOverride, true);
+		INSERT INTO settings VALUES(2, animatedFace, false);
+		INSERT INTO settings VALUES(3, allowCameraBobbing, false);
+	]=]
+
     ----------VARIABLES-------------
     class.camViews            = {}
     class.camActive           = 1
-    class.isTppEnabled        = false
+    class.isTppEnabled        = db.rows("SELECT value FROM settings WHERE name = 'isTppEnabled'")[0].value or false
     class.inCar               = false
     class.timeStamp           = 0.0
-    class.weaponOverride      = true
-    class.animatedFace        = false
-    class.allowCameraBobbing  = false
+    class.weaponOverride      = db.rows("SELECT value FROM settings WHERE name = 'weaponOverride'")[0].value or true
+    class.animatedFace        = db.rows("SELECT value FROM settings WHERE name = 'animatedFace'")[0].value or false
+    class.allowCameraBobbing  = db.rows("SELECT value FROM settings WHERE name = 'allowCameraBobbing'")[0].value or false
     class.switchBackToTpp     = false
     class.carCheckOnce        = false
     class.waitForCar          = false
@@ -24,6 +41,8 @@ function JB:new()
     class.carActivated        = false
     class.photoModeBeenActive = false
     ----------VARIABLES-------------
+
+
 
     setmetatable( class, JB )
     return class
