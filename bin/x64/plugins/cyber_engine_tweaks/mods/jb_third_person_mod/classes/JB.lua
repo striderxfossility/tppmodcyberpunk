@@ -92,15 +92,19 @@ function JB:CheckForRestoration()
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
-    if JB.isTppEnabled then
-        if(photoMode:IsPhotoModeActive(true)) then
+    if self.isTppEnabled then
+        if photoMode:IsPhotoModeActive() then
             self.photoModeBeenActive = true
-            JB:DeactivateTPP()
-        else
-            if self.photoModeBeenActive then
-                self.photoModeBeenActive = false
-                JB:ActivateTPP()
-            end
+            self:DeactivateTPP()
+            print("DISABLED")
+        end
+    end
+
+    if not self.isTppEnabled and self.photoModeBeenActive and not photoMode:IsPhotoModeActive() then
+        if self.photoModeBeenActive then
+            self.photoModeBeenActive = false
+            self:ActivateTPP()
+            print("ENABLED")
         end
     end
 
@@ -135,8 +139,10 @@ function JB:CheckForRestoration()
                 PlayerPuppet:DisableCameraBobbing(true)
             end
         end
-
-        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+        
+        if not self.photoModeBeenActive and self.isTppEnabled then
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+        end
 
         self.timerCheckClothes = 0.0
     end
