@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,7 +22,7 @@ jobs:
       
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
-          zip my-artifact archive/pc/patch/* bin/x64/plugins/cyber_engine_tweaks/mods/jb_third_person_mod/*
+          zip my-artifact archive/pc/patch/* bin/x64/plugins/cyber_engine_tweaks/mods/jb_third_person_mod/* bin/x64/plugins/cyber_engine_tweaks/mods/jb_third_person_mod/classes/*
         
       - name: Archive site content
         uses: TheDoctor0/zip-release@0.4.1
