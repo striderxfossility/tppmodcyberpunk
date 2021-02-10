@@ -60,7 +60,6 @@ function JB:new()
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'camActive'") do
         class.camActive = tonumber(index[1])
-        print(class.camActive)
     end
 
     ----------VARIABLES-------------
@@ -105,13 +104,11 @@ function JB:CheckForRestoration(delta)
 
             if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
                 Gender:AddHead(self.animatedFace)
-                print("adding head")
             end
         else
             if not self.inCar then
                 if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
                     Gender:AddFppHead()
-                    print("adding FPP head")
                 end
             end
         end
@@ -265,11 +262,8 @@ function JB:SwitchCamTo(cam)
     local puppet = ps:GetLocalPlayerMainGameObject()
     local ic     = puppet:GetInspectionComponent()
 
-    print(cam)
-
 	if self.camViews[cam] ~= nil then
 	    self.camActive = cam
-        print("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
         db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
 
 		if self.camViews[cam].freeform then
