@@ -18,7 +18,15 @@ function Gender:IsFemale()
     return not Gender:IsMale()
 end
 
+function Gender:RemoveHead()
+    local ts     = Game.GetTransactionSystem()
+    local player = Game.GetPlayer()
+    ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+end
+
 function Gender:AddTppHead()
+    Gender:RemoveHead()
+
     if Gender:IsMale() then
          Item:Equip("Items.PlayerMaTppHead", "TppHead")
     else
@@ -27,10 +35,14 @@ function Gender:AddTppHead()
 end
 
 function Gender:AddFppHead()
+    Gender:RemoveHead()
+
     Item:Equip("Items.PlayerFppHead", "TppHead")
 end
 
 function Gender:AddHead(animated)
+    Gender:RemoveHead()
+    
     if Gender:IsMale() then
         if animated then
             Item:Equip("Items.CharacterCustomizationMaHead", "TppHead")
