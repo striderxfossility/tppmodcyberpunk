@@ -265,12 +265,14 @@ function JB:SwitchCamTo(cam)
     local puppet = ps:GetLocalPlayerMainGameObject()
     local ic     = puppet:GetInspectionComponent()
 
+    print(cam)
+
 	if self.camViews[cam] ~= nil then
-	    self.camActive       = cam
-        db:exec("UPDATE settings SET value = " .. tostring(self.camActive) .. " WHERE name = 'camActive'")
+	    self.camActive = cam
+        print("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
+        db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
 
-
-		if(self.camViews[cam].freeform) then
+		if self.camViews[cam].freeform then
 			ic:SetIsPlayerInspecting(true)
 		else 
 			ic:SetIsPlayerInspecting(false)
@@ -279,6 +281,7 @@ function JB:SwitchCamTo(cam)
 		self:UpdateCamera()
 	else
 		self.camActive = 1
+        db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
 		ic:SetIsPlayerInspecting(false)
 		self:UpdateCamera()
 	end
