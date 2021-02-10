@@ -26,6 +26,10 @@ function Gender:AddTppHead()
     end
 end
 
+function Gender:AddFppHead()
+    Item:Equip("Items.PlayerFppHead", "TppHead")
+end
+
 function Gender:AddHead(animated)
     if Gender:IsMale() then
         if animated then

@@ -16,7 +16,7 @@ function Item:IsEquipped(slot)
     local ts = Game.GetTransactionSystem()
     local pl = Game.GetPlayer()
 
-    if(ts:GetItemInSlot(pl, TweakDBID.new(slot)) ~= nil) then
+    if(ts:GetItemInSlot(pl, TweakDBID:new(slot)) ~= nil) then
         return true
     end
 

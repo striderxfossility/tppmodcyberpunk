@@ -99,7 +99,7 @@ registerForEvent("onUpdate", function(deltaTime)
         JB:CarTimer(deltaTime)
         JB.timerCheckClothes = JB.timerCheckClothes + deltaTime
 
-        JB:CheckForRestoration()
+        JB:CheckForRestoration(deltaTime)
 
         if JB.carActivated then
             if JB.inCar then
@@ -180,7 +180,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("inCar: " .. tostring(JB.inCar))
 	      	ImGui.Text("waitTimer: " .. tostring(JB.waitTimer))
 	      	ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
-	      	--ImGui.Text("isHeadOn " .. tostring(tostring(Attachment:GetNameOfObject('TppHead')) == tostring(CName.new('player_fpp_head'))))
+	      	ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
 	      	ImGui.Text("carCheckOnce: " .. tostring(JB.carCheckOnce))
 	      	--ImGui.Text("HasWeaponEquipped: " .. tostring(JB:HasWeaponEquipped()))
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))

@@ -64,13 +64,12 @@ end
 function Attachment:GetNameOfObject(slot)
     local pl = Game.GetPlayer()
     local ts = Game.GetTransactionSystem()
-
-    if(Item.IsEquipped(slot)) then
+    if(Item:IsEquipped(slot)) then
 		local slotID = TweakDBID.new(slot)
 		local item   = ts:GetItemInSlot(pl, slotID)
 		local data   = ts:GetItemData(pl, item:GetItemID())
 
-		return data:GetName()
+		return Conversion:CNameToNameString(data:GetName())
 	end
 
 	return ''

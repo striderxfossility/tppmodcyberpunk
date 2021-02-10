@@ -74,6 +74,7 @@ function JB:new()
     class.timerCheckClothes   = 0.0
     class.carActivated        = false
     class.photoModeBeenActive = false
+    class.headTimer           = 1.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -85,18 +86,50 @@ function JB:SetEnableTPPValue(value)
     db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
 end
 
-function JB:CheckForRestoration()
+function JB:CheckForRestoration(delta)
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local fppCam       = PlayerPuppet:GetFPPCameraComponent()
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
+    self.headTimer = self.headTimer - delta
+    
+    if self.headTimer <= 0 then
+        if self.isTppEnabled and not self.inCar then
+            local str = "player_photomode_head"
+
+            if self.animatedFace then
+                str = "character_customization_head"
+            end
+
+            if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
+                Gender:AddHead(self.animatedFace)
+                print("adding head")
+            end
+        else
+            if not self.inCar then
+                if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
+                    Gender:AddFppHead()
+                    print("adding FPP head")
+                end
+            end
+        end
+
+        --if self.inCar then
+            --if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_tpp_head") then
+                --Gender:AddTppHead()
+                --print("adding TPP head")
+            --end
+        --end
+
+        self.headTimer = 0.1
+    end
+
     if self.isTppEnabled then
         if photoMode:IsPhotoModeActive() then
             self.photoModeBeenActive = true
             self:DeactivateTPP()
-            print("DISABLED")
         end
     end
 
@@ -104,7 +137,6 @@ function JB:CheckForRestoration()
         if self.photoModeBeenActive then
             self.photoModeBeenActive = false
             self:ActivateTPP()
-            print("ENABLED")
         end
     end
 
@@ -121,6 +153,7 @@ function JB:CheckForRestoration()
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
         --Gender.AddTppHead()
+        Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
 
@@ -157,7 +190,7 @@ function JB:CarTimer(deltaTime)
 		self.tppHeadActivated = false
 		self:SetEnableTPPValue(true)
         self:UpdateCamera()
-        Gender:AddHead(self.animatedFace)
+        --Gender:AddHead(self.animatedFace)
 	end
 
 	if(self.waitTimer > 1.0) then
