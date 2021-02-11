@@ -92,6 +92,22 @@ registerHotkey("jb_activate_car_cam", "Activate Car Camera", function()
 	end
 end)
 
+registerHotkey("jb_optional_cam_left", "Optional: Move cam left", function()
+	JB:MoveHorizontal(0.50)
+end)
+
+registerHotkey("jb_optional_cam_right", "Optional: Move cam right", function()
+	JB:MoveHorizontal(-0.50)
+end)
+
+registerHotkey("jb_optional_cam_up", "Optional: Move cam up", function()
+	JB:MoveVertical(0.50)
+end)
+
+registerHotkey("jb_optional_cam_down", "Optional: Move cam down", function()
+	JB:MoveVertical(-0.50)
+end)
+
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
