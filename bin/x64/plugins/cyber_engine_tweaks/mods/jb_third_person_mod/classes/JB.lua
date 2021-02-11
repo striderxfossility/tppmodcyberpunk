@@ -146,8 +146,13 @@ function JB:CheckForRestoration(delta)
 			end
 	    end
     end
-
-	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
+    
+    if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
+        self.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+    else
+        self.inCar = false
+    end
+	
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if self.inScene or self.camViews[self.camActive].freeform then
