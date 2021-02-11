@@ -108,6 +108,18 @@ registerHotkey("jb_optional_cam_down", "Optional: Move cam down", function()
 	JB:MoveVertical(-0.20)
 end)
 
+registerHotkey("jb_optional_cam_rot_x", "Optional: Move cam rotation x", function()
+	JB:MoveRotX(0.05)
+end)
+
+registerHotkey("jb_optional_cam_rot_y", "Optional: Move cam rotation y", function()
+	JB:MoveRotY(0.05)
+end)
+
+registerHotkey("jb_optional_cam_rot_z", "Optional: Move cam rotation z", function()
+	JB:MoveRotZ(-0.05)
+end)
+
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
