@@ -150,9 +150,9 @@ function JB:CheckForRestoration(delta)
 	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
-    if not self.inCar and self.inScene then
-        fppCam.yawMaxLeft = 360
-        fppCam.yawMaxRight = -360
+    if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
+        fppCam.yawMaxLeft = 3600
+        fppCam.yawMaxRight = -3600
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
@@ -193,7 +193,6 @@ function JB:CarTimer(deltaTime)
 		self.tppHeadActivated = false
 		self:SetEnableTPPValue(true)
         self:UpdateCamera()
-        --Gender:AddHead(self.animatedFace)
 	end
 
 	if(self.waitTimer > 1.0) then
