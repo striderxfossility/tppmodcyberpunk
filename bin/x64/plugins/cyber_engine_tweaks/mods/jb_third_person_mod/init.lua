@@ -108,15 +108,27 @@ registerHotkey("jb_optional_cam_down", "Optional: Move cam down", function()
 	JB:MoveVertical(-0.20)
 end)
 
-registerHotkey("jb_optional_cam_rot_x", "Optional: Move cam rotation x", function()
+registerHotkey("jb_optional_cam_rot_x", "Optional: Move cam rotation i", function()
 	JB:MoveRotX(0.05)
 end)
 
-registerHotkey("jb_optional_cam_rot_y", "Optional: Move cam rotation y", function()
+registerHotkey("jb_optional_cam_rot_y", "Optional: Move cam rotation j", function()
 	JB:MoveRotY(0.05)
 end)
 
-registerHotkey("jb_optional_cam_rot_z", "Optional: Move cam rotation z", function()
+registerHotkey("jb_optional_cam_rot_z", "Optional: Move cam rotation k", function()
+	JB:MoveRotZ(0.05)
+end)
+
+registerHotkey("jb_optional_cam_rot_x_back", "Optional: Move cam rotation i back", function()
+	JB:MoveRotX(-0.05)
+end)
+
+registerHotkey("jb_optional_cam_rot_y_back", "Optional: Move cam rotation j back", function()
+	JB:MoveRotY(-0.05)
+end)
+
+registerHotkey("jb_optional_cam_rot_z_back", "Optional: Move cam rotation k back", function()
 	JB:MoveRotZ(-0.05)
 end)
 
