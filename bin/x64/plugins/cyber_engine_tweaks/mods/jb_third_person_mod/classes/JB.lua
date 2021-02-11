@@ -150,7 +150,7 @@ function JB:CheckForRestoration(delta)
 	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
-    if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
+    if self.inScene or self.camViews[self.camActive].freeform then
         fppCam.yawMaxLeft = 3600
         fppCam.yawMaxRight = -3600
     end
