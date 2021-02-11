@@ -150,8 +150,12 @@ function JB:CheckForRestoration(delta)
 	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
+    if not self.inCar and self.inScene then
+        fppCam.yawMaxLeft = 360
+        fppCam.yawMaxRight = -360
+    end
+
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        --Gender.AddTppHead()
         Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
