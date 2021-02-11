@@ -6,3 +6,8 @@ A third person mod for cyberpunk 2077
 
 ## How to install: 
 [Wiki](https://github.com/striderxfossility/tppmodcyberpunk/wiki/How-to-install)
+
+## Credits
+- Folks at Cyber Engine Tweaks for making a awesome mod scripting tool
+- Jekky for his Red script decomiler/compiler, so i can test and see what functions i need
+- MaximiliumM (Appearance Menu Mod) for finding the head command and for helping and chatting with me
