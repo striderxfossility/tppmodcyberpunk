@@ -75,7 +75,6 @@ function JB:new()
     class.photoModeBeenActive = false
     class.headTimer           = 1.0
     class.inScene             = false
-    class.fallBackCam         = 0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -152,19 +151,8 @@ function JB:CheckForRestoration(delta)
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
-        self.fallBackCam = self.camActive
         fppCam.yawMaxLeft = 3600
         fppCam.yawMaxRight = -3600
-
-        if self.fallBackCam ~= 0 then
-            self.camActive = 5
-            self:UpdateCamera()
-        end
-    end
-
-    if not self.inScene and self.fallBackCam ~= 0 then
-        self.camActive = self.fallBackCam
-        self:UpdateCamera()
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
