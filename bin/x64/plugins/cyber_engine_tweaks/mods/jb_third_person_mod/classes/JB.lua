@@ -153,6 +153,8 @@ function JB:CheckForRestoration(delta)
     if self.inScene or self.camViews[self.camActive].freeform then
         fppCam.yawMaxLeft = 3600
         fppCam.yawMaxRight = -3600
+        fppCam.pitchMax = 100
+        fppCam.pitchMin = -100
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
