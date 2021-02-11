@@ -74,6 +74,7 @@ function JB:new()
     class.carActivated        = false
     class.photoModeBeenActive = false
     class.headTimer           = 1.0
+    class.inScene             = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -146,7 +147,8 @@ function JB:CheckForRestoration(delta)
 	    end
     end
 
-	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
+	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
+    self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
         --Gender.AddTppHead()
