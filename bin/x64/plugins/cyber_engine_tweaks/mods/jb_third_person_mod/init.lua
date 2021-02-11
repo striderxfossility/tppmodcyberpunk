@@ -46,7 +46,7 @@ end)
 
 
 registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
-    if not JB.inCar or (JB.inCar and JB.inScene) then
+    if not JB.inCar then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = PlayerPuppet:GetFPPCameraComponent()
