@@ -225,6 +225,24 @@ function JB:Zoom(i)
 	db:exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive - 1)
 end
 
+function JB:MoveRotX(i)
+    self.camViews[self.camActive].pos.rx = self.camViews[self.camActive].pos.rx + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET rx = '" .. self.camViews[self.camActive].pos.rx .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveRotY(i)
+    self.camViews[self.camActive].pos.ry = self.camViews[self.camActive].pos.ry + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET ry = '" .. self.camViews[self.camActive].pos.ry .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveRotZ(i)
+    self.camViews[self.camActive].pos.rz = self.camViews[self.camActive].pos.rz + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET rz = '" .. self.camViews[self.camActive].pos.rz .. "' WHERE id = " .. self.camActive - 1)
+end
+
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
         local PlayerSystem = Game.GetPlayerSystem()
