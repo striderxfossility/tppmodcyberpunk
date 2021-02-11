@@ -207,6 +207,18 @@ function JB:ResetZoom()
 	self:UpdateCamera()
 end
 
+function JB:MoveHorizontal(x)
+    self.camViews[self.camActive].pos.x = self.camViews[self.camActive].pos.y + x
+    self:UpdateCamera()
+    db:exec("UPDATE cameras SET x = '" .. self.camViews[self.camActive].pos.x .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveVertical(y)
+    self.camViews[self.camActive].pos.z = self.camViews[self.camActive].pos.y + y
+    self:UpdateCamera()
+    db:exec("UPDATE cameras SET z = '" .. self.camViews[self.camActive].pos.z .. "' WHERE id = " .. self.camActive - 1)
+end
+
 function JB:Zoom(z)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
 	self:UpdateCamera()
