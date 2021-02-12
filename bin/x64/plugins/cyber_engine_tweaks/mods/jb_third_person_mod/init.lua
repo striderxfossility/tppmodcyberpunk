@@ -135,6 +135,7 @@ end)
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
+
     if Game.GetPlayer() then
         JB:CarTimer(deltaTime)
         JB.timerCheckClothes = JB.timerCheckClothes + deltaTime
@@ -227,6 +228,8 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
 	      	ImGui.Text("camActive: " .. tostring(JB.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
+            ImGui.Text("tppHeadTimer: " .. tostring(JB.tppHeadTimer))
+            ImGui.Text("headTimer: " .. tostring(JB.headTimer))
         end
 	    ImGui.End()
 	end
