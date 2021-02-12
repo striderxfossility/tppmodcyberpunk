@@ -47,6 +47,9 @@ registerForEvent("onInit", function()
 	tweakItemsFactoryAppearanceSuffixCameraScriptedSystem = TweakDB:GetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedSystem'))
 	tweakItemsFactoryAppearanceSuffixCameraScriptedFunction = TweakDB:GetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedFunction'))
 
+	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedSystem'), "EquipmentSystem")
+	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedFunction'), "GetCameraSuffix")
+
     print('Jb Third Person Mod Loaded')
 end)
 
