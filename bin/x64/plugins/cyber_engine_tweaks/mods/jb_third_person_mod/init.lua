@@ -53,7 +53,7 @@ registerForEvent("onInit", function()
     print('Jb Third Person Mod Loaded')
 end)
 
-registerForEvent("onDestroy", function()
+registerForEvent("onShutdown", function()
 	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedSystem'), tweakItemsFactoryAppearanceSuffixCameraScriptedSystem)
 	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedFunction'), tweakItemsFactoryAppearanceSuffixCameraScriptedFunction)
 end)
