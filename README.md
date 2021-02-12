@@ -7,6 +7,10 @@ A third person mod for cyberpunk 2077
 ## How to install: 
 [Wiki](https://github.com/striderxfossility/tppmodcyberpunk/wiki/How-to-install)
 
+## Requirements
+[Cyber Engine Tweaks](https://github.com/yamashi/CyberEngineTweaks)
+[RedScript](https://github.com/jac3km4/redscript)
+
 ## Credits
 - Folks at Cyber Engine Tweaks for making a awesome mod scripting tool
 - Jekky for his Red script decomiler/compiler, so i can test and see what functions i need
