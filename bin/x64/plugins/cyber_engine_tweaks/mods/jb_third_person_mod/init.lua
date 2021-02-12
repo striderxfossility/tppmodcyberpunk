@@ -2,6 +2,9 @@ local JB = require("classes/JB.lua")
 local Attachment = require("classes/Attachment.lua")
 local Gender = require("classes/Gender.lua")
 
+local tweakItemsFactoryAppearanceSuffixCameraScriptedSystem = nil
+local tweakItemsFactoryAppearanceSuffixCameraScriptedFunction = nil
+
 CamView         = {}
 CamView.__index = CamView
 
@@ -41,7 +44,15 @@ registerForEvent("onInit", function()
 		table.insert(JB.camViews, cam)
 	end
 
+	tweakItemsFactoryAppearanceSuffixCameraScriptedSystem = TweakDB:GetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedSystem'))
+	tweakItemsFactoryAppearanceSuffixCameraScriptedFunction = TweakDB:GetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedFunction'))
+
     print('Jb Third Person Mod Loaded')
+end)
+
+registerForEvent("onDestroy", function()
+	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedSystem'), tweakItemsFactoryAppearanceSuffixCameraScriptedSystem)
+	TweakDB:SetFlat(TweakDBID.new('itemsFactoryAppearanceSuffix.Camera.scriptedFunction'), tweakItemsFactoryAppearanceSuffixCameraScriptedFunction)
 end)
 
 
