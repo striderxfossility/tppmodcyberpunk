@@ -184,7 +184,7 @@ function JB:CheckForRestoration(delta)
         end
         
         if not self.photoModeBeenActive and self.isTppEnabled then
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit"}, "TPP")
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         end
 
         self.timerCheckClothes = 0.0
@@ -203,7 +203,7 @@ function JB:CarTimer(deltaTime)
 	end
 
 	if(self.waitTimer > 1.0) then
-		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit"}, "TPP")
+		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
 		self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
@@ -278,7 +278,7 @@ function JB:UpdateCamera()
 end
 
 function JB:ActivateTPP()
-    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit"}, "TPP")
+    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
