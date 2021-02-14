@@ -170,6 +170,19 @@ registerForEvent("onDraw", function()
 
 		if (ImGui.Begin("JB Third Person Mod")) then
 
+            clicked = ImGui.Button("Toggle (front) player light on/of")
+	    	if (clicked) then
+				local PlayerSystem = Game.GetPlayerSystem()
+				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+                local light = PlayerPuppet:FindComponentByName(CName.new("TEMP_flashlight"))
+
+                if light:IsEnabled() then
+                    light:Toggle(false)
+                else
+                    light:Toggle(true)
+                end
+			end
+
 	    	clicked = ImGui.Button("Cam to player")
 	    	if (clicked) then
 				local PlayerSystem = Game.GetPlayerSystem()
