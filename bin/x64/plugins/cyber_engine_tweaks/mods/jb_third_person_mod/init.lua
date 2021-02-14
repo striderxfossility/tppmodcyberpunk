@@ -149,7 +149,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
                 carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
                 carCam:Activate(2.0, true)
-                Gender.AddTppHead()
+                --Gender.AddTppHead()
                 JB.tppHeadActivated = true
                 JB.carActivated     = false
             end

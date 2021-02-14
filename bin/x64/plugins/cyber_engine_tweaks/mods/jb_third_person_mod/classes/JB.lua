@@ -163,7 +163,7 @@ function JB:CheckForRestoration(delta)
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        Gender:AddFppHead()
+        --Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
 
