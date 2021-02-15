@@ -146,17 +146,24 @@ function JB:CheckForRestoration(delta)
 			end
 	    end
     end
-
-	self.inCar   = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil
+    
+    if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
+        self.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+    else
+        self.inCar = false
+    end
+	
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
         fppCam.yawMaxLeft = 3600
         fppCam.yawMaxRight = -3600
+        fppCam.pitchMax = 100
+        fppCam.pitchMin = -100
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        Gender:AddFppHead()
+        --Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
 
@@ -177,7 +184,7 @@ function JB:CheckForRestoration(delta)
         end
         
         if not self.photoModeBeenActive and self.isTppEnabled then
-            --Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         end
 
         self.timerCheckClothes = 0.0
@@ -196,7 +203,7 @@ function JB:CarTimer(deltaTime)
 	end
 
 	if(self.waitTimer > 1.0) then
-		--Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
 		self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
@@ -271,7 +278,7 @@ function JB:UpdateCamera()
 end
 
 function JB:ActivateTPP()
-    --Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
