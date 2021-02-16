@@ -288,7 +288,12 @@ function JB:ActivateTPP()
 
     local slotID = TweakDBID.new('AttachmentSlots.TppHead')
     local item = ts:GetItemInSlot(player, slotID)
-    local seamfix = player:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
+
+    if Gender:IsFemale() then
+        local seamfix = player:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
+    else
+        local seamfix = player:FindComponentByName(CName.new("t0_000_pma_base__full_seamfix"))
+    end
 
     seamfix:Toggle(false)
 end
