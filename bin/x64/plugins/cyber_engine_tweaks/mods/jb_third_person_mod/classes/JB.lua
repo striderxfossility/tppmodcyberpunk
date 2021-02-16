@@ -89,7 +89,7 @@ end
 function JB:CheckForRestoration(delta)
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = PlayerPuppet:FindComponentByName(CName.new("camera"))
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
@@ -282,6 +282,15 @@ function JB:ActivateTPP()
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
+
+    local player = Game.GetPlayer()
+    local ts = Game.GetTransactionSystem()
+
+    local slotID = TweakDBID.new('AttachmentSlots.TppHead')
+    local item = ts:GetItemInSlot(player, slotID)
+    local seamfix = player:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
+
+    seamfix:Toggle(false)
 end
 
 function JB:DeactivateTPP ()
