@@ -159,6 +159,23 @@ registerForEvent("onUpdate", function(deltaTime)
             JB:ActivateTPP()
             JB.switchBackToTpp = false
         end
+
+        if JB.isTppEnabled then
+            local PlayerSystem = Game.GetPlayerSystem()
+            local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+            local ts = Game.GetTransactionSystem()
+        
+            local slotID = TweakDBID.new('AttachmentSlots.TppHead')
+            local item = ts:GetItemInSlot(player, slotID)
+        
+            if Gender:IsFemale() then
+                seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
+            else
+                seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pma_base__full_seamfix"))
+            end
+            
+            seamfix:Toggle(false)
+        end
     end
 end)
 
@@ -180,6 +197,22 @@ registerForEvent("onDraw", function()
                     light:Toggle(false)
                 else
                     light:Toggle(true)
+                end
+			end
+
+            clicked = ImGui.Button("DEBUG")
+	    	if (clicked) then
+                local PlayerSystem = Game.GetPlayerSystem()
+				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+				local fppTorso = PlayerPuppet:FindComponentByName(CName.new("t0_000_pwa_fpp__torso"))
+                local tppTorso = PlayerPuppet:FindComponentByName(CName.new("body"))
+
+                if fppTorso.isEnabled then
+                    fppTorso:Toggle(false)
+                    tppTorso:Toggle(true)
+                else
+                    fppTorso:Toggle(true)
+                    tppTorso:Toggle(false)
                 end
 			end
 
