@@ -146,12 +146,6 @@ function JB:CheckForRestoration(delta)
 			end
 	    end
     end
-    
-    if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
-        self.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
-    else
-        self.inCar = false
-    end
 	
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 

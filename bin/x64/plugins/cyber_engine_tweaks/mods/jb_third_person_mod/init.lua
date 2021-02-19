@@ -21,6 +21,13 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
+    Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
+        if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
+            JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+        else
+            JB.inCar = false
+        end
+	end)
     
 	for row in db:rows("SELECT * FROM cameras") do
 		local vec4 = Vector4.new(tonumber(row[2]), tonumber(row[3]), tonumber(row[4]), 1.0)
@@ -155,18 +162,13 @@ registerForEvent("onUpdate", function(deltaTime)
             end
         end
 
-        if(JB.switchBackToTpp and not Attachment:HasWeaponActive()) then
-            JB:ActivateTPP()
-            JB.switchBackToTpp = false
-        end
-
-        if JB.isTppEnabled then
+        if JB.isTppEnabled and not JB.inCar then
             local PlayerSystem = Game.GetPlayerSystem()
             local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
             local ts = Game.GetTransactionSystem()
         
             local slotID = TweakDBID.new('AttachmentSlots.TppHead')
-            local item = ts:GetItemInSlot(player, slotID)
+            local item = ts:GetItemInSlot(PlayerPuppet, slotID)
         
             if Gender:IsFemale() then
                 seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
