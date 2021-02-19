@@ -74,6 +74,7 @@ function JB:new()
     class.carActivated        = false
     class.photoModeBeenActive = false
     class.headTimer           = 1.0
+    class.inScene             = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -88,7 +89,7 @@ end
 function JB:CheckForRestoration(delta)
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = PlayerPuppet:FindComponentByName(CName.new("camera"))
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
@@ -144,13 +145,25 @@ function JB:CheckForRestoration(delta)
 				self:DeactivateTPP()
 			end
 	    end
+
+        if self.switchBackToTpp and not Attachment:HasWeaponActive() then
+            self:ActivateTPP()
+            self.switchBackToTpp = false
+        end
+    end
+    
+	
+    self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
+
+    if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
+        fppCam.yawMaxLeft = 3600
+        fppCam.yawMaxRight = -3600
+        fppCam.pitchMax = 100
+        fppCam.pitchMin = -100
     end
 
-	self.inCar = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
-
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        --Gender.AddTppHead()
-        Gender:AddFppHead()
+        --Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
 
@@ -171,7 +184,7 @@ function JB:CheckForRestoration(delta)
         end
         
         if not self.photoModeBeenActive and self.isTppEnabled then
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         end
 
         self.timerCheckClothes = 0.0
@@ -187,11 +200,10 @@ function JB:CarTimer(deltaTime)
 		self.tppHeadActivated = false
 		self:SetEnableTPPValue(true)
         self:UpdateCamera()
-        --Gender:AddHead(self.animatedFace)
 	end
 
 	if(self.waitTimer > 1.0) then
-		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
 		self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
@@ -207,10 +219,40 @@ function JB:ResetZoom()
 	self:UpdateCamera()
 end
 
-function JB:Zoom(z)
-	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + z
+function JB:MoveHorizontal(i)
+    self.camViews[self.camActive].pos.x = self.camViews[self.camActive].pos.x + i
+    self:UpdateCamera()
+    db:exec("UPDATE cameras SET x = '" .. self.camViews[self.camActive].pos.x .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveVertical(i)
+    self.camViews[self.camActive].pos.z = self.camViews[self.camActive].pos.z + i
+    self:UpdateCamera()
+    db:exec("UPDATE cameras SET z = '" .. self.camViews[self.camActive].pos.z .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:Zoom(i)
+	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
 	self:UpdateCamera()
 	db:exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveRotX(i)
+    self.camViews[self.camActive].rot.i = self.camViews[self.camActive].rot.i + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET rx = '" .. self.camViews[self.camActive].rot.i .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveRotY(i)
+    self.camViews[self.camActive].rot.j = self.camViews[self.camActive].rot.j + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET ry = '" .. self.camViews[self.camActive].rot.j .. "' WHERE id = " .. self.camActive - 1)
+end
+
+function JB:MoveRotZ(i)
+    self.camViews[self.camActive].rot.k = self.camViews[self.camActive].rot.k + i
+	self:UpdateCamera()
+	db:exec("UPDATE cameras SET rz = '" .. self.camViews[self.camActive].rot.k .. "' WHERE id = " .. self.camActive - 1)
 end
 
 function JB:RestoreFPPView()
@@ -236,7 +278,7 @@ function JB:UpdateCamera()
 end
 
 function JB:ActivateTPP()
-    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head"}, "TPP")
+    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
