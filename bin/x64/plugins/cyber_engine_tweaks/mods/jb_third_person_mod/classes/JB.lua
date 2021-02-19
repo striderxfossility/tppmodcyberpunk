@@ -145,7 +145,13 @@ function JB:CheckForRestoration(delta)
 				self:DeactivateTPP()
 			end
 	    end
+
+        if self.switchBackToTpp and not Attachment:HasWeaponActive() then
+            self:ActivateTPP()
+            self.switchBackToTpp = false
+        end
     end
+    
 	
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
