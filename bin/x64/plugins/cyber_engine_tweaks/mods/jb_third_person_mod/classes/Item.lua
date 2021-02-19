@@ -46,7 +46,6 @@ function Item:Equip(name, slot)
 
         tpp.detachedObjectInfo = {obj}
         tpp.detachedObjectInfo[1].itemTDBID = TweakDBID.new(name)
-        print('working')
     end
     Item:AddToInventory(name)
     Game.EquipItemOnPlayer(name, slot)
