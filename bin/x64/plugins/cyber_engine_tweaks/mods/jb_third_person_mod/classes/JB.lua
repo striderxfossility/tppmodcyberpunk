@@ -93,16 +93,16 @@ function JB:CheckForRestoration(delta)
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
 
+    local str = "player_photomode_head"
+
+    if self.animatedFace then
+        str = "character_customization_head"
+    end
+
     self.headTimer = self.headTimer - delta
     
     if self.headTimer <= 0 then
         if self.isTppEnabled and not self.inCar then
-            local str = "player_photomode_head"
-
-            if self.animatedFace then
-                str = "character_customization_head"
-            end
-
             if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
                 Gender:AddHead(self.animatedFace)
             end
@@ -155,7 +155,7 @@ function JB:CheckForRestoration(delta)
 	
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
-    if not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
+    if self.isTppEnabled and not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
         fppCam.yawMaxLeft = 3600
         fppCam.yawMaxRight = -3600
         fppCam.pitchMax = 100
@@ -193,6 +193,12 @@ function JB:CheckForRestoration(delta)
 	if(fppCam:GetLocalPosition().x == 0.0 and fppCam:GetLocalPosition().y == 0.0 and fppCam:GetLocalPosition().z == 0.0) then
         self:SetEnableTPPValue(false)
 	end
+
+    if self.inScene and photoMode:IsPhotoModeActive() then
+        if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
+            Gender:AddHead(self.animatedFace)
+        end
+    end
 end
 
 function JB:CarTimer(deltaTime)
