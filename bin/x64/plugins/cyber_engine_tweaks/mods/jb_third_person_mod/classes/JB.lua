@@ -194,7 +194,7 @@ function JB:CheckForRestoration(delta)
         self:SetEnableTPPValue(false)
 	end
 
-    if self.inScene and photoMode:IsPhotoModeActive() then
+    if self.inScene and not self.inCar and photoMode:IsPhotoModeActive() then
         if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
             Gender:AddHead(self.animatedFace)
         end
