@@ -125,7 +125,7 @@ function JB:CheckForRestoration(delta)
     end
 
     if self.isTppEnabled then
-        if photoMode:IsPhotoModeActive() then
+        if photoMode:IsPhotoModeActive() and not self.inScene then
             self.photoModeBeenActive = true
             self:DeactivateTPP()
         end
