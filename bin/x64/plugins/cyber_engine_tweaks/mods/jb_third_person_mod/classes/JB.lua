@@ -26,6 +26,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 4, 'camActive', 1 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 4);")
 
+    db:exec("INSERT INTO settings SELECT 5, 'ModelMod', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 5);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -60,6 +62,14 @@ function JB:new()
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'camActive'") do
         class.camActive = tonumber(index[1])
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'ModelMod'") do
+        if(index[1] == 0) then
+            class.ModelMod = false
+        else
+            class.ModelMod = true
+        end
     end
 
     ----------VARIABLES-------------

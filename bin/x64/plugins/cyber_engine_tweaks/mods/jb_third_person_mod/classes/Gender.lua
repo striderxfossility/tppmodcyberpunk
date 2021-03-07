@@ -40,20 +40,25 @@ function Gender:AddFppHead()
     Item:Equip("Items.PlayerFppHead", "TppHead")
 end
 
-function Gender:AddHead(animated)
-    Gender:RemoveHead()
-    
-    if Gender:IsMale() then
-        if animated then
-            Item:Equip("Items.CharacterCustomizationMaHead", "TppHead")
+function Gender:AddHead(animated, model)
+
+    model = model or false
+
+    if not model then
+        Gender:RemoveHead()
+        
+        if Gender:IsMale() then
+            if animated then
+                Item:Equip("Items.CharacterCustomizationMaHead", "TppHead")
+            else
+                Item:Equip("Items.PlayerMaPhotomodeHead", "TppHead")
+            end
         else
-            Item:Equip("Items.PlayerMaPhotomodeHead", "TppHead")
-        end
-    else
-        if animated then
-            Item:Equip("Items.CharacterCustomizationWaHead", "TppHead")
-        else
-            Item:Equip("Items.PlayerWaPhotomodeHead", "TppHead")
+            if animated then
+                Item:Equip("Items.CharacterCustomizationWaHead", "TppHead")
+            else
+                Item:Equip("Items.PlayerWaPhotomodeHead", "TppHead")
+            end
         end
     end
 end

@@ -139,7 +139,6 @@ registerHotkey("jb_optional_cam_rot_z_back", "Optional: Move cam rotation k back
 	JB:MoveRotZ(-0.05)
 end)
 
-
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
     if Game.GetPlayer() then
@@ -175,8 +174,10 @@ registerForEvent("onUpdate", function(deltaTime)
             else
                 seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pma_base__full_seamfix"))
             end
-            
-            seamfix:Toggle(false)
+
+            if not JB.ModelMod then
+                seamfix:Toggle(false)
+            end
         end
     end
 end)
@@ -200,6 +201,12 @@ registerForEvent("onDraw", function()
                 else
                     light:Toggle(true)
                 end
+			end
+
+            clicked = ImGui.Button("Player using Model Mod (head)")
+	    	if (clicked) then
+				JB.ModelMod = not JB.ModelMod
+				db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
 			end
 
             clicked = ImGui.Button("DEBUG")
@@ -262,6 +269,7 @@ registerForEvent("onDraw", function()
 			ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
 	      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 	      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
+            ImGui.Text("Player using Model Mod (head): " .. tostring(JB.ModelMod))
 	      	ImGui.Text("---------------------------------------")
 	      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
 	      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
