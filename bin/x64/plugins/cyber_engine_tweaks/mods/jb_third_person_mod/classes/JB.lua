@@ -277,8 +277,8 @@ function JB:RestoreFPPView()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-		fppCam:SetLocalPosition(Vector4:new(0.0, 0.0, 0.0, 1.0))
-		fppCam:SetLocalOrientation(Quaternion:new(0.0, 0.0, 0.0, 1.0))
+		fppCam:SetLocalPosition(Vector4.new(0.0, 0.0, 0.0, 1.0))
+		fppCam:SetLocalOrientation(Quaternion.new(0.0, 0.0, 0.0, 1.0))
 	end
 end
 

@@ -64,7 +64,7 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		else
 			if(JB.weaponOverride) then
 				if(Attachment:HasWeaponActive()) then
-					JB.player:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
+					PlayerPuppet:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
 					JB:SetEnableTPPValue(false)
 					JB:RestoreFPPView()
 				else
