@@ -85,6 +85,8 @@ function JB:new()
     class.photoModeBeenActive = false
     class.headTimer           = 1.0
     class.inScene             = false
+    class.zoomIn              = false
+    class.zoomOut             = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -102,6 +104,14 @@ function JB:CheckForRestoration(delta)
     local fppCam       = PlayerPuppet:FindComponentByName(CName.new("camera"))
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script:GetPhotoModeSystem(script)
+
+    if(self.zoomIn) then
+        self:Zoom(0.20)
+    end
+
+    if(self.zoomOut) then
+        self:Zoom(-0.20)
+    end
 
     local str = "player_photomode_head"
 

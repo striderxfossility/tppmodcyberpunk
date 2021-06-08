@@ -77,12 +77,20 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	end
 end)
 
-registerHotkey("jb_zoom_in", "Zoom in (no continues press)", function()
-	JB:Zoom(0.50)
+registerInput('jb_zoom_in', 'Zoom in', function(isDown)
+	if (isDown) then
+		JB.zoomIn = true
+	else
+		JB.zoomIn = false
+	end
 end)
 
-registerHotkey("jb_zoom_out", "Zoom out (no continues press)", function()
-	JB:Zoom(-0.50)
+registerInput('jb_zoom_out', 'Zoom out', function(isDown)
+	if (isDown) then
+		JB.zoomOut = true
+	else
+		JB.zoomOut = false
+	end
 end)
 	
 registerHotkey("jb_switch_cam", "To next Camera view", function()
