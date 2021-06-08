@@ -211,27 +211,11 @@ registerForEvent("onDraw", function()
                 end
 			end
 
-            clicked = ImGui.Button("Player using Model Mod (head)")
+            	clicked = ImGui.Button("Player using Model Mod (head)")
 	    	if (clicked) then
-				JB.ModelMod = not JB.ModelMod
-				db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
-			end
-
-            clicked = ImGui.Button("DEBUG")
-	    	if (clicked) then
-                local PlayerSystem = Game.GetPlayerSystem()
-				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-				local fppTorso = PlayerPuppet:FindComponentByName(CName.new("t0_000_pwa_fpp__torso"))
-                local tppTorso = PlayerPuppet:FindComponentByName(CName.new("body"))
-
-                if fppTorso.isEnabled then
-                    fppTorso:Toggle(false)
-                    tppTorso:Toggle(true)
-                else
-                    fppTorso:Toggle(true)
-                    tppTorso:Toggle(false)
-                end
-			end
+			JB.ModelMod = not JB.ModelMod
+			db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
+		end
 
 	    	clicked = ImGui.Button("Cam to player")
 	    	if (clicked) then
@@ -249,7 +233,21 @@ registerForEvent("onDraw", function()
 	    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 	    		local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
 				carCam:Activate(2.0, true)
-			end
+		end
+
+		clicked = ImGui.Button("Reset cameras")
+	    	if (clicked) then
+			print("resetting cameras...")
+                	db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
+			db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
+			db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
+			db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=50, ry=0, rz=4000  WHERE id = 3")
+			db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=50, ry=0, rz=4000  WHERE id = 4")
+
+			JB:DeactivateTPP()
+
+			print("done!")
+		end
 
 	    	clicked = ImGui.Button("Reset zoom")
 	    	if (clicked) then
