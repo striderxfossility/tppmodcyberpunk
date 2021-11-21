@@ -100,7 +100,6 @@ function JB:new()
     class.directionalMovement = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
-    class.rightCam            = Vector4.new(0,0,0,0)
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -142,11 +141,9 @@ function JB:CheckForRestoration(delta)
 
         fppCam.headingLocked = true
         self.moveHorizontal  = false
-
-        self.rightCam = Game.GetPlayer():GetWorldPosition()
     end
 
-    if not self.directionalMovement and fppCam.headingLocked then
+    if not self.isTppEnabled and fppCam.headingLocked then
         fppCam.headingLocked = false
     end
 

@@ -52,16 +52,16 @@ registerForEvent("onInit", function()
             end
         end
 
-		if actionName == 'world_map_menu_move_horizontal' then
+		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
 			JB.moveHorizontal = true
-			JB.xroll = -actionValue * 1 * 2
+			JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
 
 			if speed < 8 then
                 speed = 8
             end
 
             local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
-            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), JB.rightCam, moveEuler)
+            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
 		end
 
 	end)
