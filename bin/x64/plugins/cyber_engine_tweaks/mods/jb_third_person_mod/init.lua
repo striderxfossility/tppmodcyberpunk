@@ -34,7 +34,7 @@ registerForEvent("onInit", function()
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
 		local actionName  = Game.NameToString(ListenerAction.GetName(action))
 		local actionValue = ListenerAction.GetValue(action)
-		local actionType = action:GetType(action).value
+		local actionType  = action:GetType(action).value
 
 		if actionName == 'ChoiceApply' then
             if actionType == 'BUTTON_PRESSED' then
@@ -216,42 +216,41 @@ registerForEvent("onUpdate", function(deltaTime)
                 JB.carActivated     = false
             end
         end
-    end
+    
+	    local target = Game.GetTargetingSystem():GetLookAtObject(Game.GetPlayer(), false, true)
 
-    local target = Game.GetTargetingSystem():GetLookAtObject(Game.GetPlayer(), false, true)
+	    if not target then return end
+	    if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
 
-    if not target then return end
-    if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
-
-    if target:GetClassName().value == "Door" then
-        local ps = target:GetDevicePS()
-		local state = ps:IsOpen()
-
-		if not state then
-			createInteractionHub(tostring("Open Door"), "Choice1", true)
-		else
-			createInteractionHub(tostring("Close Door"), "Choice1", true)
-		end
-		
-
-		if JB.doorInteraction then
-			JB.doorInteraction = false
-
-			if ps:IsLocked() then
-				ps:ToggleLockOnDoor()
-			end
-            if ps:IsSealed() then
-				ps:ToggleSealOnDoor()
-			end
+	    if target:GetClassName().value == "Door" then
+	        local ps = target:GetDevicePS()
+			local state = ps:IsOpen()
 
 			if not state then
-				target:OpenDoor()
+				createInteractionHub(tostring("Open Door"), "Choice1", true)
 			else
-				target:CloseDoor()
+				createInteractionHub(tostring("Close Door"), "Choice1", true)
 			end
-		end
-    end
+			
 
+			if JB.doorInteraction then
+				JB.doorInteraction = false
+
+				if ps:IsLocked() then
+					ps:ToggleLockOnDoor()
+				end
+	            if ps:IsSealed() then
+					ps:ToggleSealOnDoor()
+				end
+
+				if not state then
+					target:OpenDoor()
+				else
+					target:CloseDoor()
+				end
+			end
+	    end
+    end
 end)
 
 function createInteractionChoice(action, title)
