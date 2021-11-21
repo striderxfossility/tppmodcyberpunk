@@ -111,7 +111,7 @@ function JB:new()
     class.directionalStaticCamera = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
-    class.doorInteraction     = false
+    class.interaction         = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )

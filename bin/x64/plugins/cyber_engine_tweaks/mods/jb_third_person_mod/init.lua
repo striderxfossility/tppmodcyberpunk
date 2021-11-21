@@ -38,9 +38,9 @@ registerForEvent("onInit", function()
 
 		if actionName == 'ChoiceApply' then
             if actionType == 'BUTTON_PRESSED' then
-                JB.doorInteraction = true
+                JB.interaction = true
             elseif actionType == 'BUTTON_RELEASED' then
-                JB.doorInteraction = false
+                JB.interaction = false
             end
         end
 
@@ -233,8 +233,8 @@ registerForEvent("onUpdate", function(deltaTime)
 			end
 			
 
-			if JB.doorInteraction then
-				JB.doorInteraction = false
+			if JB.interaction then
+				JB.interaction = false
 
 				if ps:IsLocked() then
 					ps:ToggleLockOnDoor()
@@ -250,6 +250,19 @@ registerForEvent("onUpdate", function(deltaTime)
 				end
 			end
 	    end
+
+	    if target:GetClassName().value == "DataTerm" then
+	    	createInteractionHub(tostring("Select Destination"), "Choice1", true)
+
+	        target:TurnOnDevice()
+	        target:TurnOnScreen()
+
+	        if JB.interaction then
+	            target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
+	            JB.interaction = false
+	        end
+	    end
+
     end
 end)
 
