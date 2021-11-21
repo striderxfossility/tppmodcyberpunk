@@ -30,6 +30,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 6, 'directionalMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 6);")
 
+    db:exec("INSERT INTO settings SELECT 7, 'directionalStaticCamera', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 7);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -74,6 +76,14 @@ function JB:new()
         end
     end
 
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'directionalStaticCamera'") do
+        if(index[1] == 0) then
+            class.directionalStaticCamera = false
+        else
+            class.directionalStaticCamera = true
+        end
+    end
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'ModelMod'") do
         if(index[1] == 0) then
             class.ModelMod = false
@@ -98,6 +108,7 @@ function JB:new()
     class.zoomIn              = false
     class.zoomOut             = false
     class.directionalMovement = true
+    class.directionalStaticCamera = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
     ----------VARIABLES-------------

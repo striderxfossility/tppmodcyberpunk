@@ -54,7 +54,10 @@ registerForEvent("onInit", function()
 
 		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
 			JB.moveHorizontal = true
-			JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
+
+			if not JB.directionalStaticCamera then
+				JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
+			end
 
 			if speed < 8 then
                 speed = 8
@@ -277,6 +280,12 @@ registerForEvent("onDraw", function()
 				db:exec("UPDATE settings SET value = " .. tostring(JB.directionalMovement) .. " WHERE name = 'directionalMovement'")
 			end
 
+			clicked = ImGui.Button("Static camera true/false")
+	    	if (clicked) then
+	    		JB.directionalStaticCamera = not JB.directionalStaticCamera
+				db:exec("UPDATE settings SET value = " .. tostring(JB.directionalStaticCamera) .. " WHERE name = 'directionalStaticCamera'")
+			end
+
 			clicked = ImGui.Button("weaponOverride true/false")
 	    	if (clicked) then
 	    		JB.weaponOverride = not JB.weaponOverride
@@ -296,6 +305,7 @@ registerForEvent("onDraw", function()
 			end
 
 			ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
+			ImGui.Text("directionalStaticCamera: " .. tostring(JB.directionalStaticCamera))
 			ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
 	      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 	      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
