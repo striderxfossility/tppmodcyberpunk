@@ -100,6 +100,7 @@ function JB:new()
     class.directionalMovement = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
+    class.rightCam            = Vector4.new(0,0,0,0)
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -118,6 +119,36 @@ function JB:CheckForRestoration(delta)
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
     local quat         = fppCam:GetLocalOrientation()
+
+    if self.moveHorizontal and self.directionalMovement and self.isTppEnabled then
+        local pos           = fppCam:GetLocalPosition()
+        local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
+
+        fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
+
+        quat        = self:RotateQuaternion(quat, delta_quatX)
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
+
+        if stick.y < -0.5 then
+            fppCam.pitchMin = -15
+            fppCam.pitchMax = 15
+        else
+            fppCam.pitchMin = -5;
+            fppCam.pitchMax = 5;
+        end
+
+        fppCam:SetLocalOrientation(quat)
+        fppCam:SetLocalPosition(stick)
+
+        fppCam.headingLocked = true
+        self.moveHorizontal  = false
+
+        self.rightCam = Game.GetPlayer():GetWorldPosition()
+    end
+
+    if not self.directionalMovement and fppCam.headingLocked then
+        fppCam.headingLocked = false
+    end
 
     if(self.zoomIn) then
         self:Zoom(0.20)
@@ -147,13 +178,6 @@ function JB:CheckForRestoration(delta)
                 end
             end
         end
-
-        --if self.inCar then
-            --if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_tpp_head") then
-                --Gender:AddTppHead()
-                --print("adding TPP head")
-            --end
-        --end
 
         self.headTimer = 0.1
     end
@@ -233,6 +257,15 @@ function JB:CheckForRestoration(delta)
             Gender:AddHead(self.animatedFace)
         end
     end
+end
+
+function JB:RotateQuaternion(orig_quat, delta_quat)
+    local x = orig_quat.r * delta_quat.i + orig_quat.i * delta_quat.r + orig_quat.j * delta_quat.k - orig_quat.k * delta_quat.j;
+    local y = orig_quat.r * delta_quat.j + orig_quat.j * delta_quat.r + orig_quat.k * delta_quat.i - orig_quat.i * delta_quat.k;
+    local z = orig_quat.r * delta_quat.k + orig_quat.k * delta_quat.r + orig_quat.i * delta_quat.j - orig_quat.j * delta_quat.i;
+    local w = orig_quat.r * delta_quat.r - orig_quat.i * delta_quat.i - orig_quat.j * delta_quat.j - orig_quat.k * delta_quat.k;
+
+    return Quaternion.new(x, y, z, w)
 end
 
 function JB:CarTimer(deltaTime)

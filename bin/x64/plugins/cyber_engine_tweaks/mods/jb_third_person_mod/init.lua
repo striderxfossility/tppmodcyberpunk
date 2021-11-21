@@ -21,6 +21,8 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
+	local speed = 8
+
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
@@ -30,7 +32,7 @@ registerForEvent("onInit", function()
 	end)
 
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
-
+		local actionName  = Game.NameToString(ListenerAction.GetName(action))
 		local actionValue = ListenerAction.GetValue(action)
 
 		if actionName == 'mouse_y' then
@@ -42,9 +44,24 @@ registerForEvent("onInit", function()
 			JB.xroll = 0.025 * actionValue
 		end
 
+		if actionName == 'world_map_menu_move_vertical' then
+            if actionValue >= 0 then
+                speed = 1 + actionValue * 8
+            else
+                speed = 1 + actionValue * 8
+            end
+        end
+
 		if actionName == 'world_map_menu_move_horizontal' then
 			JB.moveHorizontal = true
-			JB.xroll = -actionValue * 1.429 * 2
+			JB.xroll = -actionValue * 1 * 2
+
+			if speed < 8 then
+                speed = 8
+            end
+
+            local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
+            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), JB.rightCam, moveEuler)
 		end
 
 	end)
