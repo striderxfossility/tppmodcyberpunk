@@ -183,31 +183,10 @@ registerForEvent("onUpdate", function(deltaTime)
 
                 carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
                 carCam:Activate(2.0, true)
-                --Gender.AddTppHead()
                 JB.tppHeadActivated = true
                 JB.carActivated     = false
             end
         end
-
-	-- NOT WORKING ANYMORE OF 1.3
-        --if JB.isTppEnabled and not JB.inCar then
-            --local PlayerSystem = Game.GetPlayerSystem()
-            --local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-            --local ts = Game.GetTransactionSystem()
-        
-            --local slotID = TweakDBID.new('AttachmentSlots.TppHead')
-            --local item = ts:GetItemInSlot(PlayerPuppet, slotID)
-        
-            --if Gender:IsFemale() then
-            --    seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pwa_base__full_seamfix"))
-            --else
-            --    seamfix = PlayerPuppet:FindComponentByName(CName.new("t0_000_pma_base__full_seamfix"))
-            --end
-
-            --if not JB.ModelMod then
-            --    seamfix:Toggle(false)
-            --end
-        --end
     end
 end)
 
