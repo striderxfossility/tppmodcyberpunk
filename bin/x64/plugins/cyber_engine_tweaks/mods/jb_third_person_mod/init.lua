@@ -251,7 +251,7 @@ registerForEvent("onUpdate", function(deltaTime)
 			end
 	    end
 
-	    if target:GetClassName().value == "DataTerm" then
+	    if target:GetClassName().value == "DataTerm" then -- fast travel
 	    	createInteractionHub(tostring("Select Destination"), "Choice1", true)
 
 	        target:TurnOnDevice()
@@ -259,6 +259,19 @@ registerForEvent("onUpdate", function(deltaTime)
 
 	        if JB.interaction then
 	            target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
+	            JB.interaction = false
+	        end
+	    end
+
+	    if target:GetClassName().value == "VendingMachine" then
+	        createInteractionHub(tostring("Get a drink"), "Choice1", true)
+
+	        target:TurnOnDevice()
+
+	        if JB.interaction then
+	            target:PlayItemFall()
+	            local dispenseRequest = target:CreateDispenseRequest(true, target:GetJunkItem())
+	            target:DispenseItems(dispenseRequest)
 	            JB.interaction = false
 	        end
 	    end
