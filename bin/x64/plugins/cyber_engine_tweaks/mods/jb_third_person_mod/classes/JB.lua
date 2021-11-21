@@ -98,6 +98,8 @@ function JB:new()
     class.zoomIn              = false
     class.zoomOut             = false
     class.DirectionalMovement = true
+    class.moveHorizontal      = false
+    class.xroll               = 0.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )

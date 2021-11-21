@@ -28,6 +28,26 @@ registerForEvent("onInit", function()
             JB.inCar = false
         end
 	end)
+
+	Observe('PlayerPuppet', 'OnAction', function(self, action)
+
+		local actionValue = ListenerAction.GetValue(action)
+
+		if actionName == 'mouse_y' then
+			JB.moveHorizontal = true
+		end
+
+		if actionName == 'mouse_x' then
+			JB.moveHorizontal = true
+			JB.xroll = 0.025 * actionValue
+		end
+
+		if actionName == 'world_map_menu_move_horizontal' then
+			JB.moveHorizontal = true
+			JB.xroll = -actionValue * 1.429 * 2
+		end
+
+	end)
     
 	for row in db:rows("SELECT * FROM cameras") do
 		local vec4 = Vector4.new(tonumber(row[2]), tonumber(row[3]), tonumber(row[4]), 1.0)
