@@ -254,6 +254,12 @@ registerForEvent("onDraw", function()
 	    		JB:ResetZoom()
 			end
 
+			clicked = ImGui.Button("Directional Movement true/false")
+	    	if (clicked) then
+	    		JB.directionalMovement = not JB.directionalMovement
+				db:exec("UPDATE settings SET value = " .. tostring(JB.directionalMovement) .. " WHERE name = 'directionalMovement'")
+			end
+
 			clicked = ImGui.Button("weaponOverride true/false")
 	    	if (clicked) then
 	    		JB.weaponOverride = not JB.weaponOverride
@@ -272,6 +278,7 @@ registerForEvent("onDraw", function()
 				db:exec("UPDATE settings SET value = " .. tostring(JB.allowCameraBobbing) .. " WHERE name = 'allowCameraBobbing'")
 			end
 
+			ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
 			ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
 	      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 	      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))

@@ -28,7 +28,7 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 5, 'ModelMod', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 5);")
 
-    db:exec("INSERT INTO settings SELECT 6, 'DirectionalMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 6);")
+    db:exec("INSERT INTO settings SELECT 6, 'directionalMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 6);")
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
@@ -66,11 +66,11 @@ function JB:new()
         class.camActive = tonumber(index[1])
     end
 
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'DirectionalMovement'") do
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'directionalMovement'") do
         if(index[1] == 0) then
-            class.DirectionalMovement = false
+            class.directionalMovement = false
         else
-            class.DirectionalMovement = true
+            class.directionalMovement = true
         end
     end
 
@@ -97,7 +97,7 @@ function JB:new()
     class.inScene             = false
     class.zoomIn              = false
     class.zoomOut             = false
-    class.DirectionalMovement = true
+    class.directionalMovement = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
     ----------VARIABLES-------------
