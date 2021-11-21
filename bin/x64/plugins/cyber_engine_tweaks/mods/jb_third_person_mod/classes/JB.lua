@@ -117,6 +117,7 @@ function JB:CheckForRestoration(delta)
     local fppCam       = PlayerPuppet:FindComponentByName(CName.new("camera"))
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
+    local quat         = fppCam:GetLocalOrientation()
 
     if(self.zoomIn) then
         self:Zoom(0.20)
