@@ -34,6 +34,15 @@ registerForEvent("onInit", function()
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
 		local actionName  = Game.NameToString(ListenerAction.GetName(action))
 		local actionValue = ListenerAction.GetValue(action)
+		local actionType = action:GetType(action).value
+
+		if actionName == 'ChoiceApply' then
+            if actionType == 'BUTTON_PRESSED' then
+                JB.doorInteraction = true
+            elseif actionType == 'BUTTON_RELEASED' then
+                JB.doorInteraction = false
+            end
+        end
 
 		if actionName == 'mouse_y' then
 			JB.moveHorizontal = true
@@ -208,7 +217,81 @@ registerForEvent("onUpdate", function(deltaTime)
             end
         end
     end
+
+    local target = Game.GetTargetingSystem():GetLookAtObject(Game.GetPlayer(), false, true)
+
+    if not target then return end
+    if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
+
+    if target:GetClassName().value == "Door" then
+        local ps = target:GetDevicePS()
+		local state = ps:IsOpen()
+
+		if not state then
+			createInteractionHub(tostring("Open Door"), "Choice1", true)
+		else
+			createInteractionHub(tostring("Close Door"), "Choice1", true)
+		end
+		
+
+		if JB.doorInteraction then
+			JB.doorInteraction = false
+
+			if ps:IsLocked() then
+				ps:ToggleLockOnDoor()
+			end
+            if ps:IsSealed() then
+				ps:ToggleSealOnDoor()
+			end
+
+			if not state then
+				target:OpenDoor()
+			else
+				target:CloseDoor()
+			end
+		end
+    end
+
 end)
+
+function createInteractionChoice(action, title)
+    local choiceData =  InteractionChoiceData.new()
+    choiceData.localizedName = title
+    choiceData.inputAction = action
+
+    local choiceType = ChoiceTypeWrapper.new()
+    choiceType:SetType(gameinteractionsChoiceType.Blueline)
+    choiceData.type = choiceType
+
+    return choiceData
+end
+
+function prepareVisualizersInfo(hub)
+    local visualizersInfo = VisualizersInfo.new()
+    visualizersInfo.activeVisId = hub.id
+    visualizersInfo.visIds = { hub.id }
+
+    return visualizersInfo
+end
+
+function createInteractionHub(titel, action, active)
+    local choiceHubData =  InteractionChoiceHubData.new()
+    choiceHubData.id = -1001
+    choiceHubData.active = active
+    choiceHubData.flags = EVisualizerDefinitionFlags.Undefined
+    choiceHubData.title = titel
+
+    local choices = {}
+    table.insert(choices, createInteractionChoice(action, titel))
+    choiceHubData.choices = choices
+
+    local visualizersInfo = prepareVisualizersInfo(choiceHubData)
+
+    local blackboardDefs = Game.GetAllBlackboardDefs()
+    local interactionBB = Game.GetBlackboardSystem():Get(blackboardDefs.UIInteractions)
+    interactionBB:SetVariant(blackboardDefs.UIInteractions.InteractionChoiceHub, ToVariant(choiceHubData), true)
+    interactionBB:SetVariant(blackboardDefs.UIInteractions.VisualizersInfo, ToVariant(visualizersInfo), true)
+end
 
 onOpenDebug = false
 
