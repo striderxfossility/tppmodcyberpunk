@@ -419,6 +419,11 @@ registerForEvent("onDraw", function()
 				db:exec("UPDATE settings SET value = " .. tostring(JB.allowCameraBobbing) .. " WHERE name = 'allowCameraBobbing'")
 			end
 
+			local PlayerSystem = Game.GetPlayerSystem()
+    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    		local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
+
 			ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
 			ImGui.Text("directionalStaticCamera: " .. tostring(JB.directionalStaticCamera))
 			ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
@@ -429,7 +434,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
 	      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
 	      	ImGui.Text("inCar: " .. tostring(JB.inCar))
-		ImGui.Text("inScene: " .. tostring(JB.inScene))
+			ImGui.Text("inScene: " .. tostring(JB.inScene))
 	      	ImGui.Text("waitTimer: " .. tostring(JB.waitTimer))
 	      	ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
 	      	ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
@@ -438,6 +443,7 @@ registerForEvent("onDraw", function()
 	      	ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
 	      	ImGui.Text("camActive: " .. tostring(JB.camActive))
 	      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
+	      	ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
         end
 	    ImGui.End()
 	end

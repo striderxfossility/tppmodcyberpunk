@@ -107,8 +107,6 @@ function JB:new()
     class.inScene             = false
     class.zoomIn              = false
     class.zoomOut             = false
-    class.directionalMovement = true
-    class.directionalStaticCamera = true
     class.moveHorizontal      = false
     class.xroll               = 0.0
     class.interaction         = false
@@ -131,7 +129,7 @@ function JB:CheckForRestoration(delta)
     local photoMode    = script.GetPhotoModeSystem()
     local quat         = fppCam:GetLocalOrientation()
 
-    if self.moveHorizontal and self.directionalMovement and self.isTppEnabled then
+    if self.moveHorizontal and self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
         local pos           = fppCam:GetLocalPosition()
         local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
 
@@ -155,7 +153,7 @@ function JB:CheckForRestoration(delta)
         self.moveHorizontal  = false
     end
 
-    if not self.isTppEnabled and fppCam.headingLocked then
+    if not self.isTppEnabled and fppCam.headingLocked and JB.inScene then
         fppCam.headingLocked = false
     end
 
