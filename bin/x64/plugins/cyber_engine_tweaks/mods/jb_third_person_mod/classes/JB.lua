@@ -150,6 +150,35 @@ function JB:CheckForRestoration(delta)
         fppCam:SetLocalPosition(stick)
 
         self.moveHorizontal  = false
+    else
+        if not PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+            local pos           = fppCam:GetLocalPosition()
+            local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
+
+            fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
+
+            quat        = self:RotateQuaternion(quat, delta_quatX)
+            local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
+
+            if stick.y < -0.5 then
+                fppCam.pitchMin = -15
+                fppCam.pitchMax = 15
+            else
+                fppCam.pitchMin = -5;
+                fppCam.pitchMax = 5;
+            end
+
+            fppCam:SetLocalOrientation(quat)
+            fppCam:SetLocalPosition(stick)
+
+            self.moveHorizontal  = false
+            fppCam.headingLocked = true
+        end
+
+        if PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+            self:UpdateCamera()
+            fppCam.headingLocked = false
+        end
     end
 
     if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then 
@@ -158,12 +187,10 @@ function JB:CheckForRestoration(delta)
         end
     else
         if self.directionalMovement and PlayerPuppet:IsMoving() and self.isTppEnabled then
-            print('true')
             fppCam.headingLocked = true
         end
 
         if self.directionalMovement and not self.isTppEnabled then
-            print('false')
             fppCam.headingLocked = false
         end
     end
