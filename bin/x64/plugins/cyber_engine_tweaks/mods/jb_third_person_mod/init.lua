@@ -25,10 +25,6 @@ end
 registerForEvent("onInit", function()
 	local speed = 8
 
-	Observe("PlayerPuppet", "OnRequestComponents", function (self, comp) 
-		print(Dump(comp, false))
-	end)
-
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
