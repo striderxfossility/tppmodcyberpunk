@@ -149,7 +149,6 @@ function JB:CheckForRestoration(delta)
         fppCam:SetLocalOrientation(quat)
         fppCam:SetLocalPosition(stick)
 
-        --fppCam.headingLocked = true
         self.moveHorizontal  = false
     end
 
