@@ -149,16 +149,32 @@ function JB:CheckForRestoration(delta)
         fppCam:SetLocalOrientation(quat)
         fppCam:SetLocalPosition(stick)
 
-        fppCam.headingLocked = true
+        --fppCam.headingLocked = true
         self.moveHorizontal  = false
     end
 
+    if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then 
+        if self.isTppEnabled then
+            JB:DeactivateTPP()
+        end
+    else
+        if self.directionalMovement and PlayerPuppet:IsMoving() and self.isTppEnabled then
+            print('true')
+            fppCam.headingLocked = true
+        end
+
+        if self.directionalMovement and not self.isTppEnabled then
+            print('false')
+            fppCam.headingLocked = false
+        end
+    end
+
     if not self.isTppEnabled and not JB.inCar and fppCam.headingLocked then
-        fppCam.headingLocked = false
+        --fppCam.headingLocked = false
     end
 
     if not self.isTppEnabled and fppCam.headingLocked and JB.inScene then
-        fppCam.headingLocked = false
+        --fppCam.headingLocked = false
     end
 
     if(self.zoomIn) then
@@ -232,7 +248,6 @@ function JB:CheckForRestoration(delta)
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
-        --Gender:AddFppHead()
 		self.carCheckOnce = true
 	end
 
