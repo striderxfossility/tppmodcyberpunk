@@ -153,6 +153,10 @@ function JB:CheckForRestoration(delta)
         self.moveHorizontal  = false
     end
 
+    if not self.isTppEnabled and not JB.inCar and fppCam.headingLocked then
+        fppCam.headingLocked = false
+    end
+
     if not self.isTppEnabled and fppCam.headingLocked and JB.inScene then
         fppCam.headingLocked = false
     end
