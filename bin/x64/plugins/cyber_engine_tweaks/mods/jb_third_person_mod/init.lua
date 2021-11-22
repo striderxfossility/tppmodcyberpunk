@@ -258,8 +258,8 @@ registerForEvent("onUpdate", function(deltaTime)
 	        target:TurnOnScreen()
 
 	        if JB.interaction then
+	        	JB.interaction = false
 	            target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
-	            JB.interaction = false
 	        end
 	    end
 
@@ -269,10 +269,10 @@ registerForEvent("onUpdate", function(deltaTime)
 	        target:TurnOnDevice()
 
 	        if JB.interaction then
+	        	JB.interaction = false
 	            target:PlayItemFall()
 	            local dispenseRequest = target:CreateDispenseRequest(true, target:GetJunkItem())
 	            target:DispenseItems(dispenseRequest)
-	            JB.interaction = false
 	        end
 	    end
 
