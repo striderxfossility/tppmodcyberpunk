@@ -204,6 +204,10 @@ registerForEvent("onUpdate", function(deltaTime)
 
         JB:CheckForRestoration(deltaTime)
 
+        if JB.inCar then
+        	JB:DeactivateTPP()
+        end
+
         if JB.carActivated then
             if JB.inCar then
                 local PlayerSystem = Game.GetPlayerSystem()
