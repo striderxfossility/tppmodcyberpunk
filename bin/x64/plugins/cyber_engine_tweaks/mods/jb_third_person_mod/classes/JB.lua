@@ -179,6 +179,10 @@ function JB:CheckForRestoration(delta)
             self:UpdateCamera()
             fppCam.headingLocked = false
         end
+
+        if not PlayerPuppet:IsMoving() and not self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+            fppCam.headingLocked = false
+        end
     end
 
     if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then 
