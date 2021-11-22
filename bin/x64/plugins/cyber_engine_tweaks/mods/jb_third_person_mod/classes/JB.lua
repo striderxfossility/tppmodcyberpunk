@@ -32,6 +32,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 7, 'directionalStaticCamera', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 7);")
 
+    db:exec("INSERT INTO settings SELECT 8, 'normalCameraRotateWhenStill', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 8);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -81,6 +83,14 @@ function JB:new()
             class.directionalStaticCamera = false
         else
             class.directionalStaticCamera = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'normalCameraRotateWhenStill'") do
+        if(index[1] == 0) then
+            class.normalCameraRotateWhenStill = false
+        else
+            class.normalCameraRotateWhenStill = true
         end
     end
 
@@ -151,37 +161,39 @@ function JB:CheckForRestoration(delta)
 
         self.moveHorizontal  = false
     else
-        if not PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
-            local pos           = fppCam:GetLocalPosition()
-            local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
+        if self.normalCameraRotateWhenStill then
+            if not PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+                local pos           = fppCam:GetLocalPosition()
+                local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
 
-            fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
+                fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
 
-            quat        = self:RotateQuaternion(quat, delta_quatX)
-            local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
+                quat        = self:RotateQuaternion(quat, delta_quatX)
+                local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
 
-            if stick.y < -0.5 then
-                fppCam.pitchMin = -15
-                fppCam.pitchMax = 15
-            else
-                fppCam.pitchMin = -5;
-                fppCam.pitchMax = 5;
+                if stick.y < -0.5 then
+                    fppCam.pitchMin = -15
+                    fppCam.pitchMax = 15
+                else
+                    fppCam.pitchMin = -5;
+                    fppCam.pitchMax = 5;
+                end
+
+                fppCam:SetLocalOrientation(quat)
+                fppCam:SetLocalPosition(stick)
+
+                self.moveHorizontal  = false
+                fppCam.headingLocked = true
             end
 
-            fppCam:SetLocalOrientation(quat)
-            fppCam:SetLocalPosition(stick)
+            if PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+                self:UpdateCamera()
+                fppCam.headingLocked = false
+            end
 
-            self.moveHorizontal  = false
-            fppCam.headingLocked = true
-        end
-
-        if PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement then
-            self:UpdateCamera()
-            fppCam.headingLocked = false
-        end
-
-        if not PlayerPuppet:IsMoving() and not self.isTppEnabled and not JB.inCar and not self.directionalMovement then
-            fppCam.headingLocked = false
+            if not PlayerPuppet:IsMoving() and not self.isTppEnabled and not JB.inCar and not self.directionalMovement then
+                fppCam.headingLocked = false
+            end
         end
     end
 

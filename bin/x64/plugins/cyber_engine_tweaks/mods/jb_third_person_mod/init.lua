@@ -402,6 +402,20 @@ registerForEvent("onDraw", function()
 					db:exec("UPDATE settings SET value = " .. tostring(JB.directionalStaticCamera) .. " WHERE name = 'directionalStaticCamera'")
 				end
 
+				clicked = ImGui.Button("Normal Camera Rotate When Stil true/false")
+		    	if (clicked) then
+		    		JB.normalCameraRotateWhenStill = not JB.normalCameraRotateWhenStill
+
+		    		if not JB.normalCameraRotateWhenStill then
+		    			local PlayerSystem 		= Game.GetPlayerSystem()
+			    		local PlayerPuppet 		= PlayerSystem:GetLocalPlayerMainGameObject()
+			    		local fppCam       		= PlayerPuppet:GetFPPCameraComponent()
+		    			fppCam.headingLocked 	= false
+		    		end
+
+					db:exec("UPDATE settings SET value = " .. tostring(JB.normalCameraRotateWhenStill) .. " WHERE name = 'normalCameraRotateWhenStill'")
+				end
+
 				clicked = ImGui.Button("weaponOverride true/false")
 		    	if (clicked) then
 		    		JB.weaponOverride = not JB.weaponOverride
@@ -427,6 +441,7 @@ registerForEvent("onDraw", function()
 
 				ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
 				ImGui.Text("directionalStaticCamera: " .. tostring(JB.directionalStaticCamera))
+				ImGui.Text("normalCameraRotateWhenStill: " .. tostring(JB.normalCameraRotateWhenStill))
 				ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
 		      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 		      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
