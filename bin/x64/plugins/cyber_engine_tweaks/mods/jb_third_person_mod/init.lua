@@ -385,6 +385,13 @@ registerForEvent("onDraw", function()
 			clicked = ImGui.Button("Directional Movement true/false")
 	    	if (clicked) then
 	    		JB.directionalMovement = not JB.directionalMovement
+
+	    		if not JB.directionalMovement then
+	    			local PlayerSystem 		= Game.GetPlayerSystem()
+		    		local PlayerPuppet 		= PlayerSystem:GetLocalPlayerMainGameObject()
+		    		local fppCam       		= PlayerPuppet:GetFPPCameraComponent()
+	    			fppCam.headingLocked 	= false
+	    		end
 				db:exec("UPDATE settings SET value = " .. tostring(JB.directionalMovement) .. " WHERE name = 'directionalMovement'")
 			end
 
