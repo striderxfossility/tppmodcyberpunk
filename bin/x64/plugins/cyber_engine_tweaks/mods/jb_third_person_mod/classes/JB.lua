@@ -32,7 +32,7 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 7, 'directionalStaticCamera', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 7);")
 
-    db:exec("INSERT INTO settings SELECT 8, 'normalCameraRotateWhenStill', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 8);")
+    db:exec("INSERT INTO settings SELECT 8, 'normalCameraRotateWhenStill', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 8);")
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then

@@ -2,6 +2,8 @@ local JB = require("classes/JB.lua")
 local Attachment = require("classes/Attachment.lua")
 local Gender = require("classes/Gender.lua")
 
+local test = ""
+
 CamView         = {}
 CamView.__index = CamView
 
@@ -22,6 +24,10 @@ end
 
 registerForEvent("onInit", function()
 	local speed = 8
+
+	Observe("PlayerPuppet", "OnRequestComponents", function (self, comp) 
+		print(Dump(comp, false))
+	end)
 
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
@@ -219,65 +225,94 @@ registerForEvent("onUpdate", function(deltaTime)
     
 	    local target = Game.GetTargetingSystem():GetLookAtObject(Game.GetPlayer(), false, true)
 
-	    if not target then return end
-	    if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
+		if target ~= nill then
+			test = target:GetClassName().value
 
-	    if target:GetClassName().value == "Door" then
-	        local ps = target:GetDevicePS()
-			local state = ps:IsOpen()
+			if not target then return end
+			if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
 
-			if not state then
-				createInteractionHub(tostring("Open Door"), "Choice1", true)
-			else
-				createInteractionHub(tostring("Close Door"), "Choice1", true)
-			end
-			
-
-			if JB.interaction then
-				JB.interaction = false
-
-				if ps:IsLocked() then
-					ps:ToggleLockOnDoor()
-				end
-	            if ps:IsSealed() then
-					ps:ToggleSealOnDoor()
-				end
+			if target:GetClassName().value == "Door" then
+				local ps = target:GetDevicePS()
+				local state = ps:IsOpen()
 
 				if not state then
-					target:OpenDoor()
+					createInteractionHub(tostring("Open Door"), "Choice1", true)
 				else
-					target:CloseDoor()
+					createInteractionHub(tostring("Close Door"), "Choice1", true)
+				end
+				
+
+				if JB.interaction then
+					JB.interaction = false
+
+					if ps:IsLocked() then
+						ps:ToggleLockOnDoor()
+					end
+					if ps:IsSealed() then
+						ps:ToggleSealOnDoor()
+					end
+
+					if not state then
+						target:OpenDoor()
+					else
+						target:CloseDoor()
+					end
 				end
 			end
-	    end
 
-	    if target:GetClassName().value == "DataTerm" then -- fast travel
-	    	createInteractionHub(tostring("Select Destination"), "Choice1", true)
+			if target:GetClassName().value == "DataTerm" then -- fast travel
+				createInteractionHub(tostring("Select Destination"), "Choice1", true)
 
-	        target:TurnOnDevice()
-	        target:TurnOnScreen()
+				target:TurnOnDevice()
+				target:TurnOnScreen()
 
-	        if JB.interaction then
-	        	JB.interaction = false
-	            target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
-	        end
-	    end
+				if JB.interaction then
+					JB.interaction = false
+					target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
+				end
+			end
 
-	    if target:GetClassName().value == "VendingMachine" then
-	        createInteractionHub(tostring("Get a drink"), "Choice1", true)
+			if target:GetClassName().value == "VendingMachine" then
+				createInteractionHub(tostring("Get a drink"), "Choice1", true)
 
-	        target:TurnOnDevice()
+				target:TurnOnDevice()
 
-	        if JB.interaction then
-	        	JB.interaction = false
-	            target:PlayItemFall()
-	            local dispenseRequest = target:CreateDispenseRequest(true, target:GetJunkItem())
-	            target:DispenseItems(dispenseRequest)
-	        end
-	    end
-
+				if JB.interaction then
+					JB.interaction = false
+					target:PlayItemFall()
+					local dispenseRequest = target:CreateDispenseRequest(true, target:GetJunkItem())
+					target:DispenseItems(dispenseRequest)
+				end
+			end
+		else
+			test = ""
+		end
     end
 end)
+
+function mount(entID, vehicleEVehicleDoor)
+    local player = Game.GetPlayer()
+
+    local data = NewObject('handle:gameMountEventData')
+    data.isInstant = true
+    data.slotName = vehicleEVehicleDoor
+    data.mountParentEntityId = entID
+    data.entryAnimName = "forcedTransition"
+
+    local slotID = NewObject('gamemountingMountingSlotId')
+    slotID.id = vehicleEVehicleDoor
+
+    local mountingInfo = NewObject('gamemountingMountingInfo')
+    mountingInfo.childId = player:GetEntityID()
+    mountingInfo.parentId = entID
+    mountingInfo.slotId = slotID
+
+    local mountEvent = NewObject('handle:gamemountingMountingRequest')
+    mountEvent.lowLevelMountingInfo = mountingInfo
+    mountEvent.mountData = data
+
+    Game.GetMountingFacility():Mount(mountEvent)
+end
 
 function createInteractionChoice(action, title)
     local choiceData =  InteractionChoiceData.new()
@@ -460,6 +495,7 @@ registerForEvent("onDraw", function()
 		      	ImGui.Text("camActive: " .. tostring(JB.camActive))
 		      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
 		      	ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
+				ImGui.Text("test: " .. tostring(test))
 	        end
 		    ImGui.End()
 		end
