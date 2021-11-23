@@ -24,7 +24,6 @@ end
 
 registerForEvent("onInit", function()
 	local speed = 8
-	local verticalMove = 0
 
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
@@ -69,26 +68,20 @@ registerForEvent("onInit", function()
             end
         end
 
-		local rightCam = Vector4.new(
-                    Game.GetPlayer():GetWorldPosition().x + Game.GetPlayer():GetWorldForward().x / speed,
-                    Game.GetPlayer():GetWorldPosition().y + Game.GetPlayer():GetWorldForward().y / speed,
-                    Game.GetPlayer():GetWorldPosition().z,
-                    Game.GetPlayer():GetWorldPosition().w)
-
 		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
 			JB.isMoving = true
 			JB.moveHorizontal = true
 
-			if speed < 8 then
-				speed = 8
-			end
-
 			if not JB.directionalStaticCamera then
-				JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y / 2
+				JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
 			end
 
-            local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y)
-            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+			if speed < 8 then
+                speed = 8
+            end
+
+            local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
+            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
 		end
 
 	end)
