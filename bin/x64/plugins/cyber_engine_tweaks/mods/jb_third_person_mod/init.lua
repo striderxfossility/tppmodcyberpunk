@@ -23,6 +23,8 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
+	local speed = 8
+
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
@@ -35,8 +37,6 @@ registerForEvent("onInit", function()
 		local actionName  = Game.NameToString(ListenerAction.GetName(action))
 		local actionValue = ListenerAction.GetValue(action)
 		local actionType  = action:GetType(action).value
-		local PlayerSystem = Game.GetPlayerSystem()
-    	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
 		if actionName == 'ChoiceApply' then
             if actionType == 'BUTTON_PRESSED' then
@@ -62,13 +62,11 @@ registerForEvent("onInit", function()
 		if actionName == 'world_map_menu_move_vertical' then
 			JB.isMoving = true
             if actionValue >= 0 then
-                JB.speed = 1 + actionValue * 8
+                speed = 1 + actionValue * 8
             else
-                JB.speed = 1 + actionValue * 8
+                speed = 1 + actionValue * 8
             end
         end
-
-		local rightCam = Game.GetPlayer():GetWorldPosition()
 
 		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
 			JB.isMoving = true
@@ -78,8 +76,12 @@ registerForEvent("onInit", function()
 				JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
 			end
 
+			if speed < 8 then
+                speed = 8
+            end
+
             local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
-            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
 		end
 
 	end)
@@ -205,11 +207,6 @@ end)
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
     if Game.GetPlayer() then
-
-		if JB.speed < 8 then
-			JB.speed = 8
-		end
-		
         JB:CarTimer(deltaTime)
         JB.timerCheckClothes = JB.timerCheckClothes + deltaTime
 

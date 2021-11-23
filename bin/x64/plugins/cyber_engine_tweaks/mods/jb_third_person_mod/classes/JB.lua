@@ -121,7 +121,6 @@ function JB:new()
     class.xroll               = 0.0
     class.interaction         = false
     class.IsMoving            = false
-    class.speed               = 8.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -165,15 +164,7 @@ function JB:CheckForRestoration(delta)
     else
         if self.normalCameraRotateWhenStill then
 
-            if self.isTppEnabled and (self.directionalMovement or self.normalCameraRotateWhenStill) and self.xroll == 0 and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
-
-                
-                local rightCam = Vector4.new(
-                    Game.GetPlayer():GetWorldPosition().x + Game.GetPlayer():GetWorldForward().x / self.speed,
-                    Game.GetPlayer():GetWorldPosition().y + Game.GetPlayer():GetWorldForward().y / self.speed,
-                    Game.GetPlayer():GetWorldPosition().z,
-                    Game.GetPlayer():GetWorldPosition().w
-                )
+            if not self.isMoving and self.isTppEnabled and (self.directionalMovement or self.normalCameraRotateWhenStill) and self.xroll == 0 and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
 
                 if quat.k > -0.999 and quat.k < -0.001 and quat.r > 0.001 and quat.r < 0.999 then
                     local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta)
@@ -183,7 +174,7 @@ function JB:CheckForRestoration(delta)
                     fppCam:SetLocalPosition(stick)
 
                     local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
                 if quat.k > 0.001 and quat.k < 0.999 and quat.r > 0.001 and quat.r < 0.999 then
@@ -194,7 +185,7 @@ function JB:CheckForRestoration(delta)
                     fppCam:SetLocalPosition(stick)
 
                     local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
                 if quat.k > -0.999 and quat.k < -0.001 and quat.r > -0.999 and quat.r < -0.001 then
@@ -205,7 +196,7 @@ function JB:CheckForRestoration(delta)
                     fppCam:SetLocalPosition(stick)
 
                     local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
                 if quat.k > 0.001 and quat.k < 0.999 and quat.r > -0.999 and quat.r < -0.001 then
@@ -216,7 +207,7 @@ function JB:CheckForRestoration(delta)
                     fppCam:SetLocalPosition(stick)
 
                     local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), rightCam, moveEuler)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
             end
 
