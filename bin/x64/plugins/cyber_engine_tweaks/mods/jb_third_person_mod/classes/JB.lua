@@ -120,6 +120,7 @@ function JB:new()
     class.moveHorizontal      = false
     class.xroll               = 0.0
     class.interaction         = false
+    class.IsMoving            = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -163,38 +164,50 @@ function JB:CheckForRestoration(delta)
     else
         if self.normalCameraRotateWhenStill then
 
-            if self.directionalMovement and self.xroll == 0 then
+            if not self.isMoving and self.isTppEnabled and (self.directionalMovement or self.normalCameraRotateWhenStill) and self.xroll == 0 and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
 
-                if quat.k > -1 and quat.k < 0 and quat.r > 0 and quat.r < 1 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta / 2)
+                if quat.k > -0.999 and quat.k < -0.001 and quat.r > 0.001 and quat.r < 0.999 then
+                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta)
                     quat        = self:RotateQuaternion(quat, delta_quatX)
                     fppCam:SetLocalOrientation(quat)
                     local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
                     fppCam:SetLocalPosition(stick)
+
+                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
-                if quat.k > 0 and quat.k < 1 and quat.r > 0 and quat.r < 1 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta / 2)
+                if quat.k > 0.001 and quat.k < 0.999 and quat.r > 0.001 and quat.r < 0.999 then
+                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta)
                     quat        = self:RotateQuaternion(quat, delta_quatX)
                     fppCam:SetLocalOrientation(quat)
                     local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
                     fppCam:SetLocalPosition(stick)
+
+                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
-                if quat.k > -1 and quat.k < 0 and quat.r > -1 and quat.r < 0 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta / 2)
+                if quat.k > -0.999 and quat.k < -0.001 and quat.r > -0.999 and quat.r < -0.001 then
+                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta)
                     quat        = self:RotateQuaternion(quat, delta_quatX)
                     fppCam:SetLocalOrientation(quat)
                     local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
                     fppCam:SetLocalPosition(stick)
+
+                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
 
-                if quat.k > 0 and quat.k < 1 and quat.r > -1 and quat.r < 0 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta / 2)
+                if quat.k > 0.001 and quat.k < 0.999 and quat.r > -0.999 and quat.r < -0.001 then
+                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta)
                     quat        = self:RotateQuaternion(quat, delta_quatX)
                     fppCam:SetLocalOrientation(quat)
                     local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
                     fppCam:SetLocalPosition(stick)
+
+                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
+                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
                 end
             end
 

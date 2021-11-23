@@ -46,6 +46,10 @@ registerForEvent("onInit", function()
             end
         end
 
+		if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
+			JB.isMoving = true
+		end
+
 		if actionName == 'mouse_y' then
 			JB.moveHorizontal = true
 		end
@@ -56,6 +60,7 @@ registerForEvent("onInit", function()
 		end
 
 		if actionName == 'world_map_menu_move_vertical' then
+			JB.isMoving = true
             if actionValue >= 0 then
                 speed = 1 + actionValue * 8
             else
@@ -64,6 +69,7 @@ registerForEvent("onInit", function()
         end
 
 		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
+			JB.isMoving = true
 			JB.moveHorizontal = true
 
 			if not JB.directionalStaticCamera then
@@ -285,6 +291,8 @@ registerForEvent("onUpdate", function(deltaTime)
 				test = ""
 			end
 		end
+
+		JB.isMoving = false
     end
 end)
 
