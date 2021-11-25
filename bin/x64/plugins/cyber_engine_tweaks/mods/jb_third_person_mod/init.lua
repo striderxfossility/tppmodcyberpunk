@@ -38,14 +38,6 @@ registerForEvent("onInit", function()
 		local actionValue = ListenerAction.GetValue(action)
 		local actionType  = action:GetType(action).value
 
-		if actionName == 'ChoiceApply' then
-            if actionType == 'BUTTON_PRESSED' then
-                JB.interaction = true
-            elseif actionType == 'BUTTON_RELEASED' then
-                JB.interaction = false
-            end
-        end
-
 		if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
 			JB.isMoving = true
 		end
@@ -224,77 +216,8 @@ registerForEvent("onUpdate", function(deltaTime)
                 JB.carActivated     = false
             end
         end
-		
-		if JB.isTppEnabled then
-			local target = Game.GetTargetingSystem():GetLookAtObject(Game.GetPlayer(), false, true)
-
-			if target ~= nill then
-				test = target:GetClassName().value
-
-				if not target then return end
-				if Vector4.Distance(target:GetWorldPosition(), Game.GetPlayer():GetWorldPosition()) > 2.9 then return end
-
-				if target:GetClassName().value == "Door" then
-					local ps = target:GetDevicePS()
-					local state = ps:IsOpen()
-
-					if not state then
-						createInteractionHub(tostring("Open Door"), "Choice1", true)
-					else
-						createInteractionHub(tostring("Close Door"), "Choice1", true)
-					end
-					
-
-					if JB.interaction then
-						JB.interaction = false
-
-						if ps:IsLocked() then
-							ps:ToggleLockOnDoor()
-						end
-						if ps:IsSealed() then
-							ps:ToggleSealOnDoor()
-						end
-
-						if not state then
-							target:OpenDoor()
-						else
-							target:CloseDoor()
-						end
-					end
-				end
-
-				if target:GetClassName().value == "DataTerm" then -- fast travel
-					createInteractionHub(tostring("Select Destination"), "Choice1", true)
-
-					target:TurnOnDevice()
-					target:TurnOnScreen()
-
-					if JB.interaction then
-						JB.interaction = false
-						target:TriggerMenuEvent(CName.new('OnOpenFastTravel'))
-					end
-				end
-
-				if target:GetClassName().value == "VendingMachine" then
-					createInteractionHub(tostring("Get a drink"), "Choice1", true)
-
-					target:TurnOnDevice()
-
-					if JB.interaction then
-						JB.interaction = false
-						target:PlayItemFall()
-						local dispenseRequest = target:CreateDispenseRequest(true, target:GetJunkItem())
-						target:DispenseItems(dispenseRequest)
-					end
-				end
-			else
-				test = ""
-			end
-		end
 
 		JB.isMoving = false
-
-		JB.interaction = false
     end
 end)
 

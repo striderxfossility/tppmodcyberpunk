@@ -119,7 +119,6 @@ function JB:new()
     class.zoomOut             = false
     class.moveHorizontal      = false
     class.xroll               = 0.0
-    class.interaction         = false
     class.IsMoving            = false
     ----------VARIABLES-------------
 
