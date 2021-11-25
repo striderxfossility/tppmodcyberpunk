@@ -293,6 +293,8 @@ registerForEvent("onUpdate", function(deltaTime)
 		end
 
 		JB.isMoving = false
+
+		JB.interaction = false
     end
 end)
 
