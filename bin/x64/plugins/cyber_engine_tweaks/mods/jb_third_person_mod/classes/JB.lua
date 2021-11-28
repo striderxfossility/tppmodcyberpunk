@@ -239,37 +239,8 @@ function JB:CheckForRestoration(delta)
 
             if PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
                 self:UpdateCamera()
-                --fppCam.headingLocked = false
-            end
-
-            if not PlayerPuppet:IsMoving() and not self.isTppEnabled and not JB.inCar and not self.directionalMovement and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
-                --fppCam.headingLocked = false
             end
         end
-    end
-
-    if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then 
-        if self.isTppEnabled then
-            self:DeactivateTPP()
-        end
-    else
-        --if not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
-        --    if self.directionalMovement and PlayerPuppet:IsMoving() and self.isTppEnabled then
-        --        fppCam.headingLocked = true
-        --    end
-        --
-        --    if self.directionalMovement and not self.isTppEnabled then
-        --        fppCam.headingLocked = false
-        --   end
-        --end
-    end
-
-    if not self.isTppEnabled and not self.inCar and fppCam.headingLocked then
-        --fppCam.headingLocked = false
-    end
-
-    if not self.isTppEnabled and fppCam.headingLocked and self.inScene then
-        --fppCam.headingLocked = false
     end
 
     if(self.zoomIn) then
@@ -290,9 +261,7 @@ function JB:CheckForRestoration(delta)
     
     if self.headTimer <= 0 then
         if self.isTppEnabled and not self.inCar then
-            if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
-                Gender:AddHead(self.animatedFace)
-            end
+            --
         else
             if not self.inCar then
                 if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
@@ -352,7 +321,7 @@ function JB:CheckForRestoration(delta)
 		self.waitTimer    = 0.0
 	end
 
-	if(self.timerCheckClothes > 10.0) then
+	if(self.timerCheckClothes > 5.0) then
 
         if not self.inCar then
             if self.allowCameraBobbing then
@@ -366,7 +335,21 @@ function JB:CheckForRestoration(delta)
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         end
 
-        if not self.isTppEnabled then
+        if not self.isTppEnabled and not self.inCar then
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+        end
+
+        if self.inCar and not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.isTppEnabled then
+            self:DeactivateTPP()
+        end
+
+        if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
+            Gender:AddHead(self.animatedFace)
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
+        end
+
+        if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and fppCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
+            Gender:AddFppHead()
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
         end
 
@@ -402,7 +385,8 @@ function JB:CarTimer(deltaTime)
 
 	if(self.waitTimer > 1.0) then
 		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-		self.waitTimer  = 0.0
+		Gender:AddHead(self.animatedFace)
+        self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
 
@@ -484,6 +468,7 @@ end
 
 function JB:DeactivateTPP ()
 	if self.isTppEnabled then
+        print("deactivate")
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
 		ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)

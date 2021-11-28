@@ -28,6 +28,9 @@ registerForEvent("onInit", function()
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+			if Game.GetPlayer():FindVehicleCameraManager():IsTPPActive() then
+				Gender:AddHead(JB.animatedFace)
+			end
         else
             JB.inCar = false
         end
@@ -421,7 +424,6 @@ registerForEvent("onDraw", function()
 		      	ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
 		      	ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
 		      	ImGui.Text("carCheckOnce: " .. tostring(JB.carCheckOnce))
-		      	--ImGui.Text("HasWeaponEquipped: " .. tostring(JB:HasWeaponEquipped()))
 		      	ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
 		      	ImGui.Text("camActive: " .. tostring(JB.camActive))
 		      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
