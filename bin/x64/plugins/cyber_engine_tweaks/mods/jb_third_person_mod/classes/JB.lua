@@ -120,6 +120,8 @@ function JB:new()
     class.moveHorizontal      = false
     class.xroll               = 0.0
     class.IsMoving            = false
+    class.onChangePerspective = false
+    class.previousPerspective = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )

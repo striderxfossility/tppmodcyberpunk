@@ -202,6 +202,26 @@ end)
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
     if Game.GetPlayer() then
+
+		local PlayerSystem = Game.GetPlayerSystem()
+		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+		if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
+			if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
+				Gender:AddHead(JB.animatedFace)
+            	Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
+			else
+				Gender:AddFppHead()
+            	Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+				fppCam:SetLocalPosition(Vector4.new(0, 0, 0, 1))
+			end
+		else
+			JB.onChangePerspective = false
+		end
+
+		JB.previousPerspective = PlayerPuppet:FindVehicleCameraManager():IsTPPActive()
+
         JB:CarTimer(deltaTime)
         JB.timerCheckClothes = JB.timerCheckClothes + deltaTime
 
@@ -209,10 +229,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
         if JB.carActivated then
             if JB.inCar then
-                local PlayerSystem = Game.GetPlayerSystem()
-                local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-                local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
                 carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
                 carCam:Activate(2.0, true)
                 JB.tppHeadActivated = true
