@@ -366,6 +366,10 @@ function JB:CheckForRestoration(delta)
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         end
 
+        if not self.isTppEnabled then
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+        end
+
         self.timerCheckClothes = 0.0
     end
 
