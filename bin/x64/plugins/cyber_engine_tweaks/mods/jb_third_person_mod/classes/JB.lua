@@ -263,7 +263,11 @@ function JB:CheckForRestoration(delta)
     
     if self.headTimer <= 0 then
         if self.isTppEnabled and not self.inCar then
-            --
+            if Gender:IsMale() then
+                Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
+            else
+                Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
+            end
         else
             if not self.inCar then
                 if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
@@ -272,7 +276,7 @@ function JB:CheckForRestoration(delta)
             end
         end
 
-        self.headTimer = 0.1
+        self.headTimer = 2
     end
 
     if self.isTppEnabled then
