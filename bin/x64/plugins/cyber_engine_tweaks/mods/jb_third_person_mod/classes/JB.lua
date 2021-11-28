@@ -468,10 +468,10 @@ end
 
 function JB:DeactivateTPP ()
 	if self.isTppEnabled then
-        print("deactivate")
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
 		ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+        Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
 	end
 
 	self:SetEnableTPPValue(false)
