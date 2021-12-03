@@ -154,10 +154,22 @@ registerForEvent("onInit", function()
 end)
 
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
+	local PlayerSystem = Game.GetPlayerSystem()
+    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
 	if (isDown) then
 	  	JB.directionalMovement = true
+
+		if not JB.inScene then
+			fppCam.headingLocked = true
+		end
 	else
 		JB.directionalMovement = false
+		
+		if not JB.inScene then
+			fppCam.headingLocked = false
+		end
 	end
   end)
 
