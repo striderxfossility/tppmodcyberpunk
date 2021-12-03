@@ -311,7 +311,7 @@ function JB:UpdateSecondCam()
             
             self.secondCam = Ref.Weak(self.johhnyEnt:FindComponentByName(CName.new("camera")))
 
-            self.secondCam:SetLocalPosition(Vector4.new(0, -5, self.offset, 1))
+            self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.offset, 1))
 
             self:DeactivateMesh()
 
