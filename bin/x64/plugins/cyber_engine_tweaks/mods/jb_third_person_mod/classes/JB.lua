@@ -100,8 +100,6 @@ function JB:new()
     class.photoModeBeenActive = false
     class.headTimer           = 1.0
     class.inScene             = false
-    class.zoomIn              = false
-    class.zoomOut             = false
     class.moveHorizontal      = false
     class.xroll               = 0.0
     class.yroll               = 0.0
@@ -114,6 +112,10 @@ function JB:new()
     class.secondCam           = nil
     class.isInitialized       = false
     class.offset              = 5
+    class.controllerZoom      = false
+    class.controller360       = false
+    class.controllerRightTrigger = false
+    class.controllerLeftTrigger = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -139,8 +141,20 @@ function JB:CheckForRestoration(delta)
     end
 
     local quat = self.secondCam:GetLocalOrientation()
+    
+    if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
 
-    if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) then
+        if self.controllerLeftTrigger then
+            print("set")
+            self.xroll = 2
+            self.controllerLeftTrigger = false
+        end
+
+        if self.controllerRightTrigger then
+            self.xroll = -2
+            self.controllerRightTrigger = false
+        end
+        
         local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
         local delta_quatY   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
@@ -166,14 +180,6 @@ function JB:CheckForRestoration(delta)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
         self.moveHorizontal  = false
-    end
-
-    if(self.zoomIn) then
-        self:Zoom(0.20)
-    end
-
-    if(self.zoomOut) then
-        self:Zoom(-0.20)
     end
 
     local str = "player_photomode_head"

@@ -74,6 +74,22 @@ registerForEvent("onInit", function()
 					JB:Zoom(actionValue / 2)
 				end
 
+				if actionName == "right_trigger" and JB.controllerZoom then -- CONTROLLER
+					JB:Zoom(0.1)
+				end
+
+				if actionName == "left_trigger" and JB.controllerZoom then -- CONTROLLER
+					JB:Zoom(-0.1)
+				end
+
+				if actionName == "right_trigger" and JB.controller360 then -- CONTROLLER
+					JB.controllerRightTrigger = true
+				end
+
+				if actionName == "left_trigger" and JB.controller360 then -- CONTROLLER
+					JB.controllerLeftTrigger = true
+				end
+
 				if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
 					JB.isMoving = true
 				end
@@ -83,7 +99,12 @@ registerForEvent("onInit", function()
 					JB.moveHorizontal = true
 				end
 
-				if actionName == 'mouse_x' then
+				if actionName == 'right_stick_y' then -- CONTROLLER
+					JB.yroll = actionValue
+					JB.moveHorizontal = true
+				end
+
+				if actionName == 'mouse_x' or actionName == 'right_stick_x' then
 					JB.moveHorizontal = true
 					JB.xroll = 0.025 * actionValue
 				end
@@ -111,6 +132,20 @@ registerForEvent("onInit", function()
 
 					local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
 					Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
+				end
+
+				if actionName == 'TagButton' then
+					JB.directionalMovement = true
+
+					if not JB.inScene then
+						fppCam.headingLocked = true
+					end
+				else
+					JB.directionalMovement = false
+
+					if not JB.inScene then
+						fppCam.headingLocked = false
+					end
 				end
 			end
 		end
@@ -254,6 +289,14 @@ end)
 
 registerHotkey("jb_optional_cam_rot_z_back", "Optional: Move cam rotation k back", function()
 	JB:MoveRotZ(-0.05)
+end)
+
+registerHotkey("jb_controller_zoom_activate", "Controller: Activate zoom", function()
+	JB.controllerZoom = not JB.controllerZoom
+end)
+
+registerHotkey("jb_controller_360", "Controller: Activate 360 camera", function()
+	JB.controller360 = not JB.controller360
 end)
 
 -- GAME RUNNING
