@@ -411,7 +411,6 @@ registerForEvent("onDraw", function()
 		      	ImGui.Text("camActive: " .. tostring(JB.camActive))
 		      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
 		      	ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
-				ImGui.Text("test: " .. tostring(test))
 	        end
 		    ImGui.End()
 		end
