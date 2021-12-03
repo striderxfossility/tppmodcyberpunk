@@ -71,7 +71,7 @@ registerForEvent("onInit", function()
 				local actionType  = action:GetType(action).value
 
 				if actionName == "mouse_wheel" then
-					JB:Zoom(actionValue)
+					JB:Zoom(actionValue / 2)
 				end
 
 				if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
@@ -166,7 +166,7 @@ registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 		end
 	else
 		JB.directionalMovement = false
-		
+
 		if not JB.inScene then
 			fppCam.headingLocked = false
 		end
