@@ -145,7 +145,6 @@ function JB:CheckForRestoration(delta)
     if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
 
         if self.controllerLeftTrigger then
-            print("set")
             self.xroll = 2
             self.controllerLeftTrigger = false
         end
