@@ -424,6 +424,12 @@ function JB:ActivateTPP()
 end
 
 function JB:DeactivateTPP(noUpdate)
+    local PlayerSystem = Game.GetPlayerSystem()
+    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+    fppCam:ResetPitch()
+
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
