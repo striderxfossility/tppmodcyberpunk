@@ -160,7 +160,7 @@ function JB:CheckForRestoration(delta)
         quat = self:RotateQuaternion(quat, delta_quatX)
         quat = self:RotateQuaternion(quat, delta_quatY)
 
-        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0, 0))
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, 0, 0))
 
         self.secondCam:SetLocalOrientation(quat)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
@@ -173,7 +173,7 @@ function JB:CheckForRestoration(delta)
 
         quat = self:RotateQuaternion(quat, delta_quatY)
 
-        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0, 0))
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, 0, 0))
 
         self.secondCam:SetLocalOrientation(quat)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
