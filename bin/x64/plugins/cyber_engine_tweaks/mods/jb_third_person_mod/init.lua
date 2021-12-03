@@ -4,6 +4,7 @@ local Gender 		= require("classes/Gender.lua")
 local Cron 			= require("classes/Cron.lua")
 local GameSession 	= require('classes/GameSession.lua')
 local Ref        	= require("classes/Ref.lua")
+local ev = nil
 
 CamView         = {}
 CamView.__index = CamView
@@ -133,20 +134,6 @@ registerForEvent("onInit", function()
 					local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
 					Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
 				end
-
-				if actionName == 'TagButton' then
-					JB.directionalMovement = true
-
-					if not JB.inScene then
-						fppCam.headingLocked = true
-					end
-				else
-					JB.directionalMovement = false
-
-					if not JB.inScene then
-						fppCam.headingLocked = false
-					end
-				end
 			end
 		end
 	end)
@@ -268,6 +255,10 @@ registerForEvent("onUpdate", function(deltaTime)
 				JB.johnnyEntId = exEntitySpawner.Spawn([[base\characters\entities\player\replacer\johnny_silverhand_replacer.ent]], Game.GetPlayer():GetWorldTransform())
 			end
 
+			if ev == nil then
+				ev = LookAtAddEvent.new()
+			end
+
 			JB:UpdateSecondCam()
 
 			local PlayerSystem = Game.GetPlayerSystem()
@@ -303,9 +294,37 @@ registerForEvent("onUpdate", function(deltaTime)
 			JB.isMoving = false
 
 			Cron.Update(deltaTime)
+
+			if ev ~= nil then
+				EyesFollowCamera(deltaTime)
+			end
 		end
 	end
 end)
+
+function EyesFollowCamera(deltaTime)
+	if JB.eyesTimer <= 0 then
+		local arr = JB:GetEYEObjects()
+		for _, v in ipairs(arr) do
+			local obj = v:GetComponent(v):GetEntity()
+			if obj:GetClassName() == CName.new("NPCPuppet") then
+				ev:SetEntityTarget(obj, CName.new('pla_default_tgt'), GetSingleton('Vector4'):EmptyVector())
+				ev.SetStyle = Enum.new('animLookAtStyle', 2)
+				ev.bodyPart = CName.new('Eyes')
+				ev.request.limits.softLimitDegrees = 360.00;
+				ev.request.limits.hardLimitDegrees = 270.00;
+				ev.request.limits.backLimitDegrees = 210.00;
+				ev.request.calculatePositionInParentSpace = true
+
+				Game.GetPlayer():QueueEvent(ev)
+				JB.eyesTimer = 3
+				break
+			end
+		end
+	end
+
+	JB.eyesTimer = JB.eyesTimer - deltaTime
+end
 
 function IsPlayerInAnyMenu()
     local blackboard = Game.GetBlackboardSystem():Get(Game.GetAllBlackboardDefs().UI_System);

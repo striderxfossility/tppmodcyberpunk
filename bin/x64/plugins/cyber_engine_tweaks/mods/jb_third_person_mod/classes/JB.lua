@@ -116,6 +116,7 @@ function JB:new()
     class.controller360       = false
     class.controllerRightTrigger = false
     class.controllerLeftTrigger = false
+    class.eyesTimer           = 5.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -453,6 +454,21 @@ function JB:GetPlayerObjects()
     
     searchQuery.maxDistance = 10
     searchQuery.testedSet = Enum.new('gameTargetingSet', 4)
+
+    success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
+
+    return parts
+end
+
+function JB:GetEYEObjects()
+    local targetingSystem = Game.GetTargetingSystem();
+    local parts = {};
+    local searchQuery = Game["TSQ_ALL;"]()
+
+    targetingSystem:AddIgnoredCollisionEntities(Game.GetPlayer())
+    
+    searchQuery.maxDistance = 10
+    searchQuery.testedSet = Enum.new('gameTargetingSet', 0)
 
     success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
 
