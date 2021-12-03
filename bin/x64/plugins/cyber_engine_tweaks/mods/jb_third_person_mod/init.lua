@@ -293,8 +293,8 @@ registerForEvent("onUpdate", function(deltaTime)
 end)
 
 function IsPlayerInAnyMenu()
-    blackboard = Game.GetBlackboardSystem():Get(Game.GetAllBlackboardDefs().UI_System);
-    uiSystemBB = (Game.GetAllBlackboardDefs().UI_System);
+    local blackboard = Game.GetBlackboardSystem():Get(Game.GetAllBlackboardDefs().UI_System);
+    local uiSystemBB = (Game.GetAllBlackboardDefs().UI_System);
     return(blackboard:GetBool(uiSystemBB.IsInMenu));
 end
 
