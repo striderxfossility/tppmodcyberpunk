@@ -1,5 +1,6 @@
 local Gender     = require("classes/Gender.lua")
 local Attachment = require("classes/Attachment.lua")
+local Ref        = require("classes/Ref.lua")
 
 local JB         = {}
       JB.__index = JB
@@ -70,27 +71,11 @@ function JB:new()
         class.camActive = tonumber(index[1])
     end
 
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'directionalMovement'") do
-        if(index[1] == 0) then
-            class.directionalMovement = false
-        else
-            class.directionalMovement = true
-        end
-    end
-
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'directionalStaticCamera'") do
         if(index[1] == 0) then
             class.directionalStaticCamera = false
         else
             class.directionalStaticCamera = true
-        end
-    end
-
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'normalCameraRotateWhenStill'") do
-        if(index[1] == 0) then
-            class.normalCameraRotateWhenStill = false
-        else
-            class.normalCameraRotateWhenStill = true
         end
     end
 
@@ -119,9 +104,16 @@ function JB:new()
     class.zoomOut             = false
     class.moveHorizontal      = false
     class.xroll               = 0.0
+    class.yroll               = 0.0
     class.IsMoving            = false
     class.onChangePerspective = false
     class.previousPerspective = false
+    class.johnnyEntId         = nil
+    class.foundJohnnyEnt      = false
+    class.johnnyEnt           = nil
+    class.secondCam           = nil
+    class.isInitialized       = false
+    class.offset              = 5
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -136,113 +128,44 @@ end
 function JB:CheckForRestoration(delta)
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:FindComponentByName(CName.new("camera"))
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
-    local quat         = fppCam:GetLocalOrientation()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-    if self.moveHorizontal and self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
-        local pos           = fppCam:GetLocalPosition()
+    self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
+
+    if self.secondCam == nil then
+        return
+    end
+
+    local quat = self.secondCam:GetLocalOrientation()
+
+    if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) then
         local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
+        local delta_quatY   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
-        fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
+        quat = self:RotateQuaternion(quat, delta_quatX)
+        quat = self:RotateQuaternion(quat, delta_quatY)
 
-        quat        = self:RotateQuaternion(quat, delta_quatX)
-        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0, 0))
 
-        if stick.y < -0.5 then
-            fppCam.pitchMin = -15
-            fppCam.pitchMax = 15
-        else
-            fppCam.pitchMin = -5;
-            fppCam.pitchMax = 5;
-        end
-
-        fppCam:SetLocalOrientation(quat)
-        fppCam:SetLocalPosition(stick)
+        self.secondCam:SetLocalOrientation(quat)
+        self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
         self.moveHorizontal  = false
-    else
-        if self.normalCameraRotateWhenStill then
+    end
 
-            if not self.isMoving and self.isTppEnabled and (self.directionalMovement or self.normalCameraRotateWhenStill) and self.xroll == 0 and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
+    if not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
+        local delta_quatY = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
-                if quat.k > -0.999 and quat.k < -0.001 and quat.r > 0.001 and quat.r < 0.999 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta)
-                    quat        = self:RotateQuaternion(quat, delta_quatX)
-                    fppCam:SetLocalOrientation(quat)
-                    local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
-                    fppCam:SetLocalPosition(stick)
+        quat = self:RotateQuaternion(quat, delta_quatY)
 
-                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
-                end
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0, 0))
 
-                if quat.k > 0.001 and quat.k < 0.999 and quat.r > 0.001 and quat.r < 0.999 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta)
-                    quat        = self:RotateQuaternion(quat, delta_quatX)
-                    fppCam:SetLocalOrientation(quat)
-                    local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
-                    fppCam:SetLocalPosition(stick)
+        self.secondCam:SetLocalOrientation(quat)
+        self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
-                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
-                end
-
-                if quat.k > -0.999 and quat.k < -0.001 and quat.r > -0.999 and quat.r < -0.001 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -delta)
-                    quat        = self:RotateQuaternion(quat, delta_quatX)
-                    fppCam:SetLocalOrientation(quat)
-                    local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
-                    fppCam:SetLocalPosition(stick)
-
-                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
-                end
-
-                if quat.k > 0.001 and quat.k < 0.999 and quat.r > -0.999 and quat.r < -0.001 then
-                    local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), delta)
-                    quat        = self:RotateQuaternion(quat, delta_quatX)
-                    fppCam:SetLocalOrientation(quat)
-                    local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
-                    fppCam:SetLocalPosition(stick)
-
-                    local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - delta * -self.camViews[self.camActive].pos.y * 20)
-                    Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
-                end
-            end
-
-            if not PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) and not Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
-                local pos           = fppCam:GetLocalPosition()
-                local delta_quatX   = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(0,0,1,0), -self.xroll * delta)
-
-                fppCam:SetLocalPosition(Vector4.new(pos.x, pos.y, 0.0, 1.0))
-
-                quat        = self:RotateQuaternion(quat, delta_quatX)
-                local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(0, self.camViews[self.camActive].pos.y, 0.0, 0))
-
-                if stick.y < -0.5 then
-                    fppCam.pitchMin = -15
-                    fppCam.pitchMax = 15
-                else
-                    fppCam.pitchMin = -5;
-                    fppCam.pitchMax = 5;
-                end
-
-                fppCam:SetLocalOrientation(quat)
-                fppCam:SetLocalPosition(stick)
-
-                self.moveHorizontal  = false
-
-                if fppCam.headingLocked then
-                    fppCam.headingLocked = true
-                end
-            end
-
-            if PlayerPuppet:IsMoving() and self.isTppEnabled and not JB.inCar and not self.directionalMovement and not Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet) then
-                self:UpdateCamera()
-            end
-        end
+        self.moveHorizontal  = false
     end
 
     if(self.zoomIn) then
@@ -306,15 +229,12 @@ function JB:CheckForRestoration(delta)
             self.switchBackToTpp = false
         end
     end
-    
-	
-    self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if self.isTppEnabled and not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
-        fppCam.yawMaxLeft = 3600
-        fppCam.yawMaxRight = -3600
-        fppCam.pitchMax = 100
-        fppCam.pitchMin = -100
+        self.secondCam.yawMaxLeft = 3600
+        self.secondCam.yawMaxRight = -3600
+        self.secondCam.pitchMax = 100
+        self.secondCam.pitchMin = -100
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
@@ -354,7 +274,7 @@ function JB:CheckForRestoration(delta)
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
         end
 
-        if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and fppCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
+        if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.secondCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
             Gender:AddFppHead()
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
         end
@@ -362,7 +282,7 @@ function JB:CheckForRestoration(delta)
         self.timerCheckClothes = 0.0
     end
 
-	if(fppCam:GetLocalPosition().x == 0.0 and fppCam:GetLocalPosition().y == 0.0 and fppCam:GetLocalPosition().z == 0.0) then
+	if(self.secondCam:GetLocalPosition().x == 0.0 and self.secondCam:GetLocalPosition().y == 0.0 and self.secondCam:GetLocalPosition().z == 0.0) then
         self:SetEnableTPPValue(false)
 	end
 
@@ -373,11 +293,48 @@ function JB:CheckForRestoration(delta)
     end
 end
 
+function JB:UpdateSecondCam()
+    if not self.foundJohnnyEnt then
+        if Game.FindEntityByID(self.johnnyEntId) ~= nil then
+            self.foundJohnnyEnt                 = true
+            self.johhnyEnt          	        = Ref.Weak(Game.FindEntityByID(self.johnnyEntId)) -- the spawned object
+            self.johhnyEnt.audioResourceName    = CName.new("johnnysecondcam")
+
+            local root = self.johhnyEnt:FindComponentByName(CName.new("root"))
+
+            root:SetLocalPosition(Vector4.new(0, 0, -self.offset, 1))
+            
+            self.secondCam = Ref.Weak(self.johhnyEnt:FindComponentByName(CName.new("camera")))
+
+            self.secondCam:SetLocalPosition(Vector4.new(0, -5, self.offset, 1))
+
+            self:DeactivateMesh()
+
+            print('Jb Third Person Mod Loaded')
+        end
+    end
+
+    if self.secondCam ~= nil then
+        local PlayerSystem = Game.GetPlayerSystem()
+        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+        self.secondCam:SetLocalPosition(Vector4.new(self.secondCam:GetLocalPosition().x, self.secondCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
+
+        local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw())
+        local transform = Game.GetPlayer():GetWorldPosition()
+        local vec = Vector4.new(transform.x, transform.y, transform.z - 0)
+        if self.johhnyEnt ~= nil then
+            Game.GetTeleportationFacility():Teleport(self.johhnyEnt, vec, moveEuler)
+        end
+    end
+end
+
 function JB:RotateQuaternion(orig_quat, delta_quat)
-    local x = orig_quat.r * delta_quat.i + orig_quat.i * delta_quat.r + orig_quat.j * delta_quat.k - orig_quat.k * delta_quat.j;
-    local y = orig_quat.r * delta_quat.j + orig_quat.j * delta_quat.r + orig_quat.k * delta_quat.i - orig_quat.i * delta_quat.k;
-    local z = orig_quat.r * delta_quat.k + orig_quat.k * delta_quat.r + orig_quat.i * delta_quat.j - orig_quat.j * delta_quat.i;
-    local w = orig_quat.r * delta_quat.r - orig_quat.i * delta_quat.i - orig_quat.j * delta_quat.j - orig_quat.k * delta_quat.k;
+    local x = orig_quat.r * delta_quat.i + orig_quat.i * delta_quat.r - orig_quat.j * delta_quat.k - orig_quat.k * delta_quat.j;
+    local y = orig_quat.r * delta_quat.j + orig_quat.j * delta_quat.r + orig_quat.k * delta_quat.i + orig_quat.i * delta_quat.k;
+    local z = orig_quat.r * delta_quat.k + orig_quat.k * delta_quat.r - orig_quat.i * delta_quat.j + orig_quat.j * delta_quat.i;
+    local w = orig_quat.r * delta_quat.r + orig_quat.i * delta_quat.i + orig_quat.j * delta_quat.j - orig_quat.k * delta_quat.k;
 
     return Quaternion.new(x, y, z, w)
 end
@@ -391,7 +348,7 @@ function JB:CarTimer(deltaTime)
 
 	if(self.waitTimer > 1.0) then
 		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-		Gender:AddHead(self.animatedFace)
+        Gender:AddHead(self.animatedFace)
         self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
@@ -421,8 +378,6 @@ end
 
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
-	self:UpdateCamera()
-	db:exec("UPDATE cameras SET y = '" .. self.camViews[self.camActive].pos.y .. "' WHERE id = " .. self.camActive - 1)
 end
 
 function JB:MoveRotX(i)
@@ -449,31 +404,27 @@ function JB:RestoreFPPView()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-		fppCam:SetLocalPosition(Vector4.new(0.0, 0.0, 0.0, 1.0))
-		fppCam:SetLocalOrientation(Quaternion.new(0.0, 0.0, 0.0, 1.0))
+        fppCam:Activate(1)
 	end
 end
 
 function JB:UpdateCamera()
 	if self.isTppEnabled then
-        local PlayerSystem = Game.GetPlayerSystem()
-        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
-		fppCam:SetLocalPosition(self.camViews[self.camActive].pos)
-		fppCam:SetLocalOrientation(self.camViews[self.camActive].rot)
+		self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
+		self.secondCam:SetLocalOrientation(self.camViews[self.camActive].rot)
 	end
 end
 
 function JB:ActivateTPP()
     Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
+    self.secondCam:Activate(1)
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
 end
 
-function JB:DeactivateTPP ()
-	if self.isTppEnabled then
+function JB:DeactivateTPP(noUpdate)
+	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
 		ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
@@ -485,7 +436,7 @@ function JB:DeactivateTPP ()
 end
 
 function JB:NextCam()
-         self:SwitchCamTo(self.camActive + 1)
+    self:SwitchCamTo(self.camActive + 1)
 end
 
 function JB:SwitchCamTo(cam)
@@ -510,6 +461,109 @@ function JB:SwitchCamTo(cam)
 		ic:SetIsPlayerInspecting(false)
 		self:UpdateCamera()
 	end
+end
+
+function JB:GetPlayerObjects()
+    local targetingSystem = Game.GetTargetingSystem();
+    local parts = {};
+    local searchQuery = Game["TSQ_ALL;"]()
+
+    targetingSystem:AddIgnoredCollisionEntities(Game.GetPlayer())
+    
+    searchQuery.maxDistance = 10
+    searchQuery.testedSet = Enum.new('gameTargetingSet', 4)
+
+    success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
+
+    return parts
+end
+
+function JB:DeactivateMesh()
+    local search = Game.FindEntityByID(self.johnnyEntId)
+    search:FindComponentByName(CName.new("t0_000_pma_base__full_shadow")).isEnabled = false
+    search:FindComponentByName(CName.new("legs")).isEnabled = false
+    search:FindComponentByName(CName.new("shoes")).isEnabled = false
+    search:FindComponentByName(CName.new("head_shadowmesh")).isEnabled = false
+    search:FindComponentByName(CName.new("a0_008_ma__fpp_right_q001_injection_mark")).isEnabled = false
+    search:FindComponentByName(CName.new("n0_000_pma_base__full")).isEnabled = false
+    search:FindComponentByName(CName.new("a0_000_nomad_base_fists")).isEnabled = false
+    search:FindComponentByName(CName.new("t0_000_pma_base__full_shadow")).isEnabled = false
+    search:FindComponentByName(CName.new("shadow")).isEnabled = false
+    search:FindComponentByName(CName.new("OccupantSlots")).isEnabled = false
+    search:FindComponentByName(CName.new("CarryOverrides")).isEnabled = false
+    search:FindComponentByName(CName.new("WidgetHud0516")).isEnabled = false
+    search:FindComponentByName(CName.new("cyberspace_character_light")).isEnabled = false
+    search:FindComponentByName(CName.new("EffectSpawnercs101")).isEnabled = false
+    search:FindComponentByName(CName.new("VisionModeActivator")).isEnabled = false
+    search:FindComponentByName(CName.new("AnimationControllerComponent")).isEnabled = false
+    search:FindComponentByName(CName.new("Slot1777")).isEnabled = false
+    search:FindComponentByName(CName.new("Inventory")).isEnabled = false
+    search:FindComponentByName(CName.new("fx")).isEnabled = false
+    search:FindComponentByName(CName.new("AttachmentSlots")).isEnabled = false
+    search:FindComponentByName(CName.new("phone")).isEnabled = false
+    search:FindComponentByName(CName.new("inspect")).isEnabled = false
+    search:FindComponentByName(CName.new("DEBUG_Visualizer")).isEnabled = false
+    search:FindComponentByName(CName.new("BodyDescription")).isEnabled = false
+    search:FindComponentByName(CName.new("PuppetMountable4032")).isEnabled = false
+    search:FindComponentByName(CName.new("MoveComponent")).isEnabled = false
+    search:FindComponentByName(CName.new("AnimGraphResourceContainer")).isEnabled = false
+    search:FindComponentByName(CName.new("CombatHUDManager")).isEnabled = false
+    search:FindComponentByName(CName.new("CarAnimsets")).isEnabled = false
+    search:FindComponentByName(CName.new("TriggerActivator")).isEnabled = false
+    search:FindComponentByName(CName.new("PlayerVoice")).isEnabled = false
+    search:FindComponentByName(CName.new("slots")).isEnabled = false
+    search:FindComponentByName(CName.new("fx_player")).isEnabled = false
+    search:FindComponentByName(CName.new("hud_component")).isEnabled = false
+    search:FindComponentByName(CName.new("monodisc_light")).isEnabled = false
+    search:FindComponentByName(CName.new("menu_component")).isEnabled = false
+    search:FindComponentByName(CName.new("EnvTriggerActivator")).isEnabled = false
+    search:FindComponentByName(CName.new("LeftFootRepeller")).isEnabled = false
+    search:FindComponentByName(CName.new("RightFootRepeller")).isEnabled = false
+    search:FindComponentByName(CName.new("HipsRepeller")).isEnabled = false
+    search:FindComponentByName(CName.new("HitPhysicalQueryMesh")).isEnabled = false
+    search:FindComponentByName(CName.new("HitRepresentation")).isEnabled = false
+    search:FindComponentByName(CName.new("ItemAttachmentSlots")).isEnabled = false
+    search:FindComponentByName(CName.new("targeting_primary")).isEnabled = false
+    search:FindComponentByName(CName.new("targeting_cyberarm")).isEnabled = false
+    search:FindComponentByName(CName.new("fx_status_effects")).isEnabled = false
+    search:FindComponentByName(CName.new("ScanningActivator")).isEnabled = false
+    search:FindComponentByName(CName.new("PlayerMappin5838")).isEnabled = false
+    search:FindComponentByName(CName.new("PlayerGarage")).isEnabled = false
+    search:FindComponentByName(CName.new("PlayerInteractions")).isEnabled = false
+    search:FindComponentByName(CName.new("quickSlots")).isEnabled = false
+    search:FindComponentByName(CName.new("EffectAttachment5471")).isEnabled = false
+    search:FindComponentByName(CName.new("UI_Slots")).isEnabled = false
+    search:FindComponentByName(CName.new("BumpComponent")).isEnabled = false
+    search:FindComponentByName(CName.new("FX_Glitches")).isEnabled = false
+    search:FindComponentByName(CName.new("StimBroadcaster")).isEnabled = false
+    search:FindComponentByName(CName.new("TargetingActivator8632")).isEnabled = false
+    search:FindComponentByName(CName.new("fx_damage")).isEnabled = false
+    search:FindComponentByName(CName.new("TEMP_flashlight")).isEnabled = false
+    search:FindComponentByName(CName.new("ResourceLibrary")).isEnabled = false
+    search:FindComponentByName(CName.new("EffectAttachment5224")).isEnabled = false
+    search:FindComponentByName(CName.new("targetShootComponent")).isEnabled = false
+    search:FindComponentByName(CName.new("PlayerTier7886")).isEnabled = false
+    search:FindComponentByName(CName.new("senseSensorObject")).isEnabled = false
+    search:FindComponentByName(CName.new("disarm")).isEnabled = false
+    search:FindComponentByName(CName.new("TransformHistoryComponent")).isEnabled = false
+    search:FindComponentByName(CName.new("QuestCustomEffects")).isEnabled = false
+    search:FindComponentByName(CName.new("senseVisibleObject")).isEnabled = false
+    search:FindComponentByName(CName.new("influenceObstacle")).isEnabled = false
+    search:FindComponentByName(CName.new("fx_cyberware")).isEnabled = false
+    search:FindComponentByName(CName.new("Slot6342")).isEnabled = false
+    search:FindComponentByName(CName.new("q_blood_mesh_decal")).isEnabled = false
+    search:FindComponentByName(CName.new("environmentDamageReceiver")).isEnabled = false
+    search:FindComponentByName(CName.new("WorldSpaceBlendCamera")).isEnabled = false
+    search:FindComponentByName(CName.new("vehicleTPPCamera")).isEnabled = false
+    search:FindComponentByName(CName.new("vehicleCameraManager")).isEnabled = false
+    search:FindComponentByName(CName.new("vehicleVehicleProxyBlendCamera4681")).isEnabled = false
+    search:FindComponentByName(CName.new("BigObjectsRepeller")).isEnabled = false
+    search:FindComponentByName(CName.new("VisualController5425")).isEnabled = false
+    search:FindComponentByName(CName.new("7551")).isEnabled = false
+
+    search:ScheduleAppearanceChange(CName.new("None"))
+    Game.GetTransactionSystem():RemoveAllItems(search)
+    search.renderSceneLayerMask = Enum.new("RenderSceneLayerMask", 2)
 end
 
 return JB:new()

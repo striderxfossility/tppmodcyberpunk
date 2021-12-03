@@ -1,8 +1,9 @@
-local JB = require("classes/JB.lua")
-local Attachment = require("classes/Attachment.lua")
-local Gender = require("classes/Gender.lua")
-
-local test = ""
+local JB 			= require("classes/JB.lua")
+local Attachment 	= require("classes/Attachment.lua")
+local Gender 		= require("classes/Gender.lua")
+local Cron 			= require("classes/Cron.lua")
+local GameSession 	= require('classes/GameSession.lua')
+local Ref        	= require("classes/Ref.lua")
 
 CamView         = {}
 CamView.__index = CamView
@@ -25,6 +26,32 @@ end
 registerForEvent("onInit", function()
 	local speed = 8
 
+	-- FIX CRASH LOAD SAVE
+	GameSession.Listen(function(state)
+		if state.event == "Clean" then
+			JB.isInitialized   = false
+			JB.secondCam       = nil
+			JB.foundJohnnyEnt  = false
+			JB.johnnyEntId     = nil
+			exEntitySpawner.Despawn(JB.johnnyEnt)
+			JB.johnnyEnt       = nil
+		end
+    end)
+
+	JB.isInitialized = Game.GetPlayer() and Game.GetPlayer():IsAttached() and not Game.GetSystemRequestsHandler():IsPreGame()
+
+	Observe('QuestTrackerGameController', 'OnInitialize', function()
+		if not isLoaded then
+			JB.isInitialized = true
+		end
+	end)
+
+	Observe('QuestTrackerGameController', 'OnUninitialize', function()
+		if Game.GetPlayer() == nil then
+			JB.isInitialized   = false
+		end
+	end)
+
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
@@ -37,48 +64,56 @@ registerForEvent("onInit", function()
 	end)
 
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
-		local actionName  = Game.NameToString(ListenerAction.GetName(action))
-		local actionValue = ListenerAction.GetValue(action)
-		local actionType  = action:GetType(action).value
+		if JB.isInitialized then
+			if not IsPlayerInAnyMenu() then
+				local actionName  = Game.NameToString(ListenerAction.GetName(action))
+				local actionValue = ListenerAction.GetValue(action)
+				local actionType  = action:GetType(action).value
 
-		if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
-			JB.isMoving = true
-		end
+				if actionName == "mouse_wheel" then
+					JB:Zoom(actionValue)
+				end
 
-		if actionName == 'mouse_y' then
-			JB.moveHorizontal = true
-		end
+				if actionName == "Right" or actionName == "Left" or actionName == "Forward" or actionName == "Back" then
+					JB.isMoving = true
+				end
 
-		if actionName == 'mouse_x' then
-			JB.moveHorizontal = true
-			JB.xroll = 0.025 * actionValue
-		end
+				if actionName == 'mouse_y' then
+					JB.yroll = 0.008 * actionValue
+					JB.moveHorizontal = true
+				end
 
-		if actionName == 'world_map_menu_move_vertical' then
-			JB.isMoving = true
-            if actionValue >= 0 then
-                speed = 1 + actionValue * 8
-            else
-                speed = 1 + actionValue * 8
-            end
-        end
+				if actionName == 'mouse_x' then
+					JB.moveHorizontal = true
+					JB.xroll = 0.025 * actionValue
+				end
 
-		if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
-			JB.isMoving = true
-			JB.moveHorizontal = true
+				if actionName == 'world_map_menu_move_vertical' then
+					JB.isMoving = true
+					if actionValue >= 0 then
+						speed = 1 + actionValue * 8
+					else
+						speed = 1 + actionValue * 8
+					end
+				end
 
-			if not JB.directionalStaticCamera then
-				JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
+				if actionName == 'world_map_menu_move_horizontal' and JB.directionalMovement and JB.isTppEnabled and not JB.inCar then
+					JB.isMoving = true
+					JB.moveHorizontal = true
+
+					if not JB.directionalStaticCamera then
+						JB.xroll = -actionValue * 0.87 * -JB.camViews[JB.camActive].pos.y
+					end
+
+					if speed < 8 then
+						speed = 8
+					end
+
+					local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
+					Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
+				end
 			end
-
-			if speed < 8 then
-                speed = 8
-            end
-
-            local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw() - actionValue * -JB.camViews[JB.camActive].pos.y * 2)
-            Game.GetTeleportationFacility():Teleport(Game.GetPlayer(), Game.GetPlayer():GetWorldPosition(), moveEuler)
 		end
-
 	end)
     
 	for row in db:rows("SELECT * FROM cameras") do
@@ -100,49 +135,59 @@ registerForEvent("onInit", function()
 		table.insert(JB.camViews, cam)
 	end
 
-    print('Jb Third Person Mod Loaded')
-end)
+	-- FIX CRASH RELOAD ALL MODS
+	local arr = JB:GetPlayerObjects()
+	for _, v in ipairs(arr) do
+		local obj = v:GetComponent(v):GetEntity()
 
-
-registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
-    if not JB.inCar then
-        local PlayerSystem = Game.GetPlayerSystem()
-        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
-		fppCam:Activate(2.0, true)
-		if(JB.isTppEnabled) then
-			JB:DeactivateTPP()
-		else
-			if(JB.weaponOverride) then
-				if(Attachment:HasWeaponActive()) then
-					PlayerPuppet:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
-					JB:SetEnableTPPValue(false)
-					JB:RestoreFPPView()
-				else
-					JB:ActivateTPP()
-				end
-			else
-				JB:ActivateTPP()
+		if obj:GetClassName() == CName.new("PlayerPuppet") then
+			if obj.audioResourceName == CName.new("johnnysecondcam") then
+				JB.foundJohnnyEnt 	= true
+				JB.johnnyEntId 		= obj:GetEntityID()
+				JB.johhnyEnt 		= obj
+				JB.secondCam 		= Ref.Weak(JB.johhnyEnt:FindComponentByName(CName.new("camera")))
+				break
 			end
 		end
 	end
+
 end)
 
-registerInput('jb_zoom_in', 'Zoom in', function(isDown)
+registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 	if (isDown) then
-		JB.zoomIn = true
+	  	JB.directionalMovement = true
 	else
-		JB.zoomIn = false
+		JB.directionalMovement = false
 	end
-end)
+  end)
 
-registerInput('jb_zoom_out', 'Zoom out', function(isDown)
-	if (isDown) then
-		JB.zoomOut = true
+registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
+	local PlayerSystem = Game.GetPlayerSystem()
+	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+
+	if(JB.isTppEnabled) then
+		Cron.After(1.0, function()
+			local ts     = Game.GetTransactionSystem()
+			local player = Game.GetPlayer()
+			ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+			Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+		end)
+		JB:DeactivateTPP(false)
 	else
-		JB.zoomOut = false
+		if(JB.weaponOverride) then
+			if(Attachment:HasWeaponActive()) then
+				PlayerPuppet:SetWarningMessage("Cant go into Third person when holding a weapon, change weaponOverride to false!")
+				JB:SetEnableTPPValue(false)
+				JB:RestoreFPPView()
+			else
+				JB:ActivateTPP()
+			end
+		else
+			JB:ActivateTPP()
+		end
 	end
+
+	JB:UpdateSecondCam()
 end)
 	
 registerHotkey("jb_switch_cam", "To next Camera view", function()
@@ -201,106 +246,56 @@ end)
 
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
-    if Game.GetPlayer() then
-
-		local PlayerSystem = Game.GetPlayerSystem()
-		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
-		if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
-			if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
-				Gender:AddHead(JB.animatedFace)
-            	Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
-			else
-				Gender:AddFppHead()
-            	Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-				fppCam:SetLocalPosition(Vector4.new(0, 0, 0, 1))
+    if JB.isInitialized then
+		if not IsPlayerInAnyMenu() then
+			if not (JB.johnnyEntId ~= nil) then
+				print("Jb Third Person Mod: Spawned second camera")
+				JB.johnnyEntId = exEntitySpawner.Spawn([[base\characters\entities\player\replacer\johnny_silverhand_replacer.ent]], Game.GetPlayer():GetWorldTransform())
 			end
-		else
-			JB.onChangePerspective = false
+
+			JB:UpdateSecondCam()
+
+			local PlayerSystem = Game.GetPlayerSystem()
+			local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+			local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+			if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
+				if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
+					Gender:AddHead(JB.animatedFace)
+					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
+				else
+					Gender:AddFppHead()
+					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+				end
+			else
+				JB.onChangePerspective = false
+			end
+
+			JB.previousPerspective 	= PlayerPuppet:FindVehicleCameraManager():IsTPPActive()
+			JB.timerCheckClothes 	= JB.timerCheckClothes + deltaTime
+			
+			JB:CheckForRestoration(deltaTime)
+
+			if JB.carActivated then
+				if JB.inCar then
+					carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
+					carCam:Activate(2.0, true)
+					JB.tppHeadActivated = true
+					JB.carActivated     = false
+				end
+			end
+
+			JB.isMoving = false
+
+			Cron.Update(deltaTime)
 		end
-
-		JB.previousPerspective = PlayerPuppet:FindVehicleCameraManager():IsTPPActive()
-
-        JB:CarTimer(deltaTime)
-        JB.timerCheckClothes = JB.timerCheckClothes + deltaTime
-
-        JB:CheckForRestoration(deltaTime)
-
-        if JB.carActivated then
-            if JB.inCar then
-                carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
-                carCam:Activate(2.0, true)
-                JB.tppHeadActivated = true
-                JB.carActivated     = false
-            end
-        end
-
-		JB.isMoving = false
-    end
+	end
 end)
 
-function mount(entID, vehicleEVehicleDoor)
-    local player = Game.GetPlayer()
-
-    local data = NewObject('handle:gameMountEventData')
-    data.isInstant = true
-    data.slotName = vehicleEVehicleDoor
-    data.mountParentEntityId = entID
-    data.entryAnimName = "forcedTransition"
-
-    local slotID = NewObject('gamemountingMountingSlotId')
-    slotID.id = vehicleEVehicleDoor
-
-    local mountingInfo = NewObject('gamemountingMountingInfo')
-    mountingInfo.childId = player:GetEntityID()
-    mountingInfo.parentId = entID
-    mountingInfo.slotId = slotID
-
-    local mountEvent = NewObject('handle:gamemountingMountingRequest')
-    mountEvent.lowLevelMountingInfo = mountingInfo
-    mountEvent.mountData = data
-
-    Game.GetMountingFacility():Mount(mountEvent)
-end
-
-function createInteractionChoice(action, title)
-    local choiceData =  InteractionChoiceData.new()
-    choiceData.localizedName = title
-    choiceData.inputAction = action
-
-    local choiceType = ChoiceTypeWrapper.new()
-    choiceType:SetType(gameinteractionsChoiceType.Blueline)
-    choiceData.type = choiceType
-
-    return choiceData
-end
-
-function prepareVisualizersInfo(hub)
-    local visualizersInfo = VisualizersInfo.new()
-    visualizersInfo.activeVisId = hub.id
-    visualizersInfo.visIds = { hub.id }
-
-    return visualizersInfo
-end
-
-function createInteractionHub(titel, action, active)
-    local choiceHubData =  InteractionChoiceHubData.new()
-    choiceHubData.id = -1001
-    choiceHubData.active = active
-    choiceHubData.flags = EVisualizerDefinitionFlags.Undefined
-    choiceHubData.title = titel
-
-    local choices = {}
-    table.insert(choices, createInteractionChoice(action, titel))
-    choiceHubData.choices = choices
-
-    local visualizersInfo = prepareVisualizersInfo(choiceHubData)
-
-    local blackboardDefs = Game.GetAllBlackboardDefs()
-    local interactionBB = Game.GetBlackboardSystem():Get(blackboardDefs.UIInteractions)
-    interactionBB:SetVariant(blackboardDefs.UIInteractions.InteractionChoiceHub, ToVariant(choiceHubData), true)
-    interactionBB:SetVariant(blackboardDefs.UIInteractions.VisualizersInfo, ToVariant(visualizersInfo), true)
+function IsPlayerInAnyMenu()
+    blackboard = Game.GetBlackboardSystem():Get(Game.GetAllBlackboardDefs().UI_System);
+    uiSystemBB = (Game.GetAllBlackboardDefs().UI_System);
+    return(blackboard:GetBool(uiSystemBB.IsInMenu));
 end
 
 onOpenDebug = false
@@ -368,37 +363,10 @@ registerForEvent("onDraw", function()
 		    		JB:ResetZoom()
 				end
 
-				clicked = ImGui.Button("Directional Movement true/false")
-		    	if (clicked) then
-		    		JB.directionalMovement = not JB.directionalMovement
-
-		    		if not JB.directionalMovement then
-		    			local PlayerSystem 		= Game.GetPlayerSystem()
-			    		local PlayerPuppet 		= PlayerSystem:GetLocalPlayerMainGameObject()
-			    		local fppCam       		= PlayerPuppet:GetFPPCameraComponent()
-		    			fppCam.headingLocked 	= false
-		    		end
-					db:exec("UPDATE settings SET value = " .. tostring(JB.directionalMovement) .. " WHERE name = 'directionalMovement'")
-				end
-
 				clicked = ImGui.Button("Static camera true/false")
 		    	if (clicked) then
 		    		JB.directionalStaticCamera = not JB.directionalStaticCamera
 					db:exec("UPDATE settings SET value = " .. tostring(JB.directionalStaticCamera) .. " WHERE name = 'directionalStaticCamera'")
-				end
-
-				clicked = ImGui.Button("Normal Camera Rotate When Stil true/false")
-		    	if (clicked) then
-		    		JB.normalCameraRotateWhenStill = not JB.normalCameraRotateWhenStill
-
-		    		if not JB.normalCameraRotateWhenStill then
-		    			local PlayerSystem 		= Game.GetPlayerSystem()
-			    		local PlayerPuppet 		= PlayerSystem:GetLocalPlayerMainGameObject()
-			    		local fppCam       		= PlayerPuppet:GetFPPCameraComponent()
-		    			fppCam.headingLocked 	= false
-		    		end
-
-					db:exec("UPDATE settings SET value = " .. tostring(JB.normalCameraRotateWhenStill) .. " WHERE name = 'normalCameraRotateWhenStill'")
 				end
 
 				clicked = ImGui.Button("weaponOverride true/false")
@@ -426,7 +394,6 @@ registerForEvent("onDraw", function()
 
 				ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
 				ImGui.Text("directionalStaticCamera: " .. tostring(JB.directionalStaticCamera))
-				ImGui.Text("normalCameraRotateWhenStill: " .. tostring(JB.normalCameraRotateWhenStill))
 				ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
 		      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 		      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
