@@ -370,38 +370,8 @@ function JB:ResetZoom()
 	self:UpdateCamera()
 end
 
-function JB:MoveHorizontal(i)
-    self.camViews[self.camActive].pos.x = self.camViews[self.camActive].pos.x + i
-    self:UpdateCamera()
-    db:exec("UPDATE cameras SET x = '" .. self.camViews[self.camActive].pos.x .. "' WHERE id = " .. self.camActive - 1)
-end
-
-function JB:MoveVertical(i)
-    self.camViews[self.camActive].pos.z = self.camViews[self.camActive].pos.z + i
-    self:UpdateCamera()
-    db:exec("UPDATE cameras SET z = '" .. self.camViews[self.camActive].pos.z .. "' WHERE id = " .. self.camActive - 1)
-end
-
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
-end
-
-function JB:MoveRotX(i)
-    self.camViews[self.camActive].rot.i = self.camViews[self.camActive].rot.i + i
-	self:UpdateCamera()
-	db:exec("UPDATE cameras SET rx = '" .. self.camViews[self.camActive].rot.i .. "' WHERE id = " .. self.camActive - 1)
-end
-
-function JB:MoveRotY(i)
-    self.camViews[self.camActive].rot.j = self.camViews[self.camActive].rot.j + i
-	self:UpdateCamera()
-	db:exec("UPDATE cameras SET ry = '" .. self.camViews[self.camActive].rot.j .. "' WHERE id = " .. self.camActive - 1)
-end
-
-function JB:MoveRotZ(i)
-    self.camViews[self.camActive].rot.k = self.camViews[self.camActive].rot.k + i
-	self:UpdateCamera()
-	db:exec("UPDATE cameras SET rz = '" .. self.camViews[self.camActive].rot.k .. "' WHERE id = " .. self.camActive - 1)
 end
 
 function JB:RestoreFPPView()
