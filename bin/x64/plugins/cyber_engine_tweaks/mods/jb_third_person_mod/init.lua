@@ -423,7 +423,7 @@ registerForEvent("onDraw", function()
 					db:exec("UPDATE settings SET value = " .. tostring(JB.allowCameraBobbing) .. " WHERE name = 'allowCameraBobbing'")
 				end
 
-				clicked = ImGui.Button("eyeMovement true/false (restart)")
+				clicked = ImGui.Button("eyeMovement true/false (reactivate head))")
 		    	if (clicked) then
 		    		JB.eyeMovement = not JB.eyeMovement
 					db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
