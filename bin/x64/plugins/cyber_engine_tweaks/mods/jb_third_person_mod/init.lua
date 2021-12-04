@@ -4,6 +4,8 @@ local Gender 		= require("classes/Gender.lua")
 local Cron 			= require("classes/Cron.lua")
 local GameSession 	= require('classes/GameSession.lua')
 local Ref        	= require("classes/Ref.lua")
+local GameSettings  = require('classes/GameSettings.lua')
+
 local ev = nil
 
 CamView         = {}
@@ -96,7 +98,7 @@ registerForEvent("onInit", function()
 				end
 
 				if actionName == 'mouse_y' then
-					JB.yroll = 0.025 * actionValue
+					JB.yroll = (actionValue / 2)  /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseY').value)
 					JB.moveHorizontal = true
 				end
 
@@ -107,7 +109,7 @@ registerForEvent("onInit", function()
 
 				if actionName == 'mouse_x' or actionName == 'right_stick_x' then
 					JB.moveHorizontal = true
-					JB.xroll = 0.025 * actionValue
+					JB.xroll = actionValue /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseX').value)
 				end
 
 				if actionName == 'world_map_menu_move_vertical' then
