@@ -96,7 +96,7 @@ registerForEvent("onInit", function()
 				end
 
 				if actionName == 'mouse_y' then
-					JB.yroll = 0.008 * actionValue
+					JB.yroll = 0.025 * actionValue
 					JB.moveHorizontal = true
 				end
 
