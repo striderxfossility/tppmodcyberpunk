@@ -62,24 +62,8 @@ function JB:new()
         end
     end
 
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'allowCameraBobbing'") do
-        if(index[1] == 0) then
-            class.allowCameraBobbing = false
-        else
-            class.allowCameraBobbing = true
-        end
-    end
-
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'camActive'") do
         class.camActive = tonumber(index[1])
-    end
-
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'directionalStaticCamera'") do
-        if(index[1] == 0) then
-            class.directionalStaticCamera = false
-        else
-            class.directionalStaticCamera = true
-        end
     end
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'ModelMod'") do
@@ -265,14 +249,6 @@ function JB:CheckForRestoration(delta)
 	end
 
 	if(self.timerCheckClothes > 5.0) then
-
-        if not self.inCar then
-            if self.allowCameraBobbing then
-                PlayerPuppet:DisableCameraBobbing(false)
-            else
-                PlayerPuppet:DisableCameraBobbing(true)
-            end
-        end
         
         if not self.photoModeBeenActive and self.isTppEnabled then
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")

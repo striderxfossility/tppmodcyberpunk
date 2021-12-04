@@ -1,10 +1,11 @@
-local JB 			= require("classes/JB.lua")
-local Attachment 	= require("classes/Attachment.lua")
-local Gender 		= require("classes/Gender.lua")
-local Cron 			= require("classes/Cron.lua")
-local GameSession 	= require('classes/GameSession.lua')
-local Ref        	= require("classes/Ref.lua")
-local GameSettings  = require('classes/GameSettings.lua')
+local JB 				= require("classes/JB.lua")
+local Attachment 		= require("classes/Attachment.lua")
+local Gender 			= require("classes/Gender.lua")
+local Cron 				= require("classes/Cron.lua")
+local GameSession 		= require('classes/GameSession.lua')
+local Ref        		= require("classes/Ref.lua")
+local GameSettings  	= require('classes/GameSettings.lua')
+local nativeSettings 	= nil
 
 local ev = nil
 
@@ -27,6 +28,26 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
+	nativeSettings = GetMod("nativeSettings")
+	nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
+	nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
+	nativeSettings.addSubcategory("/jb_tpp/patches", "Patches")
+
+	nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
+		JB.weaponOverride = state
+		db:exec("UPDATE settings SET value = " .. tostring(JB.weaponOverride) .. " WHERE name = 'weaponOverride'")
+	end)
+
+	nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
+		JB.eyeMovement = state
+		db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
+	end)
+
+	nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
+		JB.ModelMod = state
+		db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
+	end)
+
 	local speed = 8
 
 	-- FIX CRASH LOAD SAVE
@@ -343,44 +364,7 @@ registerForEvent("onDraw", function()
 		if Game.GetPlayer() then
 			ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
-			if (ImGui.Begin("JB Third Person Mod")) then
-
-	            clicked = ImGui.Button("Toggle (front) player light on/of")
-		    	if (clicked) then
-					local PlayerSystem = Game.GetPlayerSystem()
-					local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-	                local light = PlayerPuppet:FindComponentByName(CName.new("TEMP_flashlight"))
-
-	                if light:IsEnabled() then
-	                    light:Toggle(false)
-	                else
-	                    light:Toggle(true)
-	                end
-				end
-
-	            	clicked = ImGui.Button("Player using Model Mod (head)")
-		    	if (clicked) then
-				JB.ModelMod = not JB.ModelMod
-				db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
-			end
-
-		    	clicked = ImGui.Button("Cam to player")
-		    	if (clicked) then
-					local PlayerSystem = Game.GetPlayerSystem()
-					local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-					local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-					local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
-					carCam:Deactivate(2.0, true)
-				end
-
-				clicked = ImGui.Button("Cam to car")
-		    	if (clicked) then
-		    		local PlayerSystem = Game.GetPlayerSystem()
-		    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-		    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-		    		local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
-					carCam:Activate(2.0, true)
-			end
+			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
 
 			clicked = ImGui.Button("Reset cameras")
 		    	if (clicked) then
@@ -388,8 +372,8 @@ registerForEvent("onDraw", function()
 	                	db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
 				db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
 				db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
-				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=50, ry=0, rz=4000  WHERE id = 3")
-				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=50, ry=0, rz=4000  WHERE id = 4")
+				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
+				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
 
 				JB:DeactivateTPP()
 
@@ -401,48 +385,11 @@ registerForEvent("onDraw", function()
 		    		JB:ResetZoom()
 				end
 
-				clicked = ImGui.Button("Static camera true/false")
-		    	if (clicked) then
-		    		JB.directionalStaticCamera = not JB.directionalStaticCamera
-					db:exec("UPDATE settings SET value = " .. tostring(JB.directionalStaticCamera) .. " WHERE name = 'directionalStaticCamera'")
-				end
-
-				clicked = ImGui.Button("weaponOverride true/false")
-		    	if (clicked) then
-		    		JB.weaponOverride = not JB.weaponOverride
-					db:exec("UPDATE settings SET value = " .. tostring(JB.weaponOverride) .. " WHERE name = 'weaponOverride'")
-				end
-
-				clicked = ImGui.Button("animatedFace true/false")
-		    	if (clicked) then
-		    		JB.animatedFace = not JB.animatedFace
-					db:exec("UPDATE settings SET value = " .. tostring(JB.animatedFace) .. " WHERE name = 'animatedFace'")
-				end
-
-				clicked = ImGui.Button("allowCameraBobbing true/false")
-		    	if (clicked) then
-		    		JB.allowCameraBobbing = not JB.allowCameraBobbing
-					db:exec("UPDATE settings SET value = " .. tostring(JB.allowCameraBobbing) .. " WHERE name = 'allowCameraBobbing'")
-				end
-
-				clicked = ImGui.Button("eyeMovement true/false (reactivate head))")
-		    	if (clicked) then
-		    		JB.eyeMovement = not JB.eyeMovement
-					db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
-				end
 
 				local PlayerSystem = Game.GetPlayerSystem()
 	    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 	    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-	    		local carCam       = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
 
-				ImGui.Text("directionalMovement: " .. tostring(JB.directionalMovement))
-				ImGui.Text("directionalStaticCamera: " .. tostring(JB.directionalStaticCamera))
-				ImGui.Text("weaponOverride: " .. tostring(JB.weaponOverride))
-		      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
-		      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
-	            ImGui.Text("Player using Model Mod (head): " .. tostring(JB.ModelMod))
-				ImGui.Text("eyeMovement: " .. tostring(JB.eyeMovement))
 		      	ImGui.Text("---------------------------------------")
 		      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
 		      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
