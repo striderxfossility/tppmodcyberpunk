@@ -32,11 +32,11 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 6, 'directionalMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 6);")
 
-    db:exec("INSERT INTO settings SELECT 7, 'directionalStaticCamera', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 7);")
-
-    db:exec("INSERT INTO settings SELECT 8, 'normalCameraRotateWhenStill', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 8);")
-
     db:exec("INSERT INTO settings SELECT 10, 'eyeMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 10);")
+
+    db:exec("INSERT INTO settings SELECT 11, 'horizontalSen', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 11);")
+
+    db:exec("INSERT INTO settings SELECT 12, 'verticalSen', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 12);")
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
@@ -82,6 +82,14 @@ function JB:new()
         end
     end
 
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'horizontalSen'") do
+        class.horizontalSen = tonumber(index[1])
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'verticalSen'") do
+        class.verticalSen = tonumber(index[1])
+    end
+
     ----------VARIABLES-------------
     class.camViews            = {}
     class.inCar               = false
@@ -104,14 +112,14 @@ function JB:new()
     class.johnnyEntId         = nil
     class.foundJohnnyEnt      = false
     class.johnnyEnt           = nil
-    class.secondCam           = nil
-    class.isInitialized       = false
-    class.offset              = 5
-    class.controllerZoom      = false
-    class.controller360       = false
-    class.controllerRightTrigger = false
-    class.controllerLeftTrigger = false
-    class.eyesTimer           = 5.0
+    class.secondCam                 = nil
+    class.isInitialized             = false
+    class.offset                    = 5
+    class.controllerZoom            = false
+    class.controller360             = false
+    class.controllerRightTrigger    = false
+    class.controllerLeftTrigger     = false
+    class.eyesTimer                 = 5.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )

@@ -31,6 +31,7 @@ registerForEvent("onInit", function()
 	nativeSettings = GetMod("nativeSettings")
 	nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
 	nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
+	nativeSettings.addSubcategory("/jb_tpp/tpp", "Third Person Camera")
 	nativeSettings.addSubcategory("/jb_tpp/patches", "Patches")
 
 	nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
@@ -41,6 +42,16 @@ registerForEvent("onInit", function()
 	nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
 		JB.eyeMovement = state
 		db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
+	end)
+
+	nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
+		JB.horizontalSen = value
+		db:exec("UPDATE settings SET value = " .. tostring(JB.horizontalSen) .. " WHERE name = 'horizontalSen'")
+	end)
+
+	nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
+		JB.verticalSen = value
+		db:exec("UPDATE settings SET value = " .. tostring(JB.verticalSen) .. " WHERE name = 'verticalSen'")
 	end)
 
 	nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
@@ -119,7 +130,7 @@ registerForEvent("onInit", function()
 				end
 
 				if actionName == 'mouse_y' then
-					JB.yroll = (actionValue / 4)  /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseY').value)
+					JB.yroll = (actionValue / 4)  /  (30 / JB.verticalSen)
 					JB.moveHorizontal = true
 				end
 
@@ -130,7 +141,7 @@ registerForEvent("onInit", function()
 
 				if actionName == 'mouse_x' or actionName == 'right_stick_x' then
 					JB.moveHorizontal = true
-					JB.xroll = (actionValue / 4) /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseX').value)
+					JB.xroll = (actionValue / 4) /  (30 / JB.horizontalSen)
 				end
 
 				if actionName == 'world_map_menu_move_vertical' then
