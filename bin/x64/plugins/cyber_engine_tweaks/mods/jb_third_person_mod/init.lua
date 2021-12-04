@@ -98,7 +98,7 @@ registerForEvent("onInit", function()
 				end
 
 				if actionName == 'mouse_y' then
-					JB.yroll = (actionValue / 2)  /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseY').value)
+					JB.yroll = (actionValue / 4)  /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseY').value)
 					JB.moveHorizontal = true
 				end
 
@@ -109,7 +109,7 @@ registerForEvent("onInit", function()
 
 				if actionName == 'mouse_x' or actionName == 'right_stick_x' then
 					JB.moveHorizontal = true
-					JB.xroll = actionValue /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseX').value)
+					JB.xroll = (actionValue / 4) /  (30 / GameSettings.Var('/controls/fppcameramouse/FPP_MouseX').value)
 				end
 
 				if actionName == 'world_map_menu_move_vertical' then
