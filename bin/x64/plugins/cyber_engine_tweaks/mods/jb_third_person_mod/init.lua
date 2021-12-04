@@ -319,7 +319,7 @@ function EyesFollowCamera(deltaTime)
 				ev.request.calculatePositionInParentSpace = true
 
 				Game.GetPlayer():QueueEvent(ev)
-				JB.eyesTimer = 3
+				JB.eyesTimer = 15
 				break
 			end
 		end
