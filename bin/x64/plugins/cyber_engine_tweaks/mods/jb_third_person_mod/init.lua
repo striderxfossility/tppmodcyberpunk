@@ -296,7 +296,9 @@ registerForEvent("onUpdate", function(deltaTime)
 			Cron.Update(deltaTime)
 
 			if ev ~= nil then
-				EyesFollowCamera(deltaTime)
+				if JB.eyeMovement then
+					EyesFollowCamera(deltaTime)
+				end
 			end
 		end
 	end
@@ -421,6 +423,12 @@ registerForEvent("onDraw", function()
 					db:exec("UPDATE settings SET value = " .. tostring(JB.allowCameraBobbing) .. " WHERE name = 'allowCameraBobbing'")
 				end
 
+				clicked = ImGui.Button("eyeMovement true/false (restart)")
+		    	if (clicked) then
+		    		JB.eyeMovement = not JB.eyeMovement
+					db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
+				end
+
 				local PlayerSystem = Game.GetPlayerSystem()
 	    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 	    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
@@ -432,6 +440,7 @@ registerForEvent("onDraw", function()
 		      	ImGui.Text("animatedFace: " .. tostring(JB.animatedFace))
 		      	ImGui.Text("allowCameraBobbing: " .. tostring(JB.allowCameraBobbing))
 	            ImGui.Text("Player using Model Mod (head): " .. tostring(JB.ModelMod))
+				ImGui.Text("eyeMovement: " .. tostring(JB.eyeMovement))
 		      	ImGui.Text("---------------------------------------")
 		      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
 		      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))

@@ -35,6 +35,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 8, 'normalCameraRotateWhenStill', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 8);")
 
+    db:exec("INSERT INTO settings SELECT 10, 'eyeMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 10);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -84,6 +86,14 @@ function JB:new()
             class.ModelMod = false
         else
             class.ModelMod = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'eyeMovement'") do
+        if(index[1] == 0) then
+            class.eyeMovement = false
+        else
+            class.eyeMovement = true
         end
     end
 
