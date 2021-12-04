@@ -1,6 +1,7 @@
 local Gender     = require("classes/Gender.lua")
 local Attachment = require("classes/Attachment.lua")
 local Ref        = require("classes/Ref.lua")
+local Cron 		 = require("classes/Cron.lua")
 
 local JB         = {}
       JB.__index = JB
@@ -419,8 +420,10 @@ function JB:DeactivateTPP(noUpdate)
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
-		ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-        Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+        Cron.After(1.0, function()
+            ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+        end)
 	end
 
 	self:SetEnableTPPValue(false)

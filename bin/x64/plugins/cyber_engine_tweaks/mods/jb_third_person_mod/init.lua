@@ -202,7 +202,7 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
 	if(JB.isTppEnabled) then
-		Cron.After(1.0, function()
+		Cron.After(1.5, function()
 			local ts     = Game.GetTransactionSystem()
 			local player = Game.GetPlayer()
 			ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
