@@ -301,6 +301,23 @@ registerHotkey("jb_controller_360", "Controller: Activate 360 camera", function(
 	JB.controller360 = not JB.controller360
 end)
 
+registerHotkey("jb_reset", "Reset cameras", function()
+	print("resetting cameras...")
+	db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
+	db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
+	db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
+	db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
+	db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
+
+	JB:DeactivateTPP()
+
+	print("done!")
+end)
+
+registerHotkey("jb_reset_zoom", "Reset zoom", function()
+	JB:ResetZoom()
+end)
+
 -- GAME RUNNING
 registerForEvent("onUpdate", function(deltaTime)
     if JB.isInitialized then
@@ -397,31 +414,51 @@ registerForEvent("onDraw", function()
 			ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
+					
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
-				pressed = ImGui.RadioButton("Weapon Override", pressed == JB.weaponOverride)
-				value, pressed = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
+				value, pressedWeaponOverride = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
 
-				if (pressed) then
+				if pressedWeaponOverride then
 					JB.weaponOverride = value
 				end
 
-				clicked = ImGui.Button("Reset cameras")
-				if (clicked) then
-					print("resetting cameras...")
-							db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
-					db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
-					db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
-					db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
-					db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
+				value, pressedEyeMovement = ImGui.Checkbox("Eye movements", JB.eyeMovement)
 
-					JB:DeactivateTPP()
-
-					print("done!")
+				if pressedEyeMovement then
+					JB.eyeMovement = value
 				end
 
-				clicked = ImGui.Button("Reset zoom")
-				if (clicked) then
-					JB:ResetZoom()
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Third Person Camera")
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Horizontal Sensitivity only 360 camera")
+
+				value, usedHorizontalSen = ImGui.SliderInt("hor", JB.horizontalSen, 0, 30, "%d")
+
+				if usedHorizontalSen then
+					JB.horizontalSen = value
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Vertical Sensitivity")
+
+				value, usedVerticalSen = ImGui.SliderInt("ver", JB.verticalSen, 0, 30, "%d")
+
+				if usedVerticalSen then
+					JB.verticalSen = value
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches")
+
+				value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
+
+				if (pressed) then
+					JB.ModelMod = value
 				end
 
 				local PlayerSystem = Game.GetPlayerSystem()
