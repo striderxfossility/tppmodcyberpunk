@@ -38,6 +38,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 12, 'verticalSen', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 12);")
 
+    db:exec("INSERT INTO settings SELECT 13, 'fov', 80 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 13);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -88,6 +90,10 @@ function JB:new()
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'verticalSen'") do
         class.verticalSen = tonumber(index[1])
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'fov'") do
+        class.fov = tonumber(index[1])
     end
 
     ----------VARIABLES-------------
@@ -147,6 +153,8 @@ function JB:CheckForRestoration(delta)
     end
 
     local quat = self.secondCam:GetLocalOrientation()
+
+    self.secondCam:SetFOV(self.fov)
     
     if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
 

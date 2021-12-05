@@ -56,6 +56,11 @@ registerForEvent("onInit", function()
 			db:exec("UPDATE settings SET value = " .. tostring(JB.verticalSen) .. " WHERE name = 'verticalSen'")
 		end)
 
+		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 1, 50, 120, JB.fov, 80, function(value)
+			JB.fov = value
+			db:exec("UPDATE settings SET value = " .. tostring(JB.fov) .. " WHERE name = 'fov'")
+		end)
+
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
 			db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
@@ -451,6 +456,16 @@ registerForEvent("onDraw", function()
 
 				if usedVerticalSen then
 					JB.verticalSen = value
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Field of view")
+
+				value, usedFov = ImGui.SliderInt("fov", JB.fov, 50, 120, "%d")
+
+				if usedFov then
+					JB.fov = value
 				end
 
 				ImGui.NewLine()
