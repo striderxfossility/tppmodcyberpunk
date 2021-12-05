@@ -6,8 +6,7 @@ local GameSession 		= require('classes/GameSession.lua')
 local Ref        		= require("classes/Ref.lua")
 local GameSettings  	= require('classes/GameSettings.lua')
 local nativeSettings 	= nil
-
-local ev = nil
+local ev 				= nil
 
 CamView         = {}
 CamView.__index = CamView
@@ -420,9 +419,7 @@ registerForEvent("onDraw", function()
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
 
-				if settingsTab then
-					ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
-				end
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
 				value, pressedWeaponOverride = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
 
@@ -475,17 +472,6 @@ registerForEvent("onDraw", function()
 
 				ImGui.NewLine()
 
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches")
-
-				value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
-
-				if (pressed) then
-					JB.ModelMod = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
 				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
 
 				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
@@ -516,6 +502,17 @@ registerForEvent("onDraw", function()
 
 				if usedX then
 					JB.camViews[JB.camActive].pos.z = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches")
+
+				value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
+
+				if (pressed) then
+					JB.ModelMod = value
 					JB.updateSettings = true
 				end
 
