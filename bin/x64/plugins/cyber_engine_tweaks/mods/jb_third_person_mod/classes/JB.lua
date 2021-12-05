@@ -130,6 +130,7 @@ function JB:new()
     class.zoomOut                   = false
     class.updateSettings            = false
     class.updateSettingsTimer       = 3.0
+    class.moveCamera                = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -178,6 +179,20 @@ function JB:CheckForRestoration(delta)
     local quat = self.secondCam:GetLocalOrientation()
 
     self.secondCam:SetFOV(self.fov)
+
+    if self.moveCamera then
+        local newPos = Vector4.new(
+            self.camViews[self.camActive].pos.x + self.xroll / 10, 
+            self.camViews[self.camActive].pos.y,
+            self.camViews[self.camActive].pos.z + self.yroll / 10, 1)
+
+        self.camViews[self.camActive].pos = newPos
+        self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
+        self.updateSettings = true
+
+        self.xroll = 0
+        self.yroll = 0
+    end
     
     if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
 

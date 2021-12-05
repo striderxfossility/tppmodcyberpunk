@@ -252,6 +252,26 @@ registerInput('jb_zoom_out', 'Zoom out', function(isDown)
 	end
 end)
 
+registerInput('jb_move_camera', 'Move Camera', function(isDown)
+	local PlayerSystem = Game.GetPlayerSystem()
+    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+	
+	if isDown then
+		JB.moveCamera = true
+
+		if not JB.inScene then
+			fppCam.headingLocked = true
+		end
+	else
+		JB.moveCamera = false
+
+		if not JB.inScene then
+			fppCam.headingLocked = false
+		end
+	end
+end)
+
 registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	local PlayerSystem = Game.GetPlayerSystem()
 	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
