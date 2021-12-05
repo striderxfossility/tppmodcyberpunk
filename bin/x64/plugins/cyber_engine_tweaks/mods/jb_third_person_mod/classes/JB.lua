@@ -120,6 +120,8 @@ function JB:new()
     class.controllerRightTrigger    = false
     class.controllerLeftTrigger     = false
     class.eyesTimer                 = 5.0
+    class.zoomIn                    = false
+    class.zoomOut                   = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -291,6 +293,14 @@ function JB:CheckForRestoration(delta)
         if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
             Gender:AddHead(self.animatedFace)
         end
+    end
+
+    if self.zoomIn then
+        self:Zoom(0.20)
+    end
+
+    if self.zoomOut then
+        self:Zoom(-0.20)
     end
 end
 

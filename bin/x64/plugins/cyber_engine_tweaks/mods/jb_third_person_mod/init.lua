@@ -105,9 +105,11 @@ registerForEvent("onInit", function()
 				local actionValue = ListenerAction.GetValue(action)
 				local actionType  = action:GetType(action).value
 
-				if actionName == "mouse_wheel" then
-					JB:Zoom(actionValue / 2)
-				end
+				print(actionName)
+
+				--if actionName == "mouse_wheel" then
+				--	JB:Zoom(actionValue / 2)
+				--end
 
 				if actionName == "right_trigger" and JB.controllerZoom then -- CONTROLLER
 					JB:Zoom(0.1)
@@ -227,7 +229,23 @@ registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 			fppCam.headingLocked = false
 		end
 	end
-  end)
+end)
+
+registerInput('jb_zoom_in', 'Zoom in', function(isDown)
+	if isDown then
+		JB.zoomIn = true
+	else
+		JB.zoomIn = false
+	end
+end)
+
+registerInput('jb_zoom_out', 'Zoom out', function(isDown)
+	if isDown then
+		JB.zoomOut = true
+	else
+		JB.zoomOut = false
+	end
+end)
 
 registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	local PlayerSystem = Game.GetPlayerSystem()
