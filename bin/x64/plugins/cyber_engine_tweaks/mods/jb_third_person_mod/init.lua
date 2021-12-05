@@ -29,35 +29,38 @@ end
 
 registerForEvent("onInit", function()
 	nativeSettings = GetMod("nativeSettings")
-	nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
-	nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
-	nativeSettings.addSubcategory("/jb_tpp/tpp", "Third Person Camera")
-	nativeSettings.addSubcategory("/jb_tpp/patches", "Patches")
 
-	nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
-		JB.weaponOverride = state
-		db:exec("UPDATE settings SET value = " .. tostring(JB.weaponOverride) .. " WHERE name = 'weaponOverride'")
-	end)
+	if nativeSettings ~= nil then
+		nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
+		nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
+		nativeSettings.addSubcategory("/jb_tpp/tpp", "Third Person Camera")
+		nativeSettings.addSubcategory("/jb_tpp/patches", "Patches")
 
-	nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
-		JB.eyeMovement = state
-		db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
-	end)
+		nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
+			JB.weaponOverride = state
+			db:exec("UPDATE settings SET value = " .. tostring(JB.weaponOverride) .. " WHERE name = 'weaponOverride'")
+		end)
 
-	nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
-		JB.horizontalSen = value
-		db:exec("UPDATE settings SET value = " .. tostring(JB.horizontalSen) .. " WHERE name = 'horizontalSen'")
-	end)
+		nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
+			JB.eyeMovement = state
+			db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
+		end)
 
-	nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
-		JB.verticalSen = value
-		db:exec("UPDATE settings SET value = " .. tostring(JB.verticalSen) .. " WHERE name = 'verticalSen'")
-	end)
+		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
+			JB.horizontalSen = value
+			db:exec("UPDATE settings SET value = " .. tostring(JB.horizontalSen) .. " WHERE name = 'horizontalSen'")
+		end)
 
-	nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
-		JB.ModelMod = state
-		db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
-	end)
+		nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
+			JB.verticalSen = value
+			db:exec("UPDATE settings SET value = " .. tostring(JB.verticalSen) .. " WHERE name = 'verticalSen'")
+		end)
+
+		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
+			JB.ModelMod = state
+			db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
+		end)
+	end
 
 	local speed = 8
 
@@ -395,43 +398,49 @@ registerForEvent("onDraw", function()
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
 
-			clicked = ImGui.Button("Reset cameras")
-		    	if (clicked) then
-				print("resetting cameras...")
-	                	db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
-				db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
-				db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
-				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
-				db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
+				pressed = ImGui.RadioButton("Weapon Override", pressed == JB.weaponOverride)
+				value, pressed = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
 
-				JB:DeactivateTPP()
-
-				print("done!")
-			end
-
-		    	clicked = ImGui.Button("Reset zoom")
-		    	if (clicked) then
-		    		JB:ResetZoom()
+				if (pressed) then
+					JB.weaponOverride = value
 				end
 
+				clicked = ImGui.Button("Reset cameras")
+				if (clicked) then
+					print("resetting cameras...")
+							db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
+					db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
+					db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
+					db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
+					db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
+
+					JB:DeactivateTPP()
+
+					print("done!")
+				end
+
+				clicked = ImGui.Button("Reset zoom")
+				if (clicked) then
+					JB:ResetZoom()
+				end
 
 				local PlayerSystem = Game.GetPlayerSystem()
-	    		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-	    		local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+				local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-		      	ImGui.Text("---------------------------------------")
-		      	ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
-		      	ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
-		      	ImGui.Text("inCar: " .. tostring(JB.inCar))
+				ImGui.Text("---------------------------------------")
+				ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
+				ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
+				ImGui.Text("inCar: " .. tostring(JB.inCar))
 				ImGui.Text("inScene: " .. tostring(JB.inScene))
-		      	ImGui.Text("waitTimer: " .. tostring(JB.waitTimer))
-		      	ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
-		      	ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
-		      	ImGui.Text("carCheckOnce: " .. tostring(JB.carCheckOnce))
-		      	ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
-		      	ImGui.Text("camActive: " .. tostring(JB.camActive))
-		      	ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
-		      	ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
+				ImGui.Text("waitTimer: " .. tostring(JB.waitTimer))
+				ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
+				ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
+				ImGui.Text("carCheckOnce: " .. tostring(JB.carCheckOnce))
+				ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
+				ImGui.Text("camActive: " .. tostring(JB.camActive))
+				ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
+				ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
 	        end
 		    ImGui.End()
 		end
