@@ -97,27 +97,27 @@ function JB:new()
     end
 
     ----------VARIABLES-------------
-    class.camViews            = {}
-    class.inCar               = false
-    class.timeStamp           = 0.0
-    class.switchBackToTpp     = false
-    class.carCheckOnce        = false
-    class.waitForCar          = false
-    class.waitTimer           = 0.0
-    class.timerCheckClothes   = 0.0
-    class.carActivated        = false
-    class.photoModeBeenActive = false
-    class.headTimer           = 1.0
-    class.inScene             = false
-    class.moveHorizontal      = false
-    class.xroll               = 0.0
-    class.yroll               = 0.0
-    class.IsMoving            = false
-    class.onChangePerspective = false
-    class.previousPerspective = false
-    class.johnnyEntId         = nil
-    class.foundJohnnyEnt      = false
-    class.johnnyEnt           = nil
+    class.camViews                  = {}
+    class.inCar                     = false
+    class.timeStamp                 = 0.0
+    class.switchBackToTpp           = false
+    class.carCheckOnce              = false
+    class.waitForCar                = false
+    class.waitTimer                 = 0.0
+    class.timerCheckClothes         = 0.0
+    class.carActivated              = false
+    class.photoModeBeenActive       = false
+    class.headTimer                 = 1.0
+    class.inScene                   = false
+    class.moveHorizontal            = false
+    class.xroll                     = 0.0
+    class.yroll                     = 0.0
+    class.IsMoving                  = false
+    class.onChangePerspective       = false
+    class.previousPerspective       = false
+    class.johnnyEntId               = nil
+    class.foundJohnnyEnt            = false
+    class.johnnyEnt                 = nil
     class.secondCam                 = nil
     class.isInitialized             = false
     class.offset                    = 5
@@ -128,6 +128,8 @@ function JB:new()
     class.eyesTimer                 = 5.0
     class.zoomIn                    = false
     class.zoomOut                   = false
+    class.updateSettings            = false
+    class.updateSettingsTimer       = 3.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -145,6 +147,20 @@ function JB:CheckForRestoration(delta)
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
     local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+    if self.updateSettings and self.updateSettingsTimer <= 0.0 then
+        self.updateSettings         = false
+        self.updateSettingsTimer    = 3.0
+
+        db:exec("UPDATE settings SET value = " .. tostring(self.weaponOverride) .. " WHERE name = 'weaponOverride'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.eyeMovement) .. " WHERE name = 'eyeMovement'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.horizontalSen) .. " WHERE name = 'horizontalSen'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.verticalSen) .. " WHERE name = 'verticalSen'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.fov) .. " WHERE name = 'fov'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.ModelMod) .. " WHERE name = 'ModelMod'")
+    end
+
+    self.updateSettingsTimer = self.updateSettingsTimer - delta
 
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
@@ -327,7 +343,7 @@ function JB:UpdateSecondCam()
 
             self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.offset, 1))
 
-            self:DeactivateMesh()
+            --self:DeactivateMesh()
 
             print('Jb Third Person Mod Loaded')
         end
@@ -385,6 +401,7 @@ end
 
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
+    JB.updateSettings = true
 end
 
 function JB:RestoreFPPView()

@@ -38,32 +38,26 @@ registerForEvent("onInit", function()
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
 			JB.weaponOverride = state
-			db:exec("UPDATE settings SET value = " .. tostring(JB.weaponOverride) .. " WHERE name = 'weaponOverride'")
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
 			JB.eyeMovement = state
-			db:exec("UPDATE settings SET value = " .. tostring(JB.eyeMovement) .. " WHERE name = 'eyeMovement'")
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
-			db:exec("UPDATE settings SET value = " .. tostring(JB.horizontalSen) .. " WHERE name = 'horizontalSen'")
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
 			JB.verticalSen = value
-			db:exec("UPDATE settings SET value = " .. tostring(JB.verticalSen) .. " WHERE name = 'verticalSen'")
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 1, 50, 120, JB.fov, 80, function(value)
 			JB.fov = value
-			db:exec("UPDATE settings SET value = " .. tostring(JB.fov) .. " WHERE name = 'fov'")
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
-			db:exec("UPDATE settings SET value = " .. tostring(JB.ModelMod) .. " WHERE name = 'ModelMod'")
 		end)
 	end
 
@@ -428,12 +422,14 @@ registerForEvent("onDraw", function()
 
 				if pressedWeaponOverride then
 					JB.weaponOverride = value
+					JB.updateSettings = true
 				end
 
 				value, pressedEyeMovement = ImGui.Checkbox("Eye movements", JB.eyeMovement)
 
 				if pressedEyeMovement then
 					JB.eyeMovement = value
+					JB.updateSettings = true
 				end
 
 				ImGui.NewLine()
@@ -446,6 +442,7 @@ registerForEvent("onDraw", function()
 
 				if usedHorizontalSen then
 					JB.horizontalSen = value
+					JB.updateSettings = true
 				end
 
 				ImGui.NewLine()
@@ -456,6 +453,7 @@ registerForEvent("onDraw", function()
 
 				if usedVerticalSen then
 					JB.verticalSen = value
+					JB.updateSettings = true
 				end
 
 				ImGui.NewLine()
@@ -466,6 +464,7 @@ registerForEvent("onDraw", function()
 
 				if usedFov then
 					JB.fov = value
+					JB.updateSettings = true
 				end
 
 				ImGui.NewLine()
@@ -476,6 +475,7 @@ registerForEvent("onDraw", function()
 
 				if (pressed) then
 					JB.ModelMod = value
+					JB.updateSettings = true
 				end
 
 				ImGui.NewLine()
@@ -499,6 +499,8 @@ registerForEvent("onDraw", function()
 				ImGui.Text("camActive: " .. tostring(JB.camActive))
 				ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
 				ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
+				ImGui.Text("updateSettings: " .. tostring(JB.updateSettings))
+				ImGui.Text("updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
 	        end
 		    ImGui.End()
 		end
