@@ -521,27 +521,72 @@ registerForEvent("onDraw", function()
 
 				ImGui.NewLine()
 
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
+				if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 11802 then
+					ImGui.TextColored(0, 1, 0, 1, "(Installed) Cyber Engine Tweaks V1.18.0 or later")
+				else
+					ImGui.TextColored(1, 0, 0, 1, "(NOT INSTALLED!) Cyber Engine Tweaks V1.18.0 or later")
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods optional")
+				if GetMod('nativeSettings') ~= nil then
+					ImGui.TextColored(0, 1, 0, 1, "(Installed) Native Settings")
+				else
+					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Native Settings")
+				end
+
+				if ModArchiveExists('grey_mesh_remover.archive') == true then
+					ImGui.TextColored(0, 1, 0, 1, "(Installed) Grey Mesh Remover")
+				else
+					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Grey Mesh Remover")
+				end
+
+				if ModArchiveExists('BreastJigglePhysicsTPP&FPP&PM.archive') == true then
+					ImGui.TextColored(0, 1, 0, 1, "(Installed) Breast Jiggle Physics")
+				else
+					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Breast Jiggle Physics")
+				end
+
+				if ModArchiveExists('jb-clothing-fit-and-better-grey-mesh-fix.archive') == true then
+					ImGui.TextColored(0, 1, 0, 1, "(Installed) JB Clothing Fit and Better Grey mesh")
+				else
+					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) JB Clothing Fit and Better Grey mesh")
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods NOT COMPATIBLE!")
+				if ModArchiveExists('modNS.archive') == true then
+					ImGui.TextColored(1, 0, 0, 1, "(Installed) Night OS")
+				else
+					ImGui.TextColored(0, 1, 0, 1, "(Not installed) Night OS")
+				end
+
+				ImGui.NewLine()
+
 				ImGui.NewLine()
 
 				local PlayerSystem = Game.GetPlayerSystem()
 				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 				local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-				ImGui.Text("---------------------------------------")
-				ImGui.Text("isTppEnabled: " .. tostring(JB.isTppEnabled))
-				ImGui.Text("timerCheckClothes: " .. tostring(JB.timerCheckClothes))
-				ImGui.Text("inCar: " .. tostring(JB.inCar))
-				ImGui.Text("inScene: " .. tostring(JB.inScene))
-				ImGui.Text("waitTimer: " .. tostring(JB.waitTimer))
-				ImGui.Text("waitForCar: " .. tostring(JB.waitForCar))
-				ImGui.Text("Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
-				ImGui.Text("carCheckOnce: " .. tostring(JB.carCheckOnce))
-				ImGui.Text("switchBackToTpp: " .. tostring(JB.switchBackToTpp))
-				ImGui.Text("camActive: " .. tostring(JB.camActive))
-				ImGui.Text("timeStamp: " .. tostring(JB.timeStamp))
-				ImGui.Text("headingLocked: " .. tostring(fppCam.headingLocked))
-				ImGui.Text("updateSettings: " .. tostring(JB.updateSettings))
-				ImGui.Text("updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "isTppEnabled: " .. tostring(JB.isTppEnabled))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timerCheckClothes: " .. tostring(JB.timerCheckClothes))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inCar: " .. tostring(JB.inCar))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inScene: " .. tostring(JB.inScene))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitTimer: " .. tostring(JB.waitTimer))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitForCar: " .. tostring(JB.waitForCar))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "carCheckOnce: " .. tostring(JB.carCheckOnce))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "switchBackToTpp: " .. tostring(JB.switchBackToTpp))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "camActive: " .. tostring(JB.camActive))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timeStamp: " .. tostring(JB.timeStamp))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "headingLocked: " .. tostring(fppCam.headingLocked))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettings: " .. tostring(JB.updateSettings))
+				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
 	        end
 		    ImGui.End()
 		end
