@@ -14,8 +14,8 @@ function JB:new()
         INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
         INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
         INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
-        INSERT INTO cameras VALUES(3, 0, 4, 0, 0, 50, 0, 4000, 0, true, false);
-        INSERT INTO cameras VALUES(4, 0, 4, 0, 0, 50, 0, 4000, 0, true, true);
+        INSERT INTO cameras VALUES(3, 0, -4, 0, 0, 0, 0, 0, 0, true, false);
+        INSERT INTO cameras VALUES(4, 0, -4, 0, 0, 0, 0, 0, 0, true, true);
     ]=]
 
     db:exec[=[
@@ -137,8 +137,8 @@ function JB:new()
 end
 
 function JB:SetEnableTPPValue(value)
-    self.isTppEnabled = value
-    db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
+    self.isTppEnabled   = value
+    self.updateSettings = true
 end
 
 function JB:CheckForRestoration(delta)
@@ -151,13 +151,20 @@ function JB:CheckForRestoration(delta)
     if self.updateSettings and self.updateSettingsTimer <= 0.0 then
         self.updateSettings         = false
         self.updateSettingsTimer    = 3.0
-
+        
         db:exec("UPDATE settings SET value = " .. tostring(self.weaponOverride) .. " WHERE name = 'weaponOverride'")
         db:exec("UPDATE settings SET value = " .. tostring(self.eyeMovement) .. " WHERE name = 'eyeMovement'")
         db:exec("UPDATE settings SET value = " .. tostring(self.horizontalSen) .. " WHERE name = 'horizontalSen'")
         db:exec("UPDATE settings SET value = " .. tostring(self.verticalSen) .. " WHERE name = 'verticalSen'")
         db:exec("UPDATE settings SET value = " .. tostring(self.fov) .. " WHERE name = 'fov'")
         db:exec("UPDATE settings SET value = " .. tostring(self.ModelMod) .. " WHERE name = 'ModelMod'")
+        db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[4].pos.x .. ", y = " .. self.camViews[4].pos.y .. ", z=" .. self.camViews[4].pos.z .. ", rx=" .. self.camViews[4].rot.i .. ", ry=" .. self.camViews[4].rot.j .. ", rz=" .. self.camViews[4].rot.k .. "  WHERE id = 3")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. "  WHERE id = 4")
     end
 
     self.updateSettingsTimer = self.updateSettingsTimer - delta
@@ -190,7 +197,9 @@ function JB:CheckForRestoration(delta)
         quat = self:RotateQuaternion(quat, delta_quatX)
         quat = self:RotateQuaternion(quat, delta_quatY)
 
-        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, 0, 0))
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z, 0))
+
+        self.camViews[self.camActive].rot = quat
 
         self.secondCam:SetLocalOrientation(quat)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
@@ -203,7 +212,9 @@ function JB:CheckForRestoration(delta)
 
         quat = self:RotateQuaternion(quat, delta_quatY)
 
-        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, 0, 0))
+        local stick = GetSingleton('Quaternion'):Transform(quat, Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z, 0))
+
+        self.camViews[self.camActive].rot = quat
 
         self.secondCam:SetLocalOrientation(quat)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
@@ -265,7 +276,7 @@ function JB:CheckForRestoration(delta)
         end
     end
 
-    if self.isTppEnabled and not self.inCar and self.inScene or self.camViews[self.camActive].freeform then
+    if self.isTppEnabled and not self.inCar and self.inScene then
         self.secondCam.yawMaxLeft = 3600
         self.secondCam.yawMaxRight = -3600
         self.secondCam.pitchMax = 100
@@ -341,9 +352,7 @@ function JB:UpdateSecondCam()
             
             self.secondCam = Ref.Weak(self.johhnyEnt:FindComponentByName(CName.new("camera")))
 
-            self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.offset, 1))
-
-            --self:DeactivateMesh()
+            self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
 
             print('Jb Third Person Mod Loaded')
         end
@@ -353,12 +362,13 @@ function JB:UpdateSecondCam()
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
+        
         self.secondCam:SetLocalPosition(Vector4.new(self.secondCam:GetLocalPosition().x, self.secondCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
 
         local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw())
         local transform = Game.GetPlayer():GetWorldPosition()
         local vec = Vector4.new(transform.x, transform.y, transform.z - 0)
+
         if self.johhnyEnt ~= nil then
             Game.GetTeleportationFacility():Teleport(self.johhnyEnt, vec, moveEuler)
         end
@@ -395,13 +405,14 @@ function JB:CarTimer(deltaTime)
 end
 
 function JB:ResetZoom()
+    self.updateSettings = true
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].defaultZoomLevel
 	self:UpdateCamera()
 end
 
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
-    JB.updateSettings = true
+    self.updateSettings = true
 end
 
 function JB:RestoreFPPView()
@@ -450,29 +461,16 @@ function JB:DeactivateTPP(noUpdate)
 end
 
 function JB:NextCam()
+    self.updateSettings = true
     self:SwitchCamTo(self.camActive + 1)
 end
 
 function JB:SwitchCamTo(cam)
-    local ps     = Game.GetPlayerSystem()
-    local puppet = ps:GetLocalPlayerMainGameObject()
-    local ic     = puppet:GetInspectionComponent()
-
 	if self.camViews[cam] ~= nil then
 	    self.camActive = cam
-        db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
-
-		if self.camViews[cam].freeform then
-			ic:SetIsPlayerInspecting(true)
-		else 
-			ic:SetIsPlayerInspecting(false)
-		end
-
 		self:UpdateCamera()
 	else
 		self.camActive = 1
-        db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
-		ic:SetIsPlayerInspecting(false)
 		self:UpdateCamera()
 	end
 end
@@ -505,94 +503,6 @@ function JB:GetEYEObjects()
     success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
 
     return parts
-end
-
-function JB:DeactivateMesh()
-    local search = Game.FindEntityByID(self.johnnyEntId)
-    search:FindComponentByName(CName.new("t0_000_pma_base__full_shadow")).isEnabled = false
-    search:FindComponentByName(CName.new("legs")).isEnabled = false
-    search:FindComponentByName(CName.new("shoes")).isEnabled = false
-    search:FindComponentByName(CName.new("head_shadowmesh")).isEnabled = false
-    search:FindComponentByName(CName.new("a0_008_ma__fpp_right_q001_injection_mark")).isEnabled = false
-    search:FindComponentByName(CName.new("n0_000_pma_base__full")).isEnabled = false
-    search:FindComponentByName(CName.new("a0_000_nomad_base_fists")).isEnabled = false
-    search:FindComponentByName(CName.new("t0_000_pma_base__full_shadow")).isEnabled = false
-    search:FindComponentByName(CName.new("shadow")).isEnabled = false
-    search:FindComponentByName(CName.new("OccupantSlots")).isEnabled = false
-    search:FindComponentByName(CName.new("CarryOverrides")).isEnabled = false
-    search:FindComponentByName(CName.new("WidgetHud0516")).isEnabled = false
-    search:FindComponentByName(CName.new("cyberspace_character_light")).isEnabled = false
-    search:FindComponentByName(CName.new("EffectSpawnercs101")).isEnabled = false
-    search:FindComponentByName(CName.new("VisionModeActivator")).isEnabled = false
-    search:FindComponentByName(CName.new("AnimationControllerComponent")).isEnabled = false
-    search:FindComponentByName(CName.new("Slot1777")).isEnabled = false
-    search:FindComponentByName(CName.new("Inventory")).isEnabled = false
-    search:FindComponentByName(CName.new("fx")).isEnabled = false
-    search:FindComponentByName(CName.new("AttachmentSlots")).isEnabled = false
-    search:FindComponentByName(CName.new("phone")).isEnabled = false
-    search:FindComponentByName(CName.new("inspect")).isEnabled = false
-    search:FindComponentByName(CName.new("DEBUG_Visualizer")).isEnabled = false
-    search:FindComponentByName(CName.new("BodyDescription")).isEnabled = false
-    search:FindComponentByName(CName.new("PuppetMountable4032")).isEnabled = false
-    search:FindComponentByName(CName.new("MoveComponent")).isEnabled = false
-    search:FindComponentByName(CName.new("AnimGraphResourceContainer")).isEnabled = false
-    search:FindComponentByName(CName.new("CombatHUDManager")).isEnabled = false
-    search:FindComponentByName(CName.new("CarAnimsets")).isEnabled = false
-    search:FindComponentByName(CName.new("TriggerActivator")).isEnabled = false
-    search:FindComponentByName(CName.new("PlayerVoice")).isEnabled = false
-    search:FindComponentByName(CName.new("slots")).isEnabled = false
-    search:FindComponentByName(CName.new("fx_player")).isEnabled = false
-    search:FindComponentByName(CName.new("hud_component")).isEnabled = false
-    search:FindComponentByName(CName.new("monodisc_light")).isEnabled = false
-    search:FindComponentByName(CName.new("menu_component")).isEnabled = false
-    search:FindComponentByName(CName.new("EnvTriggerActivator")).isEnabled = false
-    search:FindComponentByName(CName.new("LeftFootRepeller")).isEnabled = false
-    search:FindComponentByName(CName.new("RightFootRepeller")).isEnabled = false
-    search:FindComponentByName(CName.new("HipsRepeller")).isEnabled = false
-    search:FindComponentByName(CName.new("HitPhysicalQueryMesh")).isEnabled = false
-    search:FindComponentByName(CName.new("HitRepresentation")).isEnabled = false
-    search:FindComponentByName(CName.new("ItemAttachmentSlots")).isEnabled = false
-    search:FindComponentByName(CName.new("targeting_primary")).isEnabled = false
-    search:FindComponentByName(CName.new("targeting_cyberarm")).isEnabled = false
-    search:FindComponentByName(CName.new("fx_status_effects")).isEnabled = false
-    search:FindComponentByName(CName.new("ScanningActivator")).isEnabled = false
-    search:FindComponentByName(CName.new("PlayerMappin5838")).isEnabled = false
-    search:FindComponentByName(CName.new("PlayerGarage")).isEnabled = false
-    search:FindComponentByName(CName.new("PlayerInteractions")).isEnabled = false
-    search:FindComponentByName(CName.new("quickSlots")).isEnabled = false
-    search:FindComponentByName(CName.new("EffectAttachment5471")).isEnabled = false
-    search:FindComponentByName(CName.new("UI_Slots")).isEnabled = false
-    search:FindComponentByName(CName.new("BumpComponent")).isEnabled = false
-    search:FindComponentByName(CName.new("FX_Glitches")).isEnabled = false
-    search:FindComponentByName(CName.new("StimBroadcaster")).isEnabled = false
-    search:FindComponentByName(CName.new("TargetingActivator8632")).isEnabled = false
-    search:FindComponentByName(CName.new("fx_damage")).isEnabled = false
-    search:FindComponentByName(CName.new("TEMP_flashlight")).isEnabled = false
-    search:FindComponentByName(CName.new("ResourceLibrary")).isEnabled = false
-    search:FindComponentByName(CName.new("EffectAttachment5224")).isEnabled = false
-    search:FindComponentByName(CName.new("targetShootComponent")).isEnabled = false
-    search:FindComponentByName(CName.new("PlayerTier7886")).isEnabled = false
-    search:FindComponentByName(CName.new("senseSensorObject")).isEnabled = false
-    search:FindComponentByName(CName.new("disarm")).isEnabled = false
-    search:FindComponentByName(CName.new("TransformHistoryComponent")).isEnabled = false
-    search:FindComponentByName(CName.new("QuestCustomEffects")).isEnabled = false
-    search:FindComponentByName(CName.new("senseVisibleObject")).isEnabled = false
-    search:FindComponentByName(CName.new("influenceObstacle")).isEnabled = false
-    search:FindComponentByName(CName.new("fx_cyberware")).isEnabled = false
-    search:FindComponentByName(CName.new("Slot6342")).isEnabled = false
-    search:FindComponentByName(CName.new("q_blood_mesh_decal")).isEnabled = false
-    search:FindComponentByName(CName.new("environmentDamageReceiver")).isEnabled = false
-    search:FindComponentByName(CName.new("WorldSpaceBlendCamera")).isEnabled = false
-    search:FindComponentByName(CName.new("vehicleTPPCamera")).isEnabled = false
-    search:FindComponentByName(CName.new("vehicleCameraManager")).isEnabled = false
-    search:FindComponentByName(CName.new("vehicleVehicleProxyBlendCamera4681")).isEnabled = false
-    search:FindComponentByName(CName.new("BigObjectsRepeller")).isEnabled = false
-    search:FindComponentByName(CName.new("VisualController5425")).isEnabled = false
-    search:FindComponentByName(CName.new("7551")).isEnabled = false
-
-    search:ScheduleAppearanceChange(CName.new("None"))
-    Game.GetTransactionSystem():RemoveAllItems(search)
-    search.renderSceneLayerMask = Enum.new("RenderSceneLayerMask", 2)
 end
 
 return JB:new()

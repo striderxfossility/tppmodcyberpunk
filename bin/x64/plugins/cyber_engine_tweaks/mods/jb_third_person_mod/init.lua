@@ -38,26 +38,32 @@ registerForEvent("onInit", function()
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
 			JB.weaponOverride = state
+			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
 			JB.eyeMovement = state
+			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
+			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
 			JB.verticalSen = value
+			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 1, 50, 120, JB.fov, 80, function(value)
 			JB.fov = value
+			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
+			JB.updateSettings = true
 		end)
 	end
 
@@ -106,8 +112,6 @@ registerForEvent("onInit", function()
 				local actionName  = Game.NameToString(ListenerAction.GetName(action))
 				local actionValue = ListenerAction.GetValue(action)
 				local actionType  = action:GetType(action).value
-
-				print(actionName)
 
 				--if actionName == "mouse_wheel" then
 				--	JB:Zoom(actionValue / 2)
@@ -301,16 +305,18 @@ registerHotkey("jb_controller_360", "Controller: Activate 360 camera", function(
 end)
 
 registerHotkey("jb_reset", "Reset cameras", function()
-	print("resetting cameras...")
-	db:exec("UPDATE cameras SET x = 0, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 0")
-	db:exec("UPDATE cameras SET x = 0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 1")
-	db:exec("UPDATE cameras SET x = -0.5, y = -2, z=-0, rx=0, ry=0, rz=0  WHERE id = 2")
-	db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 3")
-	db:exec("UPDATE cameras SET x = 0, y = 4, z=-0, rx=0, ry=0, rz=1  WHERE id = 4")
+	JB.camViews[1].pos 	= Vector4.new(0, -2, 0, 1)
+	JB.camViews[1].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[2].pos 	= Vector4.new(0.5, -2, 0, 1)
+	JB.camViews[2].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[3].pos 	= Vector4.new(-0.5, -2, 0, 1)
+	JB.camViews[3].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[4].pos 	= Vector4.new(0, -2, 0, 1)
+	JB.camViews[4].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[5].pos 	= Vector4.new(0, -2, 0, 1)
+	JB.camViews[5].quat = Quaternion.new(0, 0, 0, 1)
 
-	JB:DeactivateTPP()
-
-	print("done!")
+	JB.updateSettings = true
 end)
 
 registerHotkey("jb_reset_zoom", "Reset zoom", function()
@@ -475,6 +481,41 @@ registerForEvent("onDraw", function()
 
 				if (pressed) then
 					JB.ModelMod = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
+
+				value, usedX = ImGui.SliderFloat("x", tonumber(JB.camViews[JB.camActive].pos.x), -3.0, 3.0)
+
+				if usedX then
+					JB.camViews[JB.camActive].pos.x = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Y-Axis")
+
+				value, usedX = ImGui.SliderFloat("y", tonumber(JB.camViews[JB.camActive].pos.y), -10.0, 10.0)
+
+				if usedX then
+					JB.camViews[JB.camActive].pos.y = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Z-Axis")
+
+				value, usedX = ImGui.SliderFloat("z", tonumber(JB.camViews[JB.camActive].pos.z), -3.0, 3.0)
+
+				if usedX then
+					JB.camViews[JB.camActive].pos.z = value
 					JB.updateSettings = true
 				end
 
