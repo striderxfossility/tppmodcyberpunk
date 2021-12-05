@@ -256,7 +256,7 @@ registerInput('jb_move_camera', 'Move Camera', function(isDown)
 	local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-	
+
 	if isDown then
 		JB.moveCamera = true
 
@@ -307,12 +307,6 @@ end)
 
 registerHotkey("jb_open_debug", "Open Debug menu", function()
 	onOpenDebug = not onOpenDebug
-end)
-
-registerHotkey("jb_activate_car_cam", "Activate Car Camera", function()
-	if JB.inCar then
-		JB.carActivated = true
-	end
 end)
 
 registerHotkey("jb_controller_zoom_activate", "Controller: Activate zoom", function()
