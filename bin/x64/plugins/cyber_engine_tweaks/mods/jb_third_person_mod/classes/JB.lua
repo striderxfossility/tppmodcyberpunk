@@ -372,7 +372,7 @@ function JB:UpdateSecondCam()
             if self.isTppEnabled then
                 self:ActivateTPP()
             end
-            
+
             print('Jb Third Person Mod Loaded')
         end
     end
