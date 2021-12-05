@@ -409,13 +409,15 @@ end
 onOpenDebug = false
 
 registerForEvent("onDraw", function()
-	if(onOpenDebug) then
+	if onOpenDebug then
 		if Game.GetPlayer() then
 			ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
-					
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
+
+				if settingsTab then
+					ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
+				end
 
 				value, pressedWeaponOverride = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
 
@@ -460,6 +462,10 @@ registerForEvent("onDraw", function()
 				if (pressed) then
 					JB.ModelMod = value
 				end
+
+				ImGui.NewLine()
+
+				ImGui.NewLine()
 
 				local PlayerSystem = Game.GetPlayerSystem()
 				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
