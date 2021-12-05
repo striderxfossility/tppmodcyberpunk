@@ -368,7 +368,11 @@ function JB:UpdateSecondCam()
             self.secondCam = Ref.Weak(self.johhnyEnt:FindComponentByName(CName.new("camera")))
 
             self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
-
+            	
+            if self.isTppEnabled then
+                self:ActivateTPP()
+            end
+            
             print('Jb Third Person Mod Loaded')
         end
     end

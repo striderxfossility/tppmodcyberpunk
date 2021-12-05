@@ -276,6 +276,11 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	local PlayerSystem = Game.GetPlayerSystem()
 	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
+	if JB.foundJohnnyEnt == false then
+		PlayerPuppet:SetWarningMessage("JB Third person mod not loaded yet!")
+		return;
+	end
+
 	if(JB.isTppEnabled) then
 		Cron.After(1.5, function()
 			local ts     = Game.GetTransactionSystem()
