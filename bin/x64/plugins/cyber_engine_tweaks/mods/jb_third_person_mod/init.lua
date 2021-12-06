@@ -271,6 +271,10 @@ registerInput('jb_move_camera', 'Move Camera', function(isDown)
 	end
 end)
 
+registerHotkey("jb_call_vehicle", "Temporary fix: call vehicle", function()
+	Game.GetPlayer():SendSummonVehicleQuickSlotsManagerRequest()
+end)
+
 registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	local PlayerSystem = Game.GetPlayerSystem()
 	local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
