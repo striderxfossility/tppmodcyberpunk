@@ -376,7 +376,7 @@ function JB:UpdateSecondCam()
             print('Jb Third Person Mod Loaded')
         end
     end
-
+    
     if self.secondCam ~= nil then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
@@ -390,6 +390,13 @@ function JB:UpdateSecondCam()
 
         if self.johhnyEnt ~= nil then
             Game.GetTeleportationFacility():Teleport(self.johhnyEnt, vec, moveEuler)
+
+            if not (self.johhnyEnt:GetWorldPosition().x >= PlayerPuppet:GetWorldPosition().x - 2) and 
+                not (self.johhnyEnt:GetWorldPosition().x <= PlayerPuppet:GetWorldPosition().x + 2) and 
+                not (self.johhnyEnt:GetWorldPosition().y >= PlayerPuppet:GetWorldPosition().y - 2) and
+                not (self.johhnyEnt:GetWorldPosition().y <= PlayerPuppet:GetWorldPosition().y + 2) then
+                print('CAMERA IS STUCK, HELP HIM!')
+            end
         end
     end
 end
@@ -511,7 +518,7 @@ end
 
 function JB:GetEYEObjects()
     local targetingSystem = Game.GetTargetingSystem();
-    
+
     if targetingSystem ~= nil then
         local parts = {};
         local searchQuery = Game["TSQ_ALL;"]()

@@ -27,8 +27,6 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
-	--Attachment:TurnArrayToPerspective({"AttachmentSlots.RightArm"}, "TPP")
-
 	nativeSettings = GetMod("nativeSettings")
 
 	if nativeSettings ~= nil then
@@ -325,16 +323,19 @@ end)
 
 registerHotkey("jb_reset", "Reset cameras", function()
 	JB.camViews[1].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[1].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[1].rot = Quaternion.new(0, 0, 0, 1)
 	JB.camViews[2].pos 	= Vector4.new(0.5, -2, 0, 1)
-	JB.camViews[2].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[2].rot = Quaternion.new(0, 0, 0, 1)
 	JB.camViews[3].pos 	= Vector4.new(-0.5, -2, 0, 1)
-	JB.camViews[3].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[3].rot = Quaternion.new(0, 0, 0, 1)
 	JB.camViews[4].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[4].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[4].rot = Quaternion.new(0, 0, 0, 1)
 	JB.camViews[5].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[5].quat = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[5].rot = Quaternion.new(0, 0, 0, 1)
 
+	JB.secondCam:SetLocalOrientation(JB.camViews[JB.camActive].rot)
+	JB.secondCam:SetLocalPosition(JB.camViews[JB.camActive].pos)
+	
 	JB.updateSettings = true
 end)
 
@@ -346,6 +347,7 @@ end)
 registerForEvent("onUpdate", function(deltaTime)
     if JB.isInitialized then
 		if not IsPlayerInAnyMenu() then
+
 			if not (JB.johnnyEntId ~= nil) then
 				print("Jb Third Person Mod: Spawned second camera")
 				JB.johnnyEntId = exEntitySpawner.Spawn([[base\characters\entities\player\replacer\johnny_silverhand_replacer.ent]], Game.GetPlayer():GetWorldTransform())
@@ -526,6 +528,44 @@ registerForEvent("onDraw", function()
 
 				if usedX then
 					JB.camViews[JB.camActive].pos.z = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				local euler = GetSingleton("Quaternion"):ToEulerAngles(JB.camViews[JB.camActive].rot)
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Roll")
+
+				value, usedroll = ImGui.SliderFloat("roll", euler.roll, -180.0, 180.0)
+
+				if usedroll then
+					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
+					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Pitch")
+
+				value, usedpitch = ImGui.SliderFloat("pitch", euler.pitch, -90.0, 90.0)
+
+				if usedpitch then
+					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
+					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Yaw")
+
+				value, usedpitch = ImGui.SliderFloat("yaw", euler.yaw, -180.0, 180.0)
+
+				if usedpitch then
+					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
+					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
 					JB.updateSettings = true
 				end
 
