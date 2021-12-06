@@ -511,17 +511,22 @@ end
 
 function JB:GetEYEObjects()
     local targetingSystem = Game.GetTargetingSystem();
-    local parts = {};
-    local searchQuery = Game["TSQ_ALL;"]()
-
-    targetingSystem:AddIgnoredCollisionEntities(Game.GetPlayer())
     
-    searchQuery.maxDistance = 10
-    searchQuery.testedSet = Enum.new('gameTargetingSet', 0)
+    if targetingSystem ~= nil then
+        local parts = {};
+        local searchQuery = Game["TSQ_ALL;"]()
 
-    success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
+        targetingSystem:AddIgnoredCollisionEntities(Game.GetPlayer())
+        
+        searchQuery.maxDistance = 10
+        searchQuery.testedSet = Enum.new('gameTargetingSet', 0)
 
-    return parts
+        success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
+
+        return parts
+    end
+
+    return {};
 end
 
 return JB:new()

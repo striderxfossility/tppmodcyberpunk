@@ -27,6 +27,8 @@ function CamView:new (pos, rot, camSwitch, freeform)
 end
 
 registerForEvent("onInit", function()
+	--Attachment:TurnArrayToPerspective({"AttachmentSlots.RightArm"}, "TPP")
+
 	nativeSettings = GetMod("nativeSettings")
 
 	if nativeSettings ~= nil then
@@ -213,7 +215,6 @@ registerForEvent("onInit", function()
 			end
 		end
 	end
-
 end)
 
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
@@ -424,6 +425,10 @@ function EyesFollowCamera(deltaTime)
 end
 
 function IsPlayerInAnyMenu()
+	if Game.GetSystemRequestsHandler():IsGamePaused() then
+        return true
+    end
+
     local blackboard = Game.GetBlackboardSystem():Get(Game.GetAllBlackboardDefs().UI_System);
     local uiSystemBB = (Game.GetAllBlackboardDefs().UI_System);
     return(blackboard:GetBool(uiSystemBB.IsInMenu));
