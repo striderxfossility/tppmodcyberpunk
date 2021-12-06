@@ -80,6 +80,10 @@ registerForEvent("onInit", function()
 		end
     end)
 
+	Override('VehicleSystem', 'IsSummoningVehiclesRestricted;GameInstance', function()
+		return false
+	end)
+
 	JB.isInitialized = Game.GetPlayer() and Game.GetPlayer():IsAttached() and not Game.GetSystemRequestsHandler():IsPreGame()
 
 	Observe('QuestTrackerGameController', 'OnInitialize', function()
