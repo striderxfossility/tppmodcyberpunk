@@ -40,6 +40,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 13, 'fov', 80 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 13);")
 
+    db:exec("INSERT INTO settings SELECT 14, 'inverted', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 14);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -94,6 +96,14 @@ function JB:new()
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'fov'") do
         class.fov = tonumber(index[1])
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'inverted'") do
+        if(index[1] == 0) then
+            class.inverted = false
+        else
+            class.inverted = true
+        end
     end
 
     ----------VARIABLES-------------
@@ -161,11 +171,17 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.ModelMod) .. " WHERE name = 'ModelMod'")
         db:exec("UPDATE settings SET value = " .. self.camActive .. " WHERE name = 'camActive'")
         db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.inverted) .. " WHERE name = 'inverted'")
         db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
         db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
         db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
         db:exec("UPDATE cameras SET x = " .. self.camViews[4].pos.x .. ", y = " .. self.camViews[4].pos.y .. ", z=" .. self.camViews[4].pos.z .. ", rx=" .. self.camViews[4].rot.i .. ", ry=" .. self.camViews[4].rot.j .. ", rz=" .. self.camViews[4].rot.k .. "  WHERE id = 3")
         db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. "  WHERE id = 4")
+    end
+
+    if self.inverted then
+        self.xroll = -self.xroll
+        self.yroll = -self.yroll
     end
 
     self.updateSettingsTimer = self.updateSettingsTimer - delta

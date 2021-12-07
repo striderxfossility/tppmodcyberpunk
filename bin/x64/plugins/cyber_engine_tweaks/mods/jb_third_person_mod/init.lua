@@ -469,6 +469,15 @@ registerForEvent("onDraw", function()
 
 				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Third Person Camera")
 
+				value, pressedInverted = ImGui.Checkbox("Inverted camera", JB.inverted)
+
+				if pressedInverted then
+					JB.inverted = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
 				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Horizontal Sensitivity only 360 camera")
 
 				value, usedHorizontalSen = ImGui.SliderInt("hor", JB.horizontalSen, 0, 30, "%d")
