@@ -45,7 +45,7 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
-		nativeSettings.addSwitch("/jb_tpp/tpp", "Inverted camera", "", JB.inverted, true, function(state)
+		nativeSettings.addSwitch("/jb_tpp/tpp", "Inverted camera", "", JB.inverted, false, function(state)
 			JB.inverted = state
 			JB.updateSettings = true
 		end)
