@@ -26,6 +26,10 @@ function CamView:new (pos, rot, camSwitch, freeform)
    return obj
 end
 
+function dd(class)
+	print(Dump(class, false))
+end
+
 registerForEvent("onInit", function()
 	nativeSettings = GetMod("nativeSettings")
 
