@@ -45,6 +45,11 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
+		nativeSettings.addSwitch("/jb_tpp/tpp", "Inverted camera", "", JB.inverted, true, function(state)
+			JB.inverted = state
+			JB.updateSettings = true
+		end)
+
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
 			JB.updateSettings = true
@@ -55,7 +60,7 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
-		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 1, 50, 120, JB.fov, 80, function(value)
+		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 50, 120, 1, JB.fov, 80, function(value)
 			JB.fov = value
 			JB.updateSettings = true
 		end)
