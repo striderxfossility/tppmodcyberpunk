@@ -55,4 +55,13 @@ function Item:Equip(name, slot)
     Game.EquipItemOnPlayer(name, slot)
 end
 
+function Item:GetItem(slot)
+    local ts      = Game.GetTransactionSystem()
+    local player  = Game.GetPlayer()
+
+    if not ts:IsSlotEmpty(player, slot) then
+        return ts:GetItemInSlot(player, slot)
+    end
+end
+
 return Item:new()

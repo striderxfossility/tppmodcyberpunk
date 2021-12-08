@@ -1,6 +1,7 @@
 local JB 				= require("classes/JB.lua")
 local Attachment 		= require("classes/Attachment.lua")
 local Gender 			= require("classes/Gender.lua")
+local Item 				= require("classes/Item.lua")
 local Cron 				= require("classes/Cron.lua")
 local GameSession 		= require('classes/GameSession.lua')
 local Ref        		= require("classes/Ref.lua")
@@ -29,6 +30,20 @@ end
 function dd(class)
 	print(Dump(class, false))
 end
+
+function ddArr(arr)
+	for index, value in ipairs(arr) do
+		dd(value)
+	end
+end
+
+registerForEvent('onTweak', function()
+	-- added tag [Preload] for clipping bug
+	TweakDB:SetFlat('Items.StrongArms.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","UnequipHolsteredArms","StrongArms","FinisherFront","HideInBackpackUI"})
+	TweakDB:SetFlat('Items.MantisBlades.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
+	TweakDB:SetFlat('Items.NanoWires.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","KeepRenderPlane","ForceDismember","UnequipHolsteredArms","HideInBackpackUI"})
+	TweakDB:SetFlat('Items.ProjectileLauncher.tags', 	{"Preload","Core","Cyberware","QuickAction","ChargeAction","ChargeAttack","WeaponAttachment","Attack_Projectile","QuickSlots","HideInBackpackUI","UnequipHolsteredArms","PSM"})
+end)
 
 registerForEvent("onInit", function()
 	nativeSettings = GetMod("nativeSettings")
