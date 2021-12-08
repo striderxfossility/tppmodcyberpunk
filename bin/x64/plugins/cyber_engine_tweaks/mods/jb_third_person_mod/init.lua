@@ -38,11 +38,26 @@ function ddArr(arr)
 end
 
 registerForEvent('onTweak', function()
+	--TweakDB:SetFlat('Items.StrongHolsteredFists.tags', {"base_fists","SkipActivityLog","IgnoreInventory","Quest"})
+	--TweakDB:SetFlat('Items.HolsteredFists.appearanceName', "holstered_strong")
+	--TweakDB:SetFlat('Items.StrongArms.holsteredItem', "")
+	--TweakDB:SetFlat('Items.StrongArms.blueprint', "Items.Base_Melee_Blueprint")
+	--TweakDB:SetFlat('Items.StrongArms.itemSecondaryAction', "ItemAction.Equip")
+	--TweakDB:SetFlat('Items.StrongArms.itemType', "ItemType.Wea_Fists")
+	--TweakDB:SetFlat('Items.StrongArms.equipArea', "EquipmentArea.BaseFists")
+	--TweakDB:SetFlat('Items.StrongArms.parentAttachmentType', "ParentAttachmentType.Slot")
+	--TweakDB:SetFlat('Items.StrongArms.tags', {"Weapon","Preload","MeleeWeapon","Core","Melee","SkipActivityLog"})
+
 	-- added tag [Preload] for clipping bug
-	TweakDB:SetFlat('Items.StrongArms.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","UnequipHolsteredArms","StrongArms","FinisherFront","HideInBackpackUI"})
-	TweakDB:SetFlat('Items.MantisBlades.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
-	TweakDB:SetFlat('Items.NanoWires.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","KeepRenderPlane","ForceDismember","UnequipHolsteredArms","HideInBackpackUI"})
-	TweakDB:SetFlat('Items.ProjectileLauncher.tags', 	{"Preload","Core","Cyberware","QuickAction","ChargeAction","ChargeAttack","WeaponAttachment","Attack_Projectile","QuickSlots","HideInBackpackUI","UnequipHolsteredArms","PSM"})
+	--TweakDB:SetFlat('Items.StrongArms.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","UnequipHolsteredArms","StrongArms","FinisherFront","HideInBackpackUI"})
+	--TweakDB:SetFlat('Items.MantisBlades.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
+	--TweakDB:SetFlat('Items.NanoWires.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","KeepRenderPlane","ForceDismember","UnequipHolsteredArms","HideInBackpackUI"})
+	--TweakDB:SetFlat('Items.ProjectileLauncher.tags', 	{"Preload","Core","Cyberware","QuickAction","ChargeAction","ChargeAttack","WeaponAttachment","Attack_Projectile","QuickSlots","HideInBackpackUI","UnequipHolsteredArms","PSM"})
+
+	TweakDB:SetFlat('Character.Player_Puppet_Base.tags', {"Player", "TPP_Player"})
+	TweakDB:SetFlat('Character.Player_Puppet_Base.itemGroups', {})
+	TweakDB:SetFlat('Character.Player_Puppet_Base.appearanceName', "TPP_Body")
+	TweakDB:SetFlat('Character.Player_Puppet_Base.isBumpable', false)
 end)
 
 registerForEvent("onInit", function()
