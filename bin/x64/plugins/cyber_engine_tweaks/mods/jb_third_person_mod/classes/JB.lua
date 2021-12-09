@@ -141,6 +141,7 @@ function JB:new()
     class.updateSettings            = false
     class.updateSettingsTimer       = 3.0
     class.moveCamera                = false
+    class.resetCams                 = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -190,6 +191,16 @@ function JB:CheckForRestoration(delta)
 
     if self.secondCam == nil then
         return
+    end
+
+    if self.inScene then
+        self.resetCams = true
+    end
+    
+    if not self.inScene and self.resetCams then -- Reset cameras to before scene
+        self.secondCam:SetLocalPosition(self.camViews[self.camActive].pos)
+        self.secondCam:SetLocalOrientation(self.camViews[self.camActive].rot)
+        self.resetCams = false
     end
 
     local quat = self.secondCam:GetLocalOrientation()
