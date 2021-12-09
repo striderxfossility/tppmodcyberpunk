@@ -660,15 +660,6 @@ registerForEvent("onDraw", function()
 
 				ImGui.NewLine()
 
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods NOT COMPATIBLE!")
-				if ModArchiveExists('modNS.archive') == true then
-					ImGui.TextColored(1, 0, 0, 1, "(Installed) Night OS")
-				else
-					ImGui.TextColored(0, 1, 0, 1, "(Not installed) Night OS")
-				end
-
-				ImGui.NewLine()
-
 				ImGui.NewLine()
 
 				local PlayerSystem = Game.GetPlayerSystem()
