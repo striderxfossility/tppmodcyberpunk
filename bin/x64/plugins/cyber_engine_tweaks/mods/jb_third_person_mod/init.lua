@@ -40,7 +40,7 @@ end
 registerForEvent('onTweak', function()
 	-- added tag [Preload] for clipping bug
 	--TweakDB:SetFlat('Items.StrongArms.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","UnequipHolsteredArms","StrongArms","FinisherFront","HideInBackpackUI"})
-	--TweakDB:SetFlat('Items.MantisBlades.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
+	--TweakDB:SetFlat('Items.MantisBlades.tags', 		{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
 	--TweakDB:SetFlat('Items.NanoWires.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","KeepRenderPlane","ForceDismember","UnequipHolsteredArms","HideInBackpackUI"})
 	--TweakDB:SetFlat('Items.ProjectileLauncher.tags', 	{"Preload","Core","Cyberware","QuickAction","ChargeAction","ChargeAttack","WeaponAttachment","Attack_Projectile","QuickSlots","HideInBackpackUI","UnequipHolsteredArms","PSM"})
 
@@ -97,17 +97,29 @@ registerForEvent("onInit", function()
 
 	local speed = 8
 
+	GameSession.OnPause(function()
+		JB.isInitialized   = false
+		JB.secondCam       = nil
+		JB.foundJohnnyEnt  = false
+		JB.johnnyEntId     = nil
+		exEntitySpawner.Despawn(JB.johnnyEnt)
+		JB.johnnyEnt       = nil
+	end)
+
+	GameSession.OnResume(function()
+		JB.isInitialized   = true
+		FindSecondCamera()
+	end)
+
 	-- FIX CRASH LOAD SAVE
-	GameSession.Listen(function(state)
-		if state.event == "Clean" then
-			JB.isInitialized   = false
-			JB.secondCam       = nil
-			JB.foundJohnnyEnt  = false
-			JB.johnnyEntId     = nil
-			exEntitySpawner.Despawn(JB.johnnyEnt)
-			JB.johnnyEnt       = nil
-		end
-    end)
+	GameSession.OnEnd(function()
+		JB.isInitialized   = false
+		JB.secondCam       = nil
+		JB.foundJohnnyEnt  = false
+		JB.johnnyEntId     = nil
+		exEntitySpawner.Despawn(JB.johnnyEnt)
+		JB.johnnyEnt       = nil
+	end)
 
 	Override('VehicleSystem', 'IsSummoningVehiclesRestricted;GameInstance', function()
 		return false
@@ -231,6 +243,10 @@ registerForEvent("onInit", function()
 		table.insert(JB.camViews, cam)
 	end
 
+	FindSecondCamera()
+end)
+
+function FindSecondCamera()
 	-- FIX CRASH RELOAD ALL MODS
 	local arr = JB:GetPlayerObjects()
 	for _, v in ipairs(arr) do
@@ -246,7 +262,7 @@ registerForEvent("onInit", function()
 			end
 		end
 	end
-end)
+end
 
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 	local PlayerSystem = Game.GetPlayerSystem()
