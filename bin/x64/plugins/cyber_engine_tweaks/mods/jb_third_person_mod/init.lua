@@ -74,6 +74,11 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
+		nativeSettings.addSwitch("/jb_tpp/tpp", "Roll always 0", "", JB.rollAlwaysZero, false, function(state)
+			JB.rollAlwaysZero = state
+			JB.updateSettings = true
+		end)
+
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
 			JB.updateSettings = true
@@ -518,6 +523,13 @@ registerForEvent("onDraw", function()
 
 				if pressedInverted then
 					JB.inverted = value
+					JB.updateSettings = true
+				end
+
+				value, pressedRollAlwaysZero = ImGui.Checkbox("Roll always 0", JB.rollAlwaysZero)
+
+				if pressedRollAlwaysZero then
+					JB.rollAlwaysZero = value
 					JB.updateSettings = true
 				end
 
