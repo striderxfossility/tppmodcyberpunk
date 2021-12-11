@@ -152,6 +152,12 @@ function JB:new()
     class.updateSettingsTimer       = 3.0
     class.moveCamera                = false
     class.resetCams                 = false
+    class.collisions                = {
+        down = false,
+        zoomedIn = 0.0,
+        zoomValue = 0.4
+    }
+    class.colliedTimer              = 0.0
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -194,6 +200,16 @@ function JB:CheckForRestoration(delta)
     if self.inverted then
         self.xroll = -self.xroll
         self.yroll = -self.yroll
+    end
+
+    if self.collisions.down then
+        self:Zoom(self.collisions.zoomValue)
+        self.collisions.zoomedIn = self.collisions.zoomedIn + self.collisions.zoomValue
+    else
+        if self.collisions.zoomedIn > 0 and self.colliedTimer <= 0 then
+            self:Zoom(-0.1)
+            self.collisions.zoomedIn = self.collisions.zoomedIn - 0.1
+        end
     end
 
     if self.rollAlwaysZero then
@@ -395,6 +411,85 @@ function JB:CheckForRestoration(delta)
 
     if self.zoomOut then
         self:Zoom(-0.20)
+    end
+
+    self:Collsion()
+    self.colliedTimer = self.colliedTimer - delta
+end
+
+function JB:Collsion()
+    local filters = {
+		'Static', -- Buildings, Concrete Roads, Crates, etc.
+		'Water',
+		'Terrain',
+    }
+
+    self.collisions.down = false
+
+    local PlayerSystem = Game.GetPlayerSystem()
+    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+    local from = self.secondCam:GetLocalToWorld():GetTranslation()
+    local to = fppCam:GetLocalToWorld():GetTranslation()
+
+    local checkValue = 0.4
+
+    if self.yroll >= 1 then
+        checkValue = checkValue * self.yroll
+    end
+
+    if self.xroll >= 1 then
+        checkValue = checkValue * self.xroll
+    end
+
+    self.collisions.zoomValue = checkValue
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.down = true
+        end
+    end
+
+    to = Vector4.new(from.x, from.y, from.z - checkValue, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.down = true
+        end
+    end
+
+    to = Vector4.new(from.x, from.y, from.z + checkValue, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.down = true
+        end
+    end
+
+    to = Vector4.new(from.x - checkValue, from.y, from.z, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.down = true
+        end
+    end
+
+    to = Vector4.new(from.x + checkValue, from.y, from.z, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.down = true
+        end
+    end
+
+    if self.collisions.down then
+        self.colliedTimer = 0.5
     end
 end
 
