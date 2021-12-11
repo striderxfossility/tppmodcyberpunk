@@ -203,6 +203,9 @@ function JB:CheckForRestoration(delta)
     end
 
     if self.collisions.down then
+        if self.collisions.zoomValue > 0.5 then
+            self.collisions.zoomValue = 0.5
+        end
         self:Zoom(self.collisions.zoomValue)
         self.collisions.zoomedIn = self.collisions.zoomedIn + self.collisions.zoomValue
     else
@@ -419,7 +422,7 @@ end
 
 function JB:Collsion()
     local filters = {
-		'Static', -- Buildings, Concrete Roads, Crates, etc.
+		'Static',
 		'Water',
 		'Terrain',
     }
@@ -489,7 +492,7 @@ function JB:Collsion()
     end
 
     if self.collisions.down then
-        self.colliedTimer = 0.5
+        self.colliedTimer = 1
     end
 end
 
