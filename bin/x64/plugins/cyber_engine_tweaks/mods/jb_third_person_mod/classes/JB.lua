@@ -155,7 +155,8 @@ function JB:new()
     class.collisions                = {
         down = false,
         zoomedIn = 0.0,
-        zoomValue = 0.4
+        zoomValue = 0.4,
+        back = true
     }
     class.colliedTimer              = 0.0
     ----------VARIABLES-------------
@@ -209,7 +210,7 @@ function JB:CheckForRestoration(delta)
         self:Zoom(self.collisions.zoomValue)
         self.collisions.zoomedIn = self.collisions.zoomedIn + self.collisions.zoomValue
     else
-        if self.collisions.zoomedIn > 0 and self.colliedTimer <= 0 then
+        if self.collisions.back and self.collisions.zoomedIn > 0 then
             self:Zoom(-0.1)
             self.collisions.zoomedIn = self.collisions.zoomedIn - 0.1
         end
@@ -435,17 +436,62 @@ function JB:Collsion()
 
     local from = fppCam:GetLocalToWorld():GetTranslation()
     local to = self.secondCam:GetLocalToWorld():GetTranslation()
+    local forw = self.johhnyEnt:GetWorldForward()
+
+    local extendedTo = Vector4.new(to.x - forw.x, to.y - forw.y, to.z, 1)
 
     for _, filter in ipairs(filters) do
         local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
         if success then
             self.collisions.down = true
-            self.collisions.zoomValue = 0.4
+            self.collisions.zoomValue = 0.2
         end
     end
 
-    if self.collisions.down then
-        self.colliedTimer = 1
+    self.collisions.back = true
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, extendedTo, filter, false, false)
+        if success then
+            self.collisions.back = false
+        end
+    end
+
+    from = self.secondCam:GetLocalToWorld():GetTranslation()
+    to = Vector4.new(from.x, from.y, from.z - 0.5, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.back = false
+        end
+    end
+
+    to = Vector4.new(from.x, from.y, from.z + 0.5, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.back = false
+        end
+    end
+
+    to = Vector4.new(from.x, from.y - 0.5, from.z, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.back = false
+        end
+    end
+
+    to = Vector4.new(from.x, from.y + 0.5, from.z, 1)
+
+    for _, filter in ipairs(filters) do
+        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
+        if success then
+            self.collisions.back = false
+        end
     end
 end
 
