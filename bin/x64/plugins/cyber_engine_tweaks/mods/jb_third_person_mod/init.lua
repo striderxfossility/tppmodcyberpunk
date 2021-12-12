@@ -79,6 +79,11 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
+		nativeSettings.addSwitch("/jb_tpp/tpp", "Yaw always 0", "", JB.yawAlwaysZero, false, function(state)
+			JB.yawAlwaysZero = state
+			JB.updateSettings = true
+		end)
+
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
 			JB.updateSettings = true
@@ -530,6 +535,13 @@ registerForEvent("onDraw", function()
 
 				if pressedRollAlwaysZero then
 					JB.rollAlwaysZero = value
+					JB.updateSettings = true
+				end
+
+				value, pressedYawAlwaysZero = ImGui.Checkbox("Yaw always 0", JB.yawAlwaysZero)
+
+				if pressedYawAlwaysZero then
+					JB.yawAlwaysZero = value
 					JB.updateSettings = true
 				end
 

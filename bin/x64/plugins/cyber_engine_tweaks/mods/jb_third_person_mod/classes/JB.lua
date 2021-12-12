@@ -44,6 +44,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 15, 'rollAlwaysZero', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 15);")
 
+    db:exec("INSERT INTO settings SELECT 16, 'yawAlwaysZero', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 16);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -113,6 +115,14 @@ function JB:new()
             class.rollAlwaysZero = false
         else
             class.rollAlwaysZero = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'yawAlwaysZero'") do
+        if(index[1] == 0) then
+            class.yawAlwaysZero = false
+        else
+            class.yawAlwaysZero = true
         end
     end
 
@@ -191,6 +201,7 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.isTppEnabled) .. " WHERE name = 'isTppEnabled'")
         db:exec("UPDATE settings SET value = " .. tostring(self.inverted) .. " WHERE name = 'inverted'")
         db:exec("UPDATE settings SET value = " .. tostring(self.rollAlwaysZero) .. " WHERE name = 'rollAlwaysZero'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.yawAlwaysZero) .. " WHERE name = 'yawAlwaysZero'")
         db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
         db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
         db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
@@ -257,9 +268,10 @@ function JB:CheckForRestoration(delta)
         self.xroll = 0
         self.yroll = 0
     end
+
+    local isDirectMovement = false
     
     if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
-
         if self.controllerLeftTrigger then
             self.xroll = 2
             self.controllerLeftTrigger = false
@@ -287,6 +299,7 @@ function JB:CheckForRestoration(delta)
     end
 
     if not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
+        isDirectMovement = true
         local delta_quatY = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
         quat = self:RotateQuaternion(quat, delta_quatY)
@@ -299,6 +312,14 @@ function JB:CheckForRestoration(delta)
         self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
         self.moveHorizontal  = false
+    end
+
+    if isDirectMovement then
+        if self.yawAlwaysZero then
+            local euler = GetSingleton("Quaternion"):ToEulerAngles(self.camViews[self.camActive].rot)
+            self.camViews[self.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, 0))
+            self.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, 0)))
+        end
     end
 
     local str = "player_photomode_head"
