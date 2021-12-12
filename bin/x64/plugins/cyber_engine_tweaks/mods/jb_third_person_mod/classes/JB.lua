@@ -433,61 +433,14 @@ function JB:Collsion()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-    local from = self.secondCam:GetLocalToWorld():GetTranslation()
-    local to = fppCam:GetLocalToWorld():GetTranslation()
-
-    local checkValue = 0.4
-
-    if self.yroll >= 1 then
-        checkValue = checkValue * self.yroll
-    end
-
-    if self.xroll >= 1 then
-        checkValue = checkValue * self.xroll
-    end
-
-    self.collisions.zoomValue = checkValue
+    local from = fppCam:GetLocalToWorld():GetTranslation()
+    local to = self.secondCam:GetLocalToWorld():GetTranslation()
 
     for _, filter in ipairs(filters) do
         local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
         if success then
             self.collisions.down = true
-        end
-    end
-
-    to = Vector4.new(from.x, from.y, from.z - checkValue, 1)
-
-    for _, filter in ipairs(filters) do
-        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
-        if success then
-            self.collisions.down = true
-        end
-    end
-
-    to = Vector4.new(from.x, from.y, from.z + checkValue, 1)
-
-    for _, filter in ipairs(filters) do
-        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
-        if success then
-            self.collisions.down = true
-        end
-    end
-
-    to = Vector4.new(from.x - checkValue, from.y, from.z, 1)
-
-    for _, filter in ipairs(filters) do
-        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
-        if success then
-            self.collisions.down = true
-        end
-    end
-
-    to = Vector4.new(from.x + checkValue, from.y, from.z, 1)
-
-    for _, filter in ipairs(filters) do
-        local success, result = Game.GetSpatialQueriesSystem():SyncRaycastByCollisionGroup(from, to, filter, false, false)
-        if success then
-            self.collisions.down = true
+            self.collisions.zoomValue = 0.4
         end
     end
 
