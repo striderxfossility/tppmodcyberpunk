@@ -297,6 +297,7 @@ end)
 registerInput('jb_zoom_in', 'Zoom in', function(isDown)
 	if isDown then
 		JB.zoomIn = true
+		JB.collisions.zoomedIn = 0.0
 	else
 		JB.zoomIn = false
 	end
@@ -305,6 +306,7 @@ end)
 registerInput('jb_zoom_out', 'Zoom out', function(isDown)
 	if isDown then
 		JB.zoomOut = true
+		JB.collisions.zoomedIn = 0.0
 	else
 		JB.zoomOut = false
 	end
@@ -396,10 +398,12 @@ registerHotkey("jb_reset", "Reset cameras", function()
 	JB.secondCam:SetLocalPosition(JB.camViews[JB.camActive].pos)
 	
 	JB.updateSettings = true
+	JB.collisions.zoomedIn = 0.0
 end)
 
 registerHotkey("jb_reset_zoom", "Reset zoom", function()
 	JB:ResetZoom()
+	JB.collisions.zoomedIn = 0.0
 end)
 
 -- GAME RUNNING
