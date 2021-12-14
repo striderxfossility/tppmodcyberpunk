@@ -161,6 +161,7 @@ function JB:new()
     class.updateSettings            = false
     class.updateSettingsTimer       = 3.0
     class.moveCamera                = false
+    class.moveCameraOnPlane         = false
     class.resetCams                 = false
     class.collisions                = {
         down = false,
@@ -266,6 +267,20 @@ function JB:CheckForRestoration(delta)
             self.camViews[self.camActive].pos.x + self.xroll / 10, 
             self.camViews[self.camActive].pos.y,
             self.camViews[self.camActive].pos.z + self.yroll / 10, 1)
+
+        self.camViews[self.camActive].pos = newPos
+        self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
+        self.updateSettings = true
+
+        self.xroll = 0
+        self.yroll = 0
+    end
+
+    if self.moveCameraOnPlane then
+        local newPos = Vector4.new(
+            self.camViews[self.camActive].pos.x + self.xroll / 10, 
+            self.camViews[self.camActive].pos.y + self.yroll / 10,
+            self.camViews[self.camActive].pos.z, 1)
 
         self.camViews[self.camActive].pos = newPos
         self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
