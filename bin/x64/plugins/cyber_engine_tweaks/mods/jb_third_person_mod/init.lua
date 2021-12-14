@@ -362,7 +362,7 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	end
 
 	if(JB.isTppEnabled) then
-		Cron.After(1.5, function()
+		Cron.After(JB.transitionSpeed, function()
 			local ts     = Game.GetTransactionSystem()
 			local player = Game.GetPlayer()
 			ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
@@ -466,7 +466,7 @@ registerForEvent("onUpdate", function(deltaTime)
 			if JB.carActivated then
 				if JB.inCar then
 					carCam = fppCam:FindComponentByName(CName.new("vehicleTPPCamera"))
-					carCam:Activate(2.0, true)
+					carCam:Activate(JB.transitionSpeed, true)
 					JB.tppHeadActivated = true
 					JB.carActivated     = false
 				end
@@ -605,6 +605,17 @@ registerForEvent("onDraw", function()
 				ImGui.NewLine()
 
 				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Transition Speed FPP to TPP")
+
+				value, usedTrans = ImGui.SliderFloat("sp", tonumber(JB.transitionSpeed), 0.0, 5.0)
+
+				if usedTrans then
+					JB.transitionSpeed = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
 
 				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
 

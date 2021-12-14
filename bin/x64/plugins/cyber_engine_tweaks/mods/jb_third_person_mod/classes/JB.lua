@@ -46,6 +46,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 16, 'yawAlwaysZero', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 16);")
 
+    db:exec("INSERT INTO settings SELECT 18, 'transitionSpeed', 2 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 18);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -92,6 +94,10 @@ function JB:new()
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'horizontalSen'") do
         class.horizontalSen = tonumber(index[1])
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'transitionSpeed'") do
+        class.transitionSpeed = tonumber(index[1])
     end
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'verticalSen'") do
@@ -203,6 +209,7 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.inverted) .. " WHERE name = 'inverted'")
         db:exec("UPDATE settings SET value = " .. tostring(self.rollAlwaysZero) .. " WHERE name = 'rollAlwaysZero'")
         db:exec("UPDATE settings SET value = " .. tostring(self.yawAlwaysZero) .. " WHERE name = 'yawAlwaysZero'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.transitionSpeed) .. " WHERE name = 'transitionSpeed'")
         db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
         db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
         db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
@@ -633,7 +640,7 @@ function JB:RestoreFPPView()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = PlayerPuppet:GetFPPCameraComponent()
 
-        fppCam:Activate(1)
+        fppCam:Activate(self.transitionSpeed)
 	end
 end
 
@@ -646,7 +653,7 @@ end
 
 function JB:ActivateTPP()
     Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-    self.secondCam:Activate(1)
+    self.secondCam:Activate(self.transitionSpeed)
     self:SetEnableTPPValue(true)
     self:UpdateCamera()
     Gender:AddHead(self.animatedFace)
@@ -662,7 +669,7 @@ function JB:DeactivateTPP(noUpdate)
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
-        Cron.After(1.0, function()
+        Cron.After(self.transitionSpeed, function()
             ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
             Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
         end)
