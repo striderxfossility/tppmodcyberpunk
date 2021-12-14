@@ -403,6 +403,10 @@ registerHotkey("jb_controller_360", "Controller: Activate 360 camera", function(
 end)
 
 registerHotkey("jb_reset", "Reset cameras", function()
+	ResetCameras()
+end)
+
+function ResetCameras() 
 	JB.camViews[1].pos 	= Vector4.new(0, -2, 0, 1)
 	JB.camViews[1].rot = Quaternion.new(0, 0, 0, 1)
 	JB.camViews[2].pos 	= Vector4.new(0.5, -2, 0, 1)
@@ -419,7 +423,7 @@ registerHotkey("jb_reset", "Reset cameras", function()
 	
 	JB.updateSettings = true
 	JB.collisions.zoomedIn = 0.0
-end)
+end
 
 registerHotkey("jb_reset_zoom", "Reset zoom", function()
 	JB:ResetZoom()
@@ -542,6 +546,19 @@ registerForEvent("onDraw", function()
 				if pressedEyeMovement then
 					JB.eyeMovement = value
 					JB.updateSettings = true
+				end
+
+				value, pressedResetZoom = ImGui.Checkbox("Reset Zoom", false)
+
+				if pressedResetZoom then
+					JB:ResetZoom()
+					JB.collisions.zoomedIn = 0.0
+				end
+
+				value, pressedResetCameras = ImGui.Checkbox("Reset Cameras", false)
+
+				if pressedResetCameras then
+					ResetCameras()
 				end
 
 				ImGui.NewLine()
