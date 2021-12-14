@@ -209,6 +209,10 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. "  WHERE id = 4")
     end
 
+    if self.secondCam == nil then
+        return
+    end
+
     if self.inverted then
         self.xroll = -self.xroll
         self.yroll = -self.yroll
@@ -218,11 +222,17 @@ function JB:CheckForRestoration(delta)
         if self.collisions.zoomValue > 0.5 then
             self.collisions.zoomValue = 0.5
         end
+        if self.secondCam:GetLocalPosition().y > 20 or self.secondCam:GetLocalPosition().y < -20 then
+            self.collisions.zoomValue = 0
+        end
         self:Zoom(self.collisions.zoomValue)
         self.collisions.zoomedIn = self.collisions.zoomedIn + self.collisions.zoomValue
     else
         if self.collisions.back and self.collisions.zoomedIn > 0 then
             self:Zoom(-0.1)
+            if self.secondCam:GetLocalPosition().y > 20 or self.secondCam:GetLocalPosition().y < -20 then
+                self.collisions.zoomValue = 0
+            end
             self.collisions.zoomedIn = self.collisions.zoomedIn - 0.1
         end
     end
@@ -236,10 +246,6 @@ function JB:CheckForRestoration(delta)
     self.updateSettingsTimer = self.updateSettingsTimer - delta
 
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
-
-    if self.secondCam == nil then
-        return
-    end
 
     if self.inScene then
         self.resetCams = true
@@ -600,6 +606,9 @@ end
 
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
+    if self.camViews[self.camActive].pos.y > -0.1 then
+        self.camViews[self.camActive].pos.y = -0.1
+    end
     self.updateSettings = true
 end
 
