@@ -230,7 +230,7 @@ function JB:CheckForRestoration(delta)
         if self.collisions.zoomValue > 0.5 then
             self.collisions.zoomValue = 0.5
         end
-        if self.secondCam:GetLocalPosition().y > 20 or self.secondCam:GetLocalPosition().y < -20 then
+        if self.secondCam:GetLocalPosition().y > -self.camViews[self.camActive].pos.y or self.secondCam:GetLocalPosition().y < self.camViews[self.camActive].pos.y then
             self.collisions.zoomValue = 0
         end
         self:Zoom(self.collisions.zoomValue)
@@ -238,7 +238,7 @@ function JB:CheckForRestoration(delta)
     else
         if self.collisions.back and self.collisions.zoomedIn > 0 then
             self:Zoom(-0.1)
-            if self.secondCam:GetLocalPosition().y > 20 or self.secondCam:GetLocalPosition().y < -20 then
+            if self.secondCam:GetLocalPosition().y > -self.camViews[self.camActive].pos.y or self.secondCam:GetLocalPosition().y < self.camViews[self.camActive].pos.y then
                 self.collisions.zoomValue = 0
             end
             self.collisions.zoomedIn = self.collisions.zoomedIn - 0.1
