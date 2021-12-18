@@ -48,6 +48,10 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 18, 'transitionSpeed', 2 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 18);")
 
+    db:exec("INSERT INTO settings SELECT 19, 'fppPatch', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 19);")
+
+    db:exec("INSERT INTO settings SELECT 20, 'zoomFpp', 0.1 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 20);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -132,6 +136,18 @@ function JB:new()
         end
     end
 
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'fppPatch'") do
+        if(index[1] == 0) then
+            class.fppPatch = false
+        else
+            class.fppPatch = true
+        end
+    end
+
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'zoomFpp'") do
+        class.zoomFpp = tonumber(index[1])
+    end
+
     ----------VARIABLES-------------
     class.camViews                  = {}
     class.inCar                     = false
@@ -210,6 +226,8 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.rollAlwaysZero) .. " WHERE name = 'rollAlwaysZero'")
         db:exec("UPDATE settings SET value = " .. tostring(self.yawAlwaysZero) .. " WHERE name = 'yawAlwaysZero'")
         db:exec("UPDATE settings SET value = " .. tostring(self.transitionSpeed) .. " WHERE name = 'transitionSpeed'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.fppPatch) .. " WHERE name = 'fppPatch'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.zoomFpp) .. " WHERE name = 'zoomFpp'")
         db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
         db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
         db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
@@ -359,14 +377,14 @@ function JB:CheckForRestoration(delta)
     self.headTimer = self.headTimer - delta
     
     if self.headTimer <= 0 then
-        if self.isTppEnabled and not self.inCar then
+        if self.isTppEnabled and not self.inCar or self.fppPatch and not self.inCar then
             if Gender:IsMale() then
                 Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
             else
                 Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
             end
         else
-            if not self.inCar then
+            if not self.inCar or not self.fppPatch then
                 if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
                     Gender:AddFppHead()
                 end
@@ -441,8 +459,10 @@ function JB:CheckForRestoration(delta)
         end
 
         if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.secondCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
-            Gender:AddFppHead()
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            if not self.fppPatch then
+                Gender:AddFppHead()
+                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            end
         end
 
         self.timerCheckClothes = 0.0
@@ -468,6 +488,17 @@ function JB:CheckForRestoration(delta)
 
     self:Collsion()
     self.colliedTimer = self.colliedTimer - delta
+end
+
+function JB:FppPatch()
+    if not self.isTppEnabled then
+        local PlayerSystem = Game.GetPlayerSystem()
+        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+        local loc          = fppCam:GetLocalPosition()
+
+        fppCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z, 1))
+    end
 end
 
 function JB:Collsion()
@@ -670,8 +701,10 @@ function JB:DeactivateTPP(noUpdate)
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
         Cron.After(self.transitionSpeed, function()
-            ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            if not self.fppPatch then
+                ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            end
         end)
 	end
 

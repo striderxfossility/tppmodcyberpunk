@@ -57,7 +57,7 @@ registerForEvent("onInit", function()
 		nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
 		nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
 		nativeSettings.addSubcategory("/jb_tpp/tpp", "Third Person Camera")
-		nativeSettings.addSubcategory("/jb_tpp/patches", "Patches")
+		nativeSettings.addSubcategory("/jb_tpp/patches", "Patches / Requests")
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
 			JB.weaponOverride = state
@@ -101,6 +101,11 @@ registerForEvent("onInit", function()
 
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
+			JB.updateSettings = true
+		end)
+
+		nativeSettings.addSwitch("/jb_tpp/patches", "Fpp reflection patch", "", JB.fppPatch, false, function(state)
+			JB.fppPatch = state
 			JB.updateSettings = true
 		end)
 	end
@@ -363,10 +368,12 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 
 	if(JB.isTppEnabled) then
 		Cron.After(JB.transitionSpeed, function()
-			local ts     = Game.GetTransactionSystem()
-			local player = Game.GetPlayer()
-			ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-			Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+			if not JB.fppPatch then
+				local ts     = Game.GetTransactionSystem()
+				local player = Game.GetPlayer()
+				ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+				Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+			end
 		end)
 		JB:DeactivateTPP(false)
 	else
@@ -455,8 +462,10 @@ registerForEvent("onUpdate", function(deltaTime)
 					Gender:AddHead(JB.animatedFace)
 					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
 				else
-					Gender:AddFppHead()
-					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+					if not JB.fppPatch then
+						Gender:AddFppHead()
+						Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+					end
 				end
 			else
 				JB.onChangePerspective = false
@@ -484,6 +493,10 @@ registerForEvent("onUpdate", function(deltaTime)
 				if JB.eyeMovement then
 					EyesFollowCamera(deltaTime)
 				end
+			end
+
+			if JB.fppPatch then
+				JB:FppPatch()
 			end
 		end
 	end
@@ -705,12 +718,30 @@ registerForEvent("onDraw", function()
 
 				ImGui.NewLine()
 
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches")
+				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches / Requests")
 
 				value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
 
 				if (pressed) then
 					JB.ModelMod = value
+					JB.updateSettings = true
+				end
+
+				value, pressedFppPatch = ImGui.Checkbox("Fpp reflection head", JB.fppPatch)
+
+				if (pressedFppPatch) then
+					JB.fppPatch = value
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
+				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Zoom Fpp Patch")
+
+				value, usedZoomFpp = ImGui.SliderFloat("zoom", JB.zoomFpp, 0.3, 0.0)
+
+				if usedZoomFpp then
+					JB.zoomFpp = value
 					JB.updateSettings = true
 				end
 
