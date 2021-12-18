@@ -52,6 +52,12 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 20, 'zoomFpp', 0.1 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 20);")
 
+    db:exec("INSERT INTO cameras SELECT 5, 0, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 5);")
+    db:exec("INSERT INTO cameras SELECT 6, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 6);")
+    db:exec("INSERT INTO cameras SELECT 7, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 7);")
+    db:exec("INSERT INTO cameras SELECT 8, 0, -4, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 8);")
+    db:exec("INSERT INTO cameras SELECT 9, 0, -4, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 9);")
+
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
             class.weaponOverride = false
@@ -662,7 +668,6 @@ function JB:Zoom(i)
     if self.camViews[self.camActive].pos.y > -0.1 then
         self.camViews[self.camActive].pos.y = -0.1
     end
-    self.updateSettings = true
 end
 
 function JB:RestoreFPPView()

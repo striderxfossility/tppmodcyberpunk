@@ -6,6 +6,7 @@ local Cron 				= require("classes/Cron.lua")
 local GameSession 		= require('classes/GameSession.lua')
 local Ref        		= require("classes/Ref.lua")
 local GameSettings  	= require('classes/GameSettings.lua')
+local UI			  	= require('classes/UI.lua')
 local nativeSettings 	= nil
 local ev 				= nil
 
@@ -414,16 +415,16 @@ registerHotkey("jb_reset", "Reset cameras", function()
 end)
 
 function ResetCameras() 
-	JB.camViews[1].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[1].rot = Quaternion.new(0, 0, 0, 1)
-	JB.camViews[2].pos 	= Vector4.new(0.5, -2, 0, 1)
-	JB.camViews[2].rot = Quaternion.new(0, 0, 0, 1)
-	JB.camViews[3].pos 	= Vector4.new(-0.5, -2, 0, 1)
-	JB.camViews[3].rot = Quaternion.new(0, 0, 0, 1)
-	JB.camViews[4].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[4].rot = Quaternion.new(0, 0, 0, 1)
-	JB.camViews[5].pos 	= Vector4.new(0, -2, 0, 1)
-	JB.camViews[5].rot = Quaternion.new(0, 0, 0, 1)
+	JB.camViews[1].pos 	= JB.camViews[6].pos
+	JB.camViews[1].rot = JB.camViews[6].rot
+	JB.camViews[2].pos 	= JB.camViews[7].pos
+	JB.camViews[2].rot = JB.camViews[7].rot
+	JB.camViews[3].pos 	= JB.camViews[8].pos
+	JB.camViews[3].rot = JB.camViews[8].rot
+	JB.camViews[4].pos 	= JB.camViews[9].pos
+	JB.camViews[4].rot = JB.camViews[9].rot
+	JB.camViews[5].pos 	= JB.camViews[10].pos
+	JB.camViews[5].rot = JB.camViews[10].rot
 
 	JB.secondCam:SetLocalOrientation(JB.camViews[JB.camActive].rot)
 	JB.secondCam:SetLocalPosition(JB.camViews[JB.camActive].pos)
@@ -540,270 +541,317 @@ onOpenDebug = false
 
 registerForEvent("onDraw", function()
 	if onOpenDebug then
+
 		if Game.GetPlayer() then
 			ImGui.SetNextWindowPos(300, 300, ImGuiCond.FirstUseEver)
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
 
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
+				if ImGui.BeginTabBar("Tabbar") then
+					if ImGui.BeginTabItem("Main settings") then
 
-				value, pressedWeaponOverride = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
-				if pressedWeaponOverride then
-					JB.weaponOverride = value
-					JB.updateSettings = true
+						value, pressedWeaponOverride = ImGui.Checkbox("Weapon Override", JB.weaponOverride)
+
+						if pressedWeaponOverride then
+							JB.weaponOverride = value
+							JB.updateSettings = true
+						end
+
+						value, pressedEyeMovement = ImGui.Checkbox("Eye movements", JB.eyeMovement)
+
+						if pressedEyeMovement then
+							JB.eyeMovement = value
+							JB.updateSettings = true
+						end
+
+						value, pressedResetZoom = ImGui.Checkbox("Reset Zoom", false)
+
+						if pressedResetZoom then
+							JB:ResetZoom()
+							JB.collisions.zoomedIn = 0.0
+						end
+
+						value, pressedResetCameras = ImGui.Checkbox("Reset Cameras", false)
+
+						if pressedResetCameras then
+							ResetCameras()
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Third Person Camera")
+
+						value, pressedInverted = ImGui.Checkbox("Inverted camera", JB.inverted)
+
+						if pressedInverted then
+							JB.inverted = value
+							JB.updateSettings = true
+						end
+
+						value, pressedRollAlwaysZero = ImGui.Checkbox("Roll always 0", JB.rollAlwaysZero)
+
+						if pressedRollAlwaysZero then
+							JB.rollAlwaysZero = value
+							JB.updateSettings = true
+						end
+
+						value, pressedYawAlwaysZero = ImGui.Checkbox("Yaw always 0", JB.yawAlwaysZero)
+
+						if pressedYawAlwaysZero then
+							JB.yawAlwaysZero = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Horizontal Sensitivity only 360 camera")
+
+						value, usedHorizontalSen = ImGui.SliderInt("hor", JB.horizontalSen, 0, 30, "%d")
+
+						if usedHorizontalSen then
+							JB.horizontalSen = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Vertical Sensitivity")
+
+						value, usedVerticalSen = ImGui.SliderInt("ver", JB.verticalSen, 0, 30, "%d")
+
+						if usedVerticalSen then
+							JB.verticalSen = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Field of view")
+
+						value, usedFov = ImGui.SliderInt("fov", JB.fov, 50, 120, "%d")
+
+						if usedFov then
+							JB.fov = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Transition Speed FPP to TPP")
+
+						value, usedTrans = ImGui.SliderFloat("sp", tonumber(JB.transitionSpeed), 0.0, 5.0)
+
+						if usedTrans then
+							JB.transitionSpeed = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
+
+						value, usedX = ImGui.SliderFloat("x", tonumber(JB.camViews[JB.camActive].pos.x), -3.0, 3.0)
+
+						if usedX then
+							JB.camViews[JB.camActive].pos.x = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Y-Axis")
+
+						value, usedX = ImGui.SliderFloat("y", tonumber(JB.camViews[JB.camActive].pos.y), -10.0, 10.0)
+
+						if usedX then
+							JB.camViews[JB.camActive].pos.y = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Z-Axis")
+
+						value, usedX = ImGui.SliderFloat("z", tonumber(JB.camViews[JB.camActive].pos.z), -3.0, 3.0)
+
+						if usedX then
+							JB.camViews[JB.camActive].pos.z = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						local euler = GetSingleton("Quaternion"):ToEulerAngles(JB.camViews[JB.camActive].rot)
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Roll")
+
+						value, usedroll = ImGui.SliderFloat("roll", euler.roll, -180.0, 180.0)
+
+						if usedroll then
+							JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
+							JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Pitch")
+
+						value, usedpitch = ImGui.SliderFloat("pitch", euler.pitch, -90.0, 90.0)
+
+						if usedpitch then
+							JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
+							JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Yaw")
+
+						value, usedpitch = ImGui.SliderFloat("yaw", euler.yaw, -180.0, 180.0)
+
+						if usedpitch then
+							JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
+							JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
+							JB.updateSettings = true
+						end
+
+						ImGui.EndTabItem()
+					end
+
+					if ImGui.BeginTabItem("Patches / Requests") then
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches / Requests")
+
+						value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
+
+						if (pressed) then
+							JB.ModelMod = value
+							JB.updateSettings = true
+						end
+
+						value, pressedFppPatch = ImGui.Checkbox("Fpp reflection head", JB.fppPatch)
+
+						if (pressedFppPatch) then
+							JB.fppPatch = value
+							JB.updateSettings = true
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Zoom Fpp Patch")
+
+						value, usedZoomFpp = ImGui.SliderFloat("zoom", JB.zoomFpp, 0.3, 0.0)
+
+						if usedZoomFpp then
+							JB.zoomFpp = value
+							JB.updateSettings = true
+						end
+
+						ImGui.EndTabItem()
+					end
+
+					if ImGui.BeginTabItem("info") then
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
+						if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 11802 then
+							ImGui.TextColored(0, 1, 0, 1, "(Installed) Cyber Engine Tweaks V1.18.1 or later")
+						else
+							ImGui.TextColored(1, 0, 0, 1, "(NOT INSTALLED!) Cyber Engine Tweaks V1.18.1 or later")
+						end
+
+						ImGui.NewLine()
+
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods optional")
+						if GetMod('nativeSettings') ~= nil then
+							ImGui.TextColored(0, 1, 0, 1, "(Installed) Native Settings")
+						else
+							ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Native Settings")
+						end
+
+						if ModArchiveExists('grey_mesh_remover.archive') == true then
+							ImGui.TextColored(0, 1, 0, 1, "(Installed) Grey Mesh Remover")
+						else
+							ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Grey Mesh Remover")
+						end
+
+						if ModArchiveExists('BreastJigglePhysicsTPP&FPP&PM.archive') == true then
+							ImGui.TextColored(0, 1, 0, 1, "(Installed) Breast Jiggle Physics")
+						else
+							ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Breast Jiggle Physics")
+						end
+
+						if ModArchiveExists('jb-clothing-fit-and-better-grey-mesh-fix.archive') == true then
+							ImGui.TextColored(0, 1, 0, 1, "(Installed) JB Clothing Fit and Better Grey mesh")
+						else
+							ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) JB Clothing Fit and Better Grey mesh")
+						end
+
+						ImGui.NewLine()
+
+						ImGui.NewLine()
+
+						local PlayerSystem = Game.GetPlayerSystem()
+						local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
+						local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "isTppEnabled: " .. tostring(JB.isTppEnabled))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timerCheckClothes: " .. tostring(JB.timerCheckClothes))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inCar: " .. tostring(JB.inCar))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inScene: " .. tostring(JB.inScene))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitTimer: " .. tostring(JB.waitTimer))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitForCar: " .. tostring(JB.waitForCar))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "carCheckOnce: " .. tostring(JB.carCheckOnce))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "switchBackToTpp: " .. tostring(JB.switchBackToTpp))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "camActive: " .. tostring(JB.camActive))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timeStamp: " .. tostring(JB.timeStamp))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "headingLocked: " .. tostring(fppCam.headingLocked))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettings: " .. tostring(JB.updateSettings))
+						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
+						
+						ImGui.EndTabItem()
+					end
+
+					if ImGui.BeginTabItem("Reset camera default") then
+
+						ImGui.NewLine()
+
+						if ImGui.BeginTabBar("Cameras") then
+							if ImGui.BeginTabItem("cam 1") then
+								UI:DrawCam(JB.camViews[6], 5)
+								ImGui.EndTabItem()
+							end
+
+							if ImGui.BeginTabItem("cam 2") then
+								UI:DrawCam(JB.camViews[7], 6)
+								ImGui.EndTabItem()
+							end
+
+							if ImGui.BeginTabItem("cam 3") then
+								UI:DrawCam(JB.camViews[8], 7)
+								ImGui.EndTabItem()
+							end
+
+							if ImGui.BeginTabItem("cam 4") then
+								UI:DrawCam(JB.camViews[9], 8)
+								ImGui.EndTabItem()
+							end
+
+							if ImGui.BeginTabItem("cam 5") then
+								UI:DrawCam(JB.camViews[10], 9)
+								ImGui.EndTabItem()
+							end
+
+						end
+
+						ImGui.EndTabItem()
+					end
 				end
-
-				value, pressedEyeMovement = ImGui.Checkbox("Eye movements", JB.eyeMovement)
-
-				if pressedEyeMovement then
-					JB.eyeMovement = value
-					JB.updateSettings = true
-				end
-
-				value, pressedResetZoom = ImGui.Checkbox("Reset Zoom", false)
-
-				if pressedResetZoom then
-					JB:ResetZoom()
-					JB.collisions.zoomedIn = 0.0
-				end
-
-				value, pressedResetCameras = ImGui.Checkbox("Reset Cameras", false)
-
-				if pressedResetCameras then
-					ResetCameras()
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Third Person Camera")
-
-				value, pressedInverted = ImGui.Checkbox("Inverted camera", JB.inverted)
-
-				if pressedInverted then
-					JB.inverted = value
-					JB.updateSettings = true
-				end
-
-				value, pressedRollAlwaysZero = ImGui.Checkbox("Roll always 0", JB.rollAlwaysZero)
-
-				if pressedRollAlwaysZero then
-					JB.rollAlwaysZero = value
-					JB.updateSettings = true
-				end
-
-				value, pressedYawAlwaysZero = ImGui.Checkbox("Yaw always 0", JB.yawAlwaysZero)
-
-				if pressedYawAlwaysZero then
-					JB.yawAlwaysZero = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Horizontal Sensitivity only 360 camera")
-
-				value, usedHorizontalSen = ImGui.SliderInt("hor", JB.horizontalSen, 0, 30, "%d")
-
-				if usedHorizontalSen then
-					JB.horizontalSen = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Vertical Sensitivity")
-
-				value, usedVerticalSen = ImGui.SliderInt("ver", JB.verticalSen, 0, 30, "%d")
-
-				if usedVerticalSen then
-					JB.verticalSen = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Field of view")
-
-				value, usedFov = ImGui.SliderInt("fov", JB.fov, 50, 120, "%d")
-
-				if usedFov then
-					JB.fov = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Transition Speed FPP to TPP")
-
-				value, usedTrans = ImGui.SliderFloat("sp", tonumber(JB.transitionSpeed), 0.0, 5.0)
-
-				if usedTrans then
-					JB.transitionSpeed = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
-
-				value, usedX = ImGui.SliderFloat("x", tonumber(JB.camViews[JB.camActive].pos.x), -3.0, 3.0)
-
-				if usedX then
-					JB.camViews[JB.camActive].pos.x = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Y-Axis")
-
-				value, usedX = ImGui.SliderFloat("y", tonumber(JB.camViews[JB.camActive].pos.y), -10.0, 10.0)
-
-				if usedX then
-					JB.camViews[JB.camActive].pos.y = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Z-Axis")
-
-				value, usedX = ImGui.SliderFloat("z", tonumber(JB.camViews[JB.camActive].pos.z), -3.0, 3.0)
-
-				if usedX then
-					JB.camViews[JB.camActive].pos.z = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				local euler = GetSingleton("Quaternion"):ToEulerAngles(JB.camViews[JB.camActive].rot)
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Roll")
-
-				value, usedroll = ImGui.SliderFloat("roll", euler.roll, -180.0, 180.0)
-
-				if usedroll then
-					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
-					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Pitch")
-
-				value, usedpitch = ImGui.SliderFloat("pitch", euler.pitch, -90.0, 90.0)
-
-				if usedpitch then
-					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
-					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Yaw")
-
-				value, usedpitch = ImGui.SliderFloat("yaw", euler.yaw, -180.0, 180.0)
-
-				if usedpitch then
-					JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
-					JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Patches / Requests")
-
-				value, pressed = ImGui.Checkbox("Model head", JB.ModelMod)
-
-				if (pressed) then
-					JB.ModelMod = value
-					JB.updateSettings = true
-				end
-
-				value, pressedFppPatch = ImGui.Checkbox("Fpp reflection head", JB.fppPatch)
-
-				if (pressedFppPatch) then
-					JB.fppPatch = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Zoom Fpp Patch")
-
-				value, usedZoomFpp = ImGui.SliderFloat("zoom", JB.zoomFpp, 0.3, 0.0)
-
-				if usedZoomFpp then
-					JB.zoomFpp = value
-					JB.updateSettings = true
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
-				if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 11802 then
-					ImGui.TextColored(0, 1, 0, 1, "(Installed) Cyber Engine Tweaks V1.18.1 or later")
-				else
-					ImGui.TextColored(1, 0, 0, 1, "(NOT INSTALLED!) Cyber Engine Tweaks V1.18.1 or later")
-				end
-
-				ImGui.NewLine()
-
-				ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods optional")
-				if GetMod('nativeSettings') ~= nil then
-					ImGui.TextColored(0, 1, 0, 1, "(Installed) Native Settings")
-				else
-					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Native Settings")
-				end
-
-				if ModArchiveExists('grey_mesh_remover.archive') == true then
-					ImGui.TextColored(0, 1, 0, 1, "(Installed) Grey Mesh Remover")
-				else
-					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Grey Mesh Remover")
-				end
-
-				if ModArchiveExists('BreastJigglePhysicsTPP&FPP&PM.archive') == true then
-					ImGui.TextColored(0, 1, 0, 1, "(Installed) Breast Jiggle Physics")
-				else
-					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) Breast Jiggle Physics")
-				end
-
-				if ModArchiveExists('jb-clothing-fit-and-better-grey-mesh-fix.archive') == true then
-					ImGui.TextColored(0, 1, 0, 1, "(Installed) JB Clothing Fit and Better Grey mesh")
-				else
-					ImGui.TextColored(0.8627, 0.8627, 0.8627, 1, "(Not installed) JB Clothing Fit and Better Grey mesh")
-				end
-
-				ImGui.NewLine()
-
-				ImGui.NewLine()
-
-				local PlayerSystem = Game.GetPlayerSystem()
-				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-				local fppCam       = PlayerPuppet:GetFPPCameraComponent()
-
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "isTppEnabled: " .. tostring(JB.isTppEnabled))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timerCheckClothes: " .. tostring(JB.timerCheckClothes))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inCar: " .. tostring(JB.inCar))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "inScene: " .. tostring(JB.inScene))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitTimer: " .. tostring(JB.waitTimer))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "waitForCar: " .. tostring(JB.waitForCar))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "Head " .. tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "carCheckOnce: " .. tostring(JB.carCheckOnce))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "switchBackToTpp: " .. tostring(JB.switchBackToTpp))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "camActive: " .. tostring(JB.camActive))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timeStamp: " .. tostring(JB.timeStamp))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "headingLocked: " .. tostring(fppCam.headingLocked))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettings: " .. tostring(JB.updateSettings))
-				ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
 	        end
 		    ImGui.End()
 		end
