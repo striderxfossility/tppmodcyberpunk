@@ -390,9 +390,11 @@ function JB:CheckForRestoration(delta)
                 Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
             end
         else
-            if not self.inCar or not self.fppPatch then
+            if not self.inCar then
                 if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
-                    Gender:AddFppHead()
+                    if not self.fppPatch then
+                        Gender:AddFppHead()
+                    end
                 end
             end
         end
