@@ -452,7 +452,9 @@ function JB:CheckForRestoration(delta)
         end
 
         if not self.isTppEnabled and not self.inCar then
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            if not self.fppPatch then
+                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            end
         end
 
         if self.inCar and not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.isTppEnabled then
