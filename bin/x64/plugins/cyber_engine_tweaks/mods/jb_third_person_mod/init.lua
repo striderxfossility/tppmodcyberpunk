@@ -283,7 +283,7 @@ end
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 	local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
 	if (isDown) then
 	  	JB.directionalMovement = true
@@ -321,7 +321,7 @@ end)
 registerInput('jb_move_camera', 'Move Camera up/down', function(isDown)
 	local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
 	if isDown then
 		JB.moveCamera = true
@@ -341,7 +341,7 @@ end)
 registerInput('jb_move_camera_forward', 'Move Camera forward/backwards', function(isDown)
 	local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
 	if isDown then
 		JB.moveCameraOnPlane = true
@@ -456,7 +456,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
 			local PlayerSystem = Game.GetPlayerSystem()
 			local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-			local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+			local fppCam       = GetPlayer():FindComponentByName('camera')
 
 			if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
 				if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
@@ -796,7 +796,7 @@ registerForEvent("onDraw", function()
 
 						local PlayerSystem = Game.GetPlayerSystem()
 						local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-						local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+						local fppCam       = GetPlayer():FindComponentByName('camera')
 
 						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
 						ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "isTppEnabled: " .. tostring(JB.isTppEnabled))

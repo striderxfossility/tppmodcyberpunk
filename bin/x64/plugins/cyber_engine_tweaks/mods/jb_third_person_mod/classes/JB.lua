@@ -214,7 +214,7 @@ function JB:CheckForRestoration(delta)
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
     if self.updateSettings and self.updateSettingsTimer <= 0.0 then
         self.updateSettings         = false
@@ -504,7 +504,7 @@ function JB:FppPatch()
     if not self.isTppEnabled then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+        local fppCam       = GetPlayer():FindComponentByName('camera')
         local loc          = fppCam:GetLocalPosition()
 
         fppCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z, 1))
@@ -522,7 +522,7 @@ function JB:Collsion()
 
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
     local from = fppCam:GetLocalToWorld():GetTranslation()
     local to = self.secondCam:GetLocalToWorld():GetTranslation()
@@ -611,7 +611,7 @@ function JB:UpdateSecondCam()
     if self.secondCam ~= nil then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+        local fppCam       = GetPlayer():FindComponentByName('camera')
         
         self.secondCam:SetLocalPosition(Vector4.new(self.secondCam:GetLocalPosition().x, self.secondCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
 
@@ -678,7 +678,7 @@ function JB:RestoreFPPView()
 	if not self.isTppEnabled then
         local PlayerSystem = Game.GetPlayerSystem()
         local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+        local fppCam       = GetPlayer():FindComponentByName('camera')
 
         fppCam:Activate(self.transitionSpeed)
 	end
@@ -702,7 +702,7 @@ end
 function JB:DeactivateTPP(noUpdate)
     local PlayerSystem = Game.GetPlayerSystem()
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = PlayerPuppet:GetFPPCameraComponent()
+    local fppCam       = GetPlayer():FindComponentByName('camera')
 
     fppCam:ResetPitch()
 
