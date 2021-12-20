@@ -165,9 +165,7 @@ registerForEvent("onInit", function()
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
-			if Game.GetPlayer():FindVehicleCameraManager():IsTPPActive() then
-				Gender:AddHead(JB.animatedFace)
-			end
+			Gender:AddTppHead()
         else
             JB.inCar = false
         end
@@ -479,11 +477,11 @@ registerForEvent("onUpdate", function(deltaTime)
 
 				if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
 					if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
-						Gender:AddHead(JB.animatedFace)
+						Gender:AddTppHead()
 						Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
 					else
 						if not JB.fppPatch then
-							Gender:AddFppHead()
+							--Gender:AddFppHead()
 							Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
 						end
 					end
@@ -518,6 +516,8 @@ registerForEvent("onUpdate", function(deltaTime)
 				if JB.fppPatch then
 					JB:FppPatch()
 				end
+
+				GameObjectEffectHelper.StopEffectEvent(GetPlayer(), "camera_mask");
 			end
 		end
 	end

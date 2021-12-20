@@ -175,7 +175,6 @@ function JB:new()
     class.timerCheckClothes         = 0.0
     class.carActivated              = false
     class.photoModeBeenActive       = false
-    class.headTimer                 = 1.0
     class.inScene                   = false
     class.moveHorizontal            = false
     class.xroll                     = 0.0
@@ -385,34 +384,6 @@ function JB:CheckForRestoration(delta)
         end
     end
 
-    local str = "player_photomode_head"
-
-    if self.animatedFace then
-        str = "character_customization_head"
-    end
-
-    self.headTimer = self.headTimer - delta
-    
-    if self.headTimer <= 0 then
-        if self.isTppEnabled and not self.inCar or self.fppPatch and not self.inCar then
-            if Gender:IsMale() then
-                Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
-            else
-                Game.EquipItemOnPlayer("Items.CharacterCustomizationMaHead", "TppHead")
-            end
-        else
-            if not self.inCar then
-                if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == "player_fpp_head") then
-                    if not self.fppPatch then
-                        Gender:AddFppHead()
-                    end
-                end
-            end
-        end
-
-        self.headTimer = 2
-    end
-
     if self.isTppEnabled then
         if photoMode:IsPhotoModeActive() and not self.inScene then
             self.photoModeBeenActive = true
@@ -431,7 +402,18 @@ function JB:CheckForRestoration(delta)
 		if(self.isTppEnabled) then
 			if(Attachment:HasWeaponActive()) then
 				self.switchBackToTpp = true
-				self:DeactivateTPP()
+				Cron.After(self.transitionSpeed, function()
+                    if not self.fppPatch then
+                        Gender:AddTppHead()
+                        Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+                        local ts     = Game.GetTransactionSystem()
+                        local player = Game.GetPlayer()
+                        ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+                        Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+                        Gender:AddFppHead()
+                    end
+                end)
+                self:DeactivateTPP(false)
 			end
 	    end
 
@@ -474,17 +456,17 @@ function JB:CheckForRestoration(delta)
             self:DeactivateTPP()
         end
 
-        if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
-            Gender:AddHead(self.animatedFace)
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
-        end
+        --if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
+            --Gender:AddHead(self.animatedFace)
+            --Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
+        --end
 
-        if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.secondCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
-            if not self.fppPatch then
-                Gender:AddFppHead()
-                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-            end
-        end
+        --if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.secondCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
+            --if not self.fppPatch then
+                --Gender:AddFppHead()
+                --Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+            --end
+        --end
 
         self.timerCheckClothes = 0.0
     end
@@ -493,11 +475,11 @@ function JB:CheckForRestoration(delta)
         self:SetEnableTPPValue(false)
 	end
 
-    if self.inScene and not self.inCar and photoMode:IsPhotoModeActive() then
-        if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
-            Gender:AddHead(self.animatedFace)
-        end
-    end
+    --if self.inScene and not self.inCar and photoMode:IsPhotoModeActive() then
+    --    if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
+    --        Gender:AddHead(self.animatedFace)
+    --    end
+    --end
 
     if self.zoomIn then
         self:Zoom(0.20)
@@ -661,7 +643,7 @@ function JB:CarTimer(deltaTime)
 
 	if(self.waitTimer > 1.0) then
 		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-        Gender:AddHead(self.animatedFace)
+        --Gender:AddHead(self.animatedFace)
         self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
