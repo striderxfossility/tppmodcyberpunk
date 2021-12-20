@@ -32,8 +32,6 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 6, 'directionalMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 6);")
 
-    db:exec("INSERT INTO settings SELECT 10, 'eyeMovement', true WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 10);")
-
     db:exec("INSERT INTO settings SELECT 11, 'horizontalSen', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 11);")
 
     db:exec("INSERT INTO settings SELECT 12, 'verticalSen', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 12);")
@@ -93,14 +91,6 @@ function JB:new()
             class.ModelMod = false
         else
             class.ModelMod = true
-        end
-    end
-
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'eyeMovement'") do
-        if(index[1] == 0) then
-            class.eyeMovement = false
-        else
-            class.eyeMovement = true
         end
     end
 
@@ -230,7 +220,6 @@ function JB:CheckForRestoration(delta)
         self.updateSettingsTimer    = 3.0
         
         db:exec("UPDATE settings SET value = " .. tostring(self.weaponOverride) .. " WHERE name = 'weaponOverride'")
-        db:exec("UPDATE settings SET value = " .. tostring(self.eyeMovement) .. " WHERE name = 'eyeMovement'")
         db:exec("UPDATE settings SET value = " .. tostring(self.horizontalSen) .. " WHERE name = 'horizontalSen'")
         db:exec("UPDATE settings SET value = " .. tostring(self.verticalSen) .. " WHERE name = 'verticalSen'")
         db:exec("UPDATE settings SET value = " .. tostring(self.fov) .. " WHERE name = 'fov'")

@@ -70,11 +70,6 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 
-		nativeSettings.addSwitch("/jb_tpp/settings", "Eye movements", "Your player is checking out other npc's!", JB.eyeMovement, true, function(state)
-			JB.eyeMovement = state
-			JB.updateSettings = true
-		end)
-
 		nativeSettings.addSwitch("/jb_tpp/tpp", "Inverted camera", "", JB.inverted, false, function(state)
 			JB.inverted = state
 			JB.updateSettings = true
@@ -515,12 +510,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
 				Cron.Update(deltaTime)
 
-				if ev ~= nil then
-					if JB.eyeMovement then
-						EyesFollowCamera(deltaTime)
-					end
-				end
-
 				if JB.fppPatch then
 					JB:FppPatch()
 				end
@@ -610,13 +599,6 @@ registerForEvent("onDraw", function()
 
 							if pressedWeaponOverride then
 								JB.weaponOverride = value
-								JB.updateSettings = true
-							end
-
-							value, pressedEyeMovement = ImGui.Checkbox("Eye movements", JB.eyeMovement)
-
-							if pressedEyeMovement then
-								JB.eyeMovement = value
 								JB.updateSettings = true
 							end
 
