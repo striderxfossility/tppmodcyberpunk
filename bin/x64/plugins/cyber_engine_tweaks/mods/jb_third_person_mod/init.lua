@@ -376,6 +376,11 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 			return;
 		end
 
+		if JB.inCar then
+			PlayerPuppet:SetWarningMessage("JB: Do you want to have bugs?")
+			return;
+		end
+
 		if(JB.isTppEnabled) then
 			Cron.After(JB.transitionSpeed, function()
 				if not JB.fppPatch then
@@ -571,6 +576,13 @@ registerForEvent("onDraw", function()
 					if ImGui.BeginTabItem("Main settings") then
 
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
+
+						value, pressedCrough = ImGui.Checkbox("Try fix crough bug", JB.disableMod)
+
+						if pressedCrough then
+							Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+							Gender:AddTppHead()
+						end
 
 						value, pressedDisableMod = ImGui.Checkbox("Disable Mod", JB.disableMod)
 

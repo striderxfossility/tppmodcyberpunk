@@ -685,11 +685,13 @@ function JB:UpdateCamera()
 end
 
 function JB:ActivateTPP()
-    Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-    self.secondCam:Activate(self.transitionSpeed)
-    self:SetEnableTPPValue(true)
-    self:UpdateCamera()
-    Gender:AddHead(self.animatedFace)
+    if not self.inCar then
+        Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
+        self.secondCam:Activate(self.transitionSpeed)
+        self:SetEnableTPPValue(true)
+        self:UpdateCamera()
+        Gender:AddHead(self.animatedFace)
+    end
 end
 
 function JB:DeactivateTPP(noUpdate)
