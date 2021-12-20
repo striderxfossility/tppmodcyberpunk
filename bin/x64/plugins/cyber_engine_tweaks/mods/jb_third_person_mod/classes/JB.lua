@@ -432,7 +432,9 @@ function JB:CheckForRestoration(delta)
 	if(self.timerCheckClothes > 5.0) then
         
         if not self.photoModeBeenActive and self.isTppEnabled then
-            Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
+            if not Attachment:HasWeaponActive() then
+                Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
+            end
         end
 
         if not self.isTppEnabled and not self.inCar then
