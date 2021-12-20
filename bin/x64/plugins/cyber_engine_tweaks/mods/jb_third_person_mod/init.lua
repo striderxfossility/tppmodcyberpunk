@@ -384,10 +384,13 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		if(JB.isTppEnabled) then
 			Cron.After(JB.transitionSpeed, function()
 				if not JB.fppPatch then
+					Gender:AddTppHead()
+					Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
 					local ts     = Game.GetTransactionSystem()
 					local player = Game.GetPlayer()
 					ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+					Gender:AddFppHead()
 				end
 			end)
 			JB:DeactivateTPP(false)
