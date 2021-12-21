@@ -679,6 +679,17 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
+							ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Zoom speed")
+
+							value, usedZoomSpeed = ImGui.SliderFloat("zp", tonumber(JB.zoomSpeed), 0.0, 1.0)
+
+							if usedZoomSpeed then
+								JB.zoomSpeed = value
+								JB.updateSettings = true
+							end
+
+							ImGui.NewLine()
+
 							ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
 
 							ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Transition Speed FPP to TPP")
