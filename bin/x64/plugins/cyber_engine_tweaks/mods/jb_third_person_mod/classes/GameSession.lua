@@ -7,7 +7,7 @@ Copyright (c) 2021 psiberx
 ]]
 
 local GameSession = {
-	version = '1.3.1',
+	version = '1.3.0',
 	framework = '1.16.4'
 }
 
@@ -276,22 +276,13 @@ local function initSessionKey()
 end
 
 local function renewSessionKey()
-	local sessionKey = getSessionKey()
-	local savedKey = readSessionKey()
-	local nextKey = generateSessionKey()
+	local sessionKey = generateSessionKey()
 
-	if sessionKey == savedKey or savedKey < nextKey - 1 then
-		sessionKey = generateSessionKey()
+	if sessionKey > readSessionKey() + 1 then
 		writeSessionKey(sessionKey)
-	else
-		sessionKey = savedKey
 	end
 
 	setSessionKey(sessionKey)
-end
-
-local function setSessionKeyName(sessionKeyName)
-	sessionKeyFactName = sessionKeyName
 end
 
 -- Session Data --
@@ -735,13 +726,8 @@ local function initialize(event)
 			initSessionKey()
 		end
 
-		---@param self PlayerPuppet
-		Observe('PlayerPuppet', 'OnTakeControl', function(self)
+		Observe('PlayerPuppet', 'OnTakeControl', function()
 			--spdlog.error(('PlayerPuppet::OnTakeControl()'))
-
-			if self:GetEntityID().hash ~= 1ULL then
-				return
-			end
 
 			if not isPreGame() then
 				-- Expand load request with session key from facts
@@ -763,13 +749,8 @@ local function initialize(event)
 			sessionLoadRequest = {}
 		end)
 
-		---@param self PlayerPuppet
-		Observe('PlayerPuppet', 'OnGameAttached', function(self)
+		Observe('PlayerPuppet', 'OnGameAttached', function()
 			--spdlog.error(('PlayerPuppet::OnGameAttached()'))
-
-			if self:IsReplacer() then
-				return
-			end
 
 			if not isPreGame() then
 				-- Store new session key in facts
@@ -807,6 +788,15 @@ local function initialize(event)
 			-- Dispatch clean event
 			dispatchEvent(GameSession.Event.Clean, { timestamps = existingTimestamps })
 		end)
+
+--[[
+		Observe('LoadGameMenuGameController', 'OnUninitialize', function()
+			--spdlog.error(('LoadGameMenuGameController::OnUninitialize()'))
+
+			-- Reset the session list on exit from load screen
+			sessionLoadList = {}
+		end)
+--]]
 
 		Observe('gameuiInGameMenuGameController', 'OnSavingComplete', function(_, success)
 			if type(success) ~= 'boolean' then
@@ -1014,10 +1004,6 @@ end
 
 function GameSession.PrintState(state)
 	print('[GameSession] ' .. GameSession.ExportState(state))
-end
-
-function GameSession.IdentifyAs(sessionName)
-	setSessionKeyName(sessionName)
 end
 
 function GameSession.StoreInDir(sessionDir)
