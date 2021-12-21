@@ -726,7 +726,7 @@ function JB:NextCam()
 end
 
 function JB:SwitchCamTo(cam)
-	if self.camViews[cam] ~= nil then
+	if cam < 6 then
 	    self.camActive = cam
 		self:UpdateCamera()
 	else
