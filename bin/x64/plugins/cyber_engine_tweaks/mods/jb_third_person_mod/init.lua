@@ -808,7 +808,7 @@ registerForEvent("onDraw", function()
 							end
 
 							ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
-							if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 11802 then
+							if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 1181 then
 								ImGui.TextColored(0, 1, 0, 1, "(Installed) Cyber Engine Tweaks V1.18.1 or later")
 							else
 								ImGui.TextColored(1, 0, 0, 1, "(NOT INSTALLED!) Cyber Engine Tweaks V1.18.1 or later")
