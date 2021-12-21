@@ -143,6 +143,10 @@ registerForEvent("onInit", function()
 		return false
 	end)
 
+	Override('SceneSystemInterface', 'GetSceneSystemCameraControlEnabled', function()
+		return true
+	end)
+
 	JB.isInitialized = Game.GetPlayer() and Game.GetPlayer():IsAttached() and not Game.GetSystemRequestsHandler():IsPreGame()
 
 	Observe('QuestTrackerGameController', 'OnInitialize', function()
@@ -794,6 +798,15 @@ registerForEvent("onDraw", function()
 						end
 
 						if ImGui.BeginTabItem("info") then
+
+							if ModArchiveExists('jb_tpp_mod_1.archive') == true then
+								ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_1.archive!!!")
+							end
+
+							if ModArchiveExists('jb_tpp_mod_0.archive') == true then
+								ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_0.archive!!!")
+							end
+
 							ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
 							if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 11802 then
 								ImGui.TextColored(0, 1, 0, 1, "(Installed) Cyber Engine Tweaks V1.18.1 or later")
