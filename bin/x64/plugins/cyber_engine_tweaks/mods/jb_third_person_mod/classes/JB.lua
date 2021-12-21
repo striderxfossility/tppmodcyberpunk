@@ -383,6 +383,12 @@ function JB:CheckForRestoration(delta)
     if not self.isTppEnabled and self.photoModeBeenActive and not photoMode:IsPhotoModeActive() then
         if self.photoModeBeenActive then
             self.photoModeBeenActive = false
+
+            Cron.After(1.0, function ()
+                Gender:AddHead(self.animatedFace)
+            end)
+            
+            Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
             self:ActivateTPP()
         end
     end
