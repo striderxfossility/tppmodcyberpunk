@@ -15,6 +15,7 @@ function UI:new()
 end
 
 function UI:DrawCam(cam, id)
+    print(cam.rot)
     ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
 
     value, usedX = ImGui.SliderFloat("x", tonumber(cam.pos.x), -3.0, 3.0)
@@ -80,7 +81,7 @@ function UI:DrawCam(cam, id)
     value, pressedSavedCameras = ImGui.Checkbox("Save", false)
 
     if pressedSavedCameras then
-        db:exec("UPDATE cameras SET x = " .. cam.pos.x .. ", y = " .. cam.pos.y .. ", z=" .. cam.pos.z .. ", rx=" .. cam.rot.i .. ", ry=" .. cam.rot.j .. ", rz=" .. cam.rot.k .. "  WHERE id = " .. id)
+        db:exec("UPDATE cameras SET x = " .. cam.pos.x .. ", y = " .. cam.pos.y .. ", z=" .. cam.pos.z .. ", rx=" .. cam.rot.i .. ", ry=" .. cam.rot.j .. ", rz=" .. cam.rot.k .. ", rw=" .. cam.rot.r .. "  WHERE id = " .. id)
     end
 end
 

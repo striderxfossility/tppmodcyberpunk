@@ -240,11 +240,11 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomFpp) .. " WHERE name = 'zoomFpp'")
         db:exec("UPDATE settings SET value = " .. tostring(self.disableMod) .. " WHERE name = 'disableMod'")
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomSpeed) .. " WHERE name = 'zoomSpeed'")
-        db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. "  WHERE id = 0")
-        db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. "  WHERE id = 1")
-        db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. "  WHERE id = 2")
-        db:exec("UPDATE cameras SET x = " .. self.camViews[4].pos.x .. ", y = " .. self.camViews[4].pos.y .. ", z=" .. self.camViews[4].pos.z .. ", rx=" .. self.camViews[4].rot.i .. ", ry=" .. self.camViews[4].rot.j .. ", rz=" .. self.camViews[4].rot.k .. "  WHERE id = 3")
-        db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. "  WHERE id = 4")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. ", rw=" .. self.camViews[1].rot.r .. "  WHERE id = 0")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. ", rw=" .. self.camViews[2].rot.r .. "  WHERE id = 1")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. ", rw=" .. self.camViews[3].rot.r .. "  WHERE id = 2")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[4].pos.x .. ", y = " .. self.camViews[4].pos.y .. ", z=" .. self.camViews[4].pos.z .. ", rx=" .. self.camViews[4].rot.i .. ", ry=" .. self.camViews[4].rot.j .. ", rz=" .. self.camViews[4].rot.k .. ", rw=" .. self.camViews[4].rot.r .. "  WHERE id = 3")
+        db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. ", rw=" .. self.camViews[5].rot.r .. "  WHERE id = 4")
     end
 
     if self.secondCam == nil then
@@ -460,30 +460,12 @@ function JB:CheckForRestoration(delta)
             self:DeactivateTPP()
         end
 
-        --if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
-            --Gender:AddHead(self.animatedFace)
-            --Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
-        --end
-
-        --if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.secondCam:GetLocalPosition() == Vector4.new(0, 0, 0, 1) then
-            --if not self.fppPatch then
-                --Gender:AddFppHead()
-                --Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-            --end
-        --end
-
         self.timerCheckClothes = 0.0
     end
 
 	if(self.secondCam:GetLocalPosition().x == 0.0 and self.secondCam:GetLocalPosition().y == 0.0 and self.secondCam:GetLocalPosition().z == 0.0) then
         self:SetEnableTPPValue(false)
 	end
-
-    --if self.inScene and not self.inCar and photoMode:IsPhotoModeActive() then
-    --    if not (tostring(Attachment:GetNameOfObject('AttachmentSlots.TppHead')) == str) then
-    --        Gender:AddHead(self.animatedFace)
-    --    end
-    --end
 
     if self.zoomIn then
         self:Zoom(self.zoomSpeed)
@@ -499,8 +481,6 @@ end
 
 function JB:FppPatch()
     if not self.isTppEnabled then
-        local PlayerSystem = Game.GetPlayerSystem()
-        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = GetPlayer():FindComponentByName('camera')
         local loc          = fppCam:GetLocalPosition()
 
@@ -647,7 +627,6 @@ function JB:CarTimer(deltaTime)
 
 	if(self.waitTimer > 1.0) then
 		Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-        --Gender:AddHead(self.animatedFace)
         self.waitTimer  = 0.0
 		self.waitForCar = false
 	end
@@ -673,11 +652,7 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
-        local PlayerSystem = Game.GetPlayerSystem()
-        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-        local fppCam       = GetPlayer():FindComponentByName('camera')
-
-        fppCam:Activate(self.transitionSpeed)
+        GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
 	end
 end
 
@@ -699,11 +674,7 @@ function JB:ActivateTPP()
 end
 
 function JB:DeactivateTPP(noUpdate)
-    local PlayerSystem = Game.GetPlayerSystem()
-    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = GetPlayer():FindComponentByName('camera')
-
-    fppCam:ResetPitch()
+    GetPlayer():FindComponentByName('camera'):ResetPitch()
 
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()

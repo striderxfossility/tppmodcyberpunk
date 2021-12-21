@@ -5,7 +5,6 @@ local Item 				= require("classes/Item.lua")
 local Cron 				= require("classes/Cron.lua")
 local GameSession 		= require('classes/GameSession.lua')
 local Ref        		= require("classes/Ref.lua")
-local GameSettings  	= require('classes/GameSettings.lua')
 local UI			  	= require('classes/UI.lua')
 local nativeSettings 	= nil
 local ev 				= nil
@@ -39,12 +38,6 @@ function ddArr(arr)
 end
 
 registerForEvent('onTweak', function()
-	-- added tag [Preload] for clipping bug
-	--TweakDB:SetFlat('Items.StrongArms.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","UnequipHolsteredArms","StrongArms","FinisherFront","HideInBackpackUI"})
-	--TweakDB:SetFlat('Items.MantisBlades.tags', 		{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","FinisherBack","FinisherFront","UnequipHolsteredArms","HideInBackpackUI"})
-	--TweakDB:SetFlat('Items.NanoWires.tags', 			{"Preload","MeleeWeapon","Core","Melee","Cyberware","TakedownWeapon","Meleeware","PSM","WeaponQuickSlots","KeepRenderPlane","ForceDismember","UnequipHolsteredArms","HideInBackpackUI"})
-	--TweakDB:SetFlat('Items.ProjectileLauncher.tags', 	{"Preload","Core","Cyberware","QuickAction","ChargeAction","ChargeAttack","WeaponAttachment","Attack_Projectile","QuickSlots","HideInBackpackUI","UnequipHolsteredArms","PSM"})
-
 	TweakDB:SetFlat('Character.Player_Puppet_Base.tags', {"Player", "TPP_Player"})
 	TweakDB:SetFlat('Character.Player_Puppet_Base.itemGroups', {})
 	TweakDB:SetFlat('Character.Player_Puppet_Base.appearanceName', "TPP_Body")
@@ -143,10 +136,6 @@ registerForEvent("onInit", function()
 		return false
 	end)
 
-	Override('SceneSystemInterface', 'GetSceneSystemCameraControlEnabled', function()
-		return true
-	end)
-
 	JB.isInitialized = Game.GetPlayer() and Game.GetPlayer():IsAttached() and not Game.GetSystemRequestsHandler():IsPreGame()
 
 	Observe('QuestTrackerGameController', 'OnInitialize', function()
@@ -185,10 +174,6 @@ registerForEvent("onInit", function()
 					local actionName  = Game.NameToString(ListenerAction.GetName(action))
 					local actionValue = ListenerAction.GetValue(action)
 					local actionType  = action:GetType(action).value
-
-					--if actionName == "mouse_wheel" then
-					--	JB:Zoom(actionValue / 2)
-					--end
 
 					if actionName == "right_trigger" and JB.controllerZoom then -- CONTROLLER
 						JB:Zoom(0.1)
@@ -256,7 +241,7 @@ registerForEvent("onInit", function()
     
 	for row in db:rows("SELECT * FROM cameras") do
 		local vec4 = Vector4.new(tonumber(row[2]), tonumber(row[3]), tonumber(row[4]), 1.0)
-		local quat = Quaternion.new(tonumber(row[6]), tonumber(row[7]), tonumber(row[8]), 1.0)
+		local quat = Quaternion.new(tonumber(row[6]), tonumber(row[7]), tonumber(row[8]), tonumber(row[9]))
 		local camSwitch = false
         local freeform = false
 		
