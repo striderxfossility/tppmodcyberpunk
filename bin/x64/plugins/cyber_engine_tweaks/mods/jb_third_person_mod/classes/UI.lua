@@ -15,7 +15,6 @@ function UI:new()
 end
 
 function UI:DrawCam(cam, id)
-    print(cam.rot)
     ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
 
     value, usedX = ImGui.SliderFloat("x", tonumber(cam.pos.x), -3.0, 3.0)
