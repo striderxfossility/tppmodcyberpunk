@@ -271,8 +271,8 @@ function FindSecondCamera()
 			if obj.audioResourceName == CName.new("johnnysecondcam") then
 				JB.foundJohnnyEnt 	= true
 				JB.johnnyEntId 		= obj:GetEntityID()
-				JB.johhnyEnt 		= obj
-				JB.secondCam 		= Ref.Weak(JB.johhnyEnt:FindComponentByName(CName.new("camera")))
+				JB.johnnyEnt 		= obj
+				JB.secondCam 		= Ref.Weak(JB.johnnyEnt:FindComponentByName(CName.new("camera")))
 				break
 			end
 		end

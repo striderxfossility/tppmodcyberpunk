@@ -497,13 +497,10 @@ function JB:Collsion()
 
     self.collisions.down = false
 
-    local PlayerSystem = Game.GetPlayerSystem()
-    local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-    local fppCam       = GetPlayer():FindComponentByName('camera')
-
-    local from = fppCam:GetLocalToWorld():GetTranslation()
-    local to = self.secondCam:GetLocalToWorld():GetTranslation()
-    local forw = self.johhnyEnt:GetWorldForward()
+    local fppCam    = GetPlayer():FindComponentByName('camera')
+    local from      = fppCam:GetLocalToWorld():GetTranslation()
+    local to        = self.secondCam:GetLocalToWorld():GetTranslation()
+    local forw      = self.johnnyEnt:GetWorldForward()
 
     local extendedTo = Vector4.new(to.x - forw.x, to.y - forw.y, to.z, 1)
 
@@ -566,14 +563,14 @@ function JB:UpdateSecondCam()
     if not self.foundJohnnyEnt then
         if Game.FindEntityByID(self.johnnyEntId) ~= nil then
             self.foundJohnnyEnt                 = true
-            self.johhnyEnt          	        = Ref.Weak(Game.FindEntityByID(self.johnnyEntId)) -- the spawned object
-            self.johhnyEnt.audioResourceName    = CName.new("johnnysecondcam")
+            self.johnnyEnt          	        = Ref.Weak(Game.FindEntityByID(self.johnnyEntId)) -- the spawned object
+            self.johnnyEnt.audioResourceName    = CName.new("johnnysecondcam")
 
-            local root = self.johhnyEnt:FindComponentByName(CName.new("root"))
+            local root = self.johnnyEnt:FindComponentByName(CName.new("root"))
 
             root:SetLocalPosition(Vector4.new(0, 0, -self.offset, 1))
             
-            self.secondCam = Ref.Weak(self.johhnyEnt:FindComponentByName(CName.new("camera")))
+            self.secondCam = Ref.Weak(self.johnnyEnt:FindComponentByName(CName.new("camera")))
 
             self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
             	
@@ -596,13 +593,13 @@ function JB:UpdateSecondCam()
         local transform = Game.GetPlayer():GetWorldPosition()
         local vec = Vector4.new(transform.x, transform.y, transform.z - 0)
 
-        if self.johhnyEnt ~= nil then
-            Game.GetTeleportationFacility():Teleport(self.johhnyEnt, vec, moveEuler)
+        if self.johnnyEnt ~= nil then
+            Game.GetTeleportationFacility():Teleport(self.johnnyEnt, vec, moveEuler)
 
-            if not (self.johhnyEnt:GetWorldPosition().x >= PlayerPuppet:GetWorldPosition().x - 2) and 
-                not (self.johhnyEnt:GetWorldPosition().x <= PlayerPuppet:GetWorldPosition().x + 2) and 
-                not (self.johhnyEnt:GetWorldPosition().y >= PlayerPuppet:GetWorldPosition().y - 2) and
-                not (self.johhnyEnt:GetWorldPosition().y <= PlayerPuppet:GetWorldPosition().y + 2) then
+            if not (self.johnnyEnt:GetWorldPosition().x >= PlayerPuppet:GetWorldPosition().x - 2) and 
+                not (self.johnnyEnt:GetWorldPosition().x <= PlayerPuppet:GetWorldPosition().x + 2) and 
+                not (self.johnnyEnt:GetWorldPosition().y >= PlayerPuppet:GetWorldPosition().y - 2) and
+                not (self.johnnyEnt:GetWorldPosition().y <= PlayerPuppet:GetWorldPosition().y + 2) then
                 print('CAMERA IS STUCK, HELP HIM!')
             end
         end
