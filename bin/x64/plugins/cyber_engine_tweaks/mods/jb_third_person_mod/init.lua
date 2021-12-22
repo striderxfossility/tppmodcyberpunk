@@ -324,8 +324,6 @@ end)
 
 registerInput('jb_move_camera', 'Move Camera up/down', function(isDown)
 	if not JB.disableMod then
-		local PlayerSystem = Game.GetPlayerSystem()
-		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 		local fppCam       = GetPlayer():FindComponentByName('camera')
 
 		if isDown then
