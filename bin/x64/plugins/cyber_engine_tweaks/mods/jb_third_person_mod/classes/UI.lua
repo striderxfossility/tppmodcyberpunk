@@ -80,6 +80,7 @@ function UI:DrawCam(cam, id)
     value, pressedSavedCameras = ImGui.Checkbox("Save", false)
 
     if pressedSavedCameras then
+        print("JB: Camera is saved")
         db:exec("UPDATE cameras SET x = " .. cam.pos.x .. ", y = " .. cam.pos.y .. ", z=" .. cam.pos.z .. ", rx=" .. cam.rot.i .. ", ry=" .. cam.rot.j .. ", rz=" .. cam.rot.k .. ", rw=" .. cam.rot.r .. "  WHERE id = " .. id)
     end
 end
