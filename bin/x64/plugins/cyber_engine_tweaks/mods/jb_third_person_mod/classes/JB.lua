@@ -224,6 +224,8 @@ function JB:CheckForRestoration(delta)
     if self.updateSettings and self.updateSettingsTimer <= 0.0 then
         self.updateSettings         = false
         self.updateSettingsTimer    = 3.0
+
+        print("JB: updated settings")
         
         db:exec("UPDATE settings SET value = " .. tostring(self.weaponOverride) .. " WHERE name = 'weaponOverride'")
         db:exec("UPDATE settings SET value = " .. tostring(self.horizontalSen) .. " WHERE name = 'horizontalSen'")
