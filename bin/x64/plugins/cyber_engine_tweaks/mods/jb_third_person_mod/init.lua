@@ -154,7 +154,11 @@ registerForEvent("onInit", function()
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
 			Cron.After(0.2, function()
+				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
 				Gender:AddTppHead()
+			end)
+			Cron.After(0.5, function()
+				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
 			end)
         else
             JB.inCar = false
