@@ -458,10 +458,6 @@ function JB:CheckForRestoration(delta)
             end
         end
 
-        if self.inCar and not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() and self.isTppEnabled then
-            self:DeactivateTPP()
-        end
-
         self.timerCheckClothes = 0.0
     end
 
