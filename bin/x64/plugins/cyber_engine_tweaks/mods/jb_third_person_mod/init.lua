@@ -513,7 +513,7 @@ registerForEvent("onUpdate", function(deltaTime)
 
 				local cus = GetPlayer():FindComponentByName('uiCharacterCustomizationGenitalsController0140')
 				if cus ~= nil then
-					cus.forceHideGenitals = true
+					cus.forceHideGenitals = false
 				end
 			end
 		end
