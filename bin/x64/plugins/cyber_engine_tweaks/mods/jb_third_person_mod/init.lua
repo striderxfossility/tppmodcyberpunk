@@ -584,6 +584,9 @@ registerForEvent("onDraw", function()
 						if pressedCrough then
 							Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
 							Gender:AddTppHead()
+							Cron.After(1.0, function()
+								Gender:AddHead(JB.animatedFace)
+							end)
 						end
 
 						value, pressedDisableMod = ImGui.Checkbox("Disable Mod", JB.disableMod)
