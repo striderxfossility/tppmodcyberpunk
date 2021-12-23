@@ -361,10 +361,6 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		local PlayerSystem = Game.GetPlayerSystem()
 		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
-		if ModArchiveExists('jb_tpp_mod_1.archive') == true then
-			PlayerPuppet:SetWarningMessage("Remove the jb_tpp_mod_1.archive!")
-		end
-
 		if JB.foundJohnnyEnt == false then
 			PlayerPuppet:SetWarningMessage("JB Third person mod not loaded yet!")
 			return;
@@ -804,10 +800,6 @@ registerForEvent("onDraw", function()
 						end
 
 						if ImGui.BeginTabItem("info") then
-
-							if ModArchiveExists('jb_tpp_mod_1.archive') == true then
-								ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_1.archive!!!")
-							end
 
 							if ModArchiveExists('jb_tpp_mod_0.archive') == true then
 								ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_0.archive!!!")
