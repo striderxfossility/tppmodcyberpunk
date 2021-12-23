@@ -726,6 +726,17 @@ registerForEvent("onDraw", function()
 
 							ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Camera options")
 
+							ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Amount of cameras")
+
+							value, usedAmountCameras = ImGui.SliderInt("ac", JB.amountCameras, 1, 5, "%d")
+
+							if usedAmountCameras then
+								JB.amountCameras = value
+								JB.updateSettings = true
+							end
+
+							ImGui.NewLine()
+
 							ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Transition Speed FPP to TPP")
 
 							value, usedTrans = ImGui.SliderFloat("sp", tonumber(JB.transitionSpeed), 0.0, 5.0)

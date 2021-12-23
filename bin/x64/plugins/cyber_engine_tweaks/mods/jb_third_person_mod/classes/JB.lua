@@ -54,6 +54,8 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 22, 'zoomSpeed', 0.2 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 22);")
 
+    db:exec("INSERT INTO settings SELECT 23, 'amountCameras', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 23);")
+
     db:exec("INSERT INTO cameras SELECT 5, 0, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 5);")
     db:exec("INSERT INTO cameras SELECT 6, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 6);")
     db:exec("INSERT INTO cameras SELECT 7, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 7);")
@@ -160,6 +162,10 @@ function JB:new()
         class.zoomSpeed = tonumber(index[1])
     end
 
+    for index, value in db:rows("SELECT value FROM settings WHERE name = 'amountCameras'") do
+        class.amountCameras = tonumber(index[1])
+    end
+
     ----------VARIABLES-------------
     class.camViews                  = {}
     class.inCar                     = false
@@ -243,6 +249,7 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomFpp) .. " WHERE name = 'zoomFpp'")
         db:exec("UPDATE settings SET value = " .. tostring(self.disableMod) .. " WHERE name = 'disableMod'")
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomSpeed) .. " WHERE name = 'zoomSpeed'")
+        db:exec("UPDATE settings SET value = " .. tostring(self.amountCameras) .. " WHERE name = 'amountCameras'")
         db:exec("UPDATE cameras SET x = " .. self.camViews[1].pos.x .. ", y = " .. self.camViews[1].pos.y .. ", z=" .. self.camViews[1].pos.z .. ", rx=" .. self.camViews[1].rot.i .. ", ry=" .. self.camViews[1].rot.j .. ", rz=" .. self.camViews[1].rot.k .. ", rw=" .. self.camViews[1].rot.r .. "  WHERE id = 0")
         db:exec("UPDATE cameras SET x = " .. self.camViews[2].pos.x .. ", y = " .. self.camViews[2].pos.y .. ", z=" .. self.camViews[2].pos.z .. ", rx=" .. self.camViews[2].rot.i .. ", ry=" .. self.camViews[2].rot.j .. ", rz=" .. self.camViews[2].rot.k .. ", rw=" .. self.camViews[2].rot.r .. "  WHERE id = 1")
         db:exec("UPDATE cameras SET x = " .. self.camViews[3].pos.x .. ", y = " .. self.camViews[3].pos.y .. ", z=" .. self.camViews[3].pos.z .. ", rx=" .. self.camViews[3].rot.i .. ", ry=" .. self.camViews[3].rot.j .. ", rz=" .. self.camViews[3].rot.k .. ", rw=" .. self.camViews[3].rot.r .. "  WHERE id = 2")
@@ -708,7 +715,7 @@ function JB:NextCam()
 end
 
 function JB:SwitchCamTo(cam)
-	if cam < 6 then
+	if cam < self.amountCameras + 1 then
 	    self.camActive = cam
 		self:UpdateCamera()
 	else
