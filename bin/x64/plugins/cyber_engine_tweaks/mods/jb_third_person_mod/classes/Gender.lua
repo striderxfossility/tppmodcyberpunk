@@ -25,6 +25,7 @@ function Gender:RemoveHead()
 end
 
 function Gender:AddTppHead()
+    GetPlayer():FindComponentByName(CName.new("TPPRepresentation")).affectedAppearanceSlots = {}
     Gender:RemoveHead()
 
     if Gender:IsMale() then
@@ -36,7 +37,6 @@ end
 
 function Gender:AddFppHead()
     Gender:RemoveHead()
-
     Item:Equip("Items.PlayerFppHead", "TppHead")
 end
 
