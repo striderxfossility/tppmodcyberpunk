@@ -567,6 +567,16 @@ registerForEvent("onDraw", function()
 				if ImGui.BeginTabBar("Tabbar") then
 					if ImGui.BeginTabItem("Main settings") then
 
+						if ModArchiveExists('jb_tpp_mod_0.archive') == true then
+							ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_0.archive!!!")
+							ImGui.NewLine()
+						end
+
+						if ModArchiveExists('jb_tpp_mod_1.archive') == true then
+							ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_1.archive!!!")
+							ImGui.NewLine()
+						end
+
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
 						value, pressedCrough = ImGui.Checkbox("Try fix crough bug", JB.disableMod)
@@ -805,10 +815,6 @@ registerForEvent("onDraw", function()
 						end
 
 						if ImGui.BeginTabItem("info") then
-
-							if ModArchiveExists('jb_tpp_mod_0.archive') == true then
-								ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_0.archive!!!")
-							end
 
 							ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Mods required")
 							if tonumber(GetVersion():gsub("%.", ""):gsub("-", ""):gsub(" ", ""):gsub('%W',''):match("%d+")) >= 1181 then
