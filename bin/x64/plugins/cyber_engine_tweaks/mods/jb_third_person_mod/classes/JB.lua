@@ -11,11 +11,11 @@ function JB:new()
 
     db:exec[=[
         CREATE TABLE cameras(id, x, y, z, w, rx, ry, rz, rw, camSwitch, freeForm);
-        INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 0, false, false);
-        INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
-        INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false);
-        INSERT INTO cameras VALUES(3, 0, -4, 0, 0, 0, 0, 0, 0, true, false);
-        INSERT INTO cameras VALUES(4, 0, -4, 0, 0, 0, 0, 0, 0, true, true);
+        INSERT INTO cameras VALUES(0, 0, -2, 0, 0, 0, 0, 0, 1, false, false);
+        INSERT INTO cameras VALUES(1, 0.5, -2, 0, 0, 0, 0, 0, 1, false, false);
+        INSERT INTO cameras VALUES(2, -0.5, -2, 0, 0, 0, 0, 0, 1, false, false);
+        INSERT INTO cameras VALUES(3, 0, -4, 0, 0, 0, 0, 0, 1, true, false);
+        INSERT INTO cameras VALUES(4, 0, -4, 0, 0, 0, 0, 0, 1, true, true);
     ]=]
 
     db:exec[=[
@@ -56,11 +56,11 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 23, 'amountCameras', 5 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 23);")
 
-    db:exec("INSERT INTO cameras SELECT 5, 0, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 5);")
-    db:exec("INSERT INTO cameras SELECT 6, 0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 6);")
-    db:exec("INSERT INTO cameras SELECT 7, -0.5, -2, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 7);")
-    db:exec("INSERT INTO cameras SELECT 8, 0, -4, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 8);")
-    db:exec("INSERT INTO cameras SELECT 9, 0, -4, 0, 0, 0, 0, 0, 0, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 9);")
+    db:exec("INSERT INTO cameras SELECT 5, 0, -2, 0, 0, 0, 0, 0, 1, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 5);")
+    db:exec("INSERT INTO cameras SELECT 6, 0.5, -2, 0, 0, 0, 0, 0, 1, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 6);")
+    db:exec("INSERT INTO cameras SELECT 7, -0.5, -2, 0, 0, 0, 0, 0, 1, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 7);")
+    db:exec("INSERT INTO cameras SELECT 8, 0, -4, 0, 0, 0, 0, 0, 1, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 8);")
+    db:exec("INSERT INTO cameras SELECT 9, 0, -4, 0, 0, 0, 0, 0, 1, false, false WHERE NOT EXISTS(SELECT 1 FROM cameras WHERE id = 9);")
 
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'weaponOverride'") do
         if(index[1] == 0) then
