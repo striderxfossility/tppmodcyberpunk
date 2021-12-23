@@ -487,6 +487,11 @@ function JB:CheckForRestoration(delta)
     if self.isTppEnabled then
         self:FppCameraMoveDown()
     end
+
+    if self.camViews[self.camActive].rot == Quaternion.new(0, 0, 0, 0) then
+        print("JB: Gimbal lock!")
+        self.camViews[self.camActive].rot = Quaternion.new(0, 0, 0, 1)
+    end
 end
 
 function JB:FppPatch()
