@@ -283,8 +283,6 @@ end
 
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 	if not JB.disableMod then
-		local PlayerSystem = Game.GetPlayerSystem()
-		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 		local fppCam       = GetPlayer():FindComponentByName('camera')
 
 		if (isDown) then
@@ -840,8 +838,6 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
-							local PlayerSystem = Game.GetPlayerSystem()
-							local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 							local fppCam       = GetPlayer():FindComponentByName('camera')
 
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
