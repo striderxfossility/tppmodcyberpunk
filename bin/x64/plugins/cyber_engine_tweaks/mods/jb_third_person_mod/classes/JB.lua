@@ -476,6 +476,10 @@ function JB:CheckForRestoration(delta)
 
     self:Collsion()
     self.colliedTimer = self.colliedTimer - delta
+
+    if self.isTppEnabled then
+        self:FppCameraMoveDown()
+    end
 end
 
 function JB:FppPatch()
@@ -484,6 +488,16 @@ function JB:FppPatch()
         local loc          = fppCam:GetLocalPosition()
 
         fppCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z, 1))
+    end
+end
+
+function JB:FppCameraMoveDown()
+    local fppCam    = GetPlayer():FindComponentByName('camera')
+    local dist      = GetSingleton("Vector4"):Distance(self.secondCam:GetLocalToWorld():GetTranslation(), fppCam:GetLocalToWorld():GetTranslation())
+    
+    if dist < 0.50 then
+        local loc = fppCam:GetLocalPosition()
+        fppCam:SetLocalPosition(Vector4.new(loc.x, loc.y, loc.z - 0.1, 1));
     end
 end
 
@@ -648,6 +662,7 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
+        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
         GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
 	end
 end
