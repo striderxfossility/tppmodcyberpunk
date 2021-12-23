@@ -203,6 +203,7 @@ function JB:new()
         back = true
     }
     class.colliedTimer              = 0.0
+    class.switchDisableMod          = false
     ----------VARIABLES-------------
 
     setmetatable( class, JB )

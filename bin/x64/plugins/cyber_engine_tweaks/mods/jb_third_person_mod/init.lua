@@ -4,6 +4,7 @@ local Gender 			= require("classes/Gender.lua")
 local Item 				= require("classes/Item.lua")
 local Cron 				= require("classes/Cron.lua")
 local GameSession 		= require('classes/GameSession.lua')
+local GameUI 			= require('classes/GameUI.lua')
 local Ref        		= require("classes/Ref.lua")
 local UI			  	= require('classes/UI.lua')
 local nativeSettings 	= nil
@@ -105,6 +106,20 @@ registerForEvent("onInit", function()
 	end
 
 	local speed = 8
+
+	GameUI.OnFastTravelStart(function()
+        if not JB.disableMod then
+			JB.disableMod = true
+			JB.switchDisableMod = true
+		end
+    end)
+
+    GameUI.OnFastTravelFinish(function()
+        if JB.switchDisableMod then
+			JB.disableMod = false
+			JB.switchDisableMod = false
+		end
+    end)
 
 	GameSession.OnPause(function()
 		JB.isInitialized   = false
@@ -583,7 +598,7 @@ registerForEvent("onDraw", function()
 
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
-						value, pressedCrough = ImGui.Checkbox("Try fix crough bug", JB.disableMod)
+						value, pressedCrough = ImGui.Checkbox("Try fix crough bug", false)
 
 						if pressedCrough then
 							Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
