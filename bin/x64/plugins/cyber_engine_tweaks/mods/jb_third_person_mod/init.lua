@@ -108,6 +108,13 @@ registerForEvent("onInit", function()
 	local speed = 8
 
 	GameUI.OnFastTravelStart(function()
+		JB.isInitialized   = false
+		JB.secondCam       = nil
+		JB.foundJohnnyEnt  = false
+		JB.johnnyEntId     = nil
+		exEntitySpawner.Despawn(JB.johnnyEnt)
+		JB.johnnyEnt       = nil
+
         if not JB.disableMod then
 			JB.disableMod = true
 			JB.switchDisableMod = true
@@ -115,27 +122,30 @@ registerForEvent("onInit", function()
     end)
 
     GameUI.OnFastTravelFinish(function()
+		JB.isInitialized   = true
+		FindSecondCamera()
+
         if JB.switchDisableMod then
 			JB.disableMod = false
 			JB.switchDisableMod = false
 		end
     end)
 
-	GameSession.OnPause(function()
-		JB.isInitialized   = false
-		JB.secondCam       = nil
-		JB.foundJohnnyEnt  = false
-		JB.johnnyEntId     = nil
-		exEntitySpawner.Despawn(JB.johnnyEnt)
-		JB.johnnyEnt       = nil
-	end)
+	--GameSession.OnPause(function()
+		--JB.isInitialized   = false
+		--JB.secondCam       = nil
+		--JB.foundJohnnyEnt  = false
+		--JB.johnnyEntId     = nil
+		--exEntitySpawner.Despawn(JB.johnnyEnt)
+		--JB.johnnyEnt       = nil
+	--end)
 
-	GameSession.OnResume(function()
-		if not JB.disableMod then
-			JB.isInitialized   = true
-			FindSecondCamera()
-		end
-	end)
+	--GameSession.OnResume(function()
+		--if not JB.disableMod then
+			--JB.isInitialized   = true
+			--FindSecondCamera()
+		--end
+	--end)
 
 	-- FIX CRASH LOAD SAVE
 	GameSession.OnEnd(function()
