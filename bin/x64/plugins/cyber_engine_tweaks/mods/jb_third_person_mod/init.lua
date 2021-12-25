@@ -479,6 +479,12 @@ registerForEvent("onUpdate", function(deltaTime)
 		if JB.isInitialized then
 			if not IsPlayerInAnyMenu() then
 
+				if GetPlayer().inCrouch then
+					JB.offset = 4.2
+				else
+					JB.offset = 5
+				end
+
 				if not (JB.johnnyEntId ~= nil) then
 					print("Jb Third Person Mod: Spawned second camera")
 					JB.johnnyEntId = exEntitySpawner.Spawn([[base\characters\entities\player\replacer\johnny_silverhand_replacer.ent]], Game.GetPlayer():GetWorldTransform())
