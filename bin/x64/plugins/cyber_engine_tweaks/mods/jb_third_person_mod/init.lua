@@ -381,6 +381,8 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		local PlayerSystem = Game.GetPlayerSystem()
 		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
+		Game.GetTransactionSystem():AddItemToSlot(Game.GetPlayer(), "AttachmentSlots.RightArm", ItemID.FromTDBID(TweakDBID("Items.HolsteredFists")))
+
 		if JB.foundJohnnyEnt == false then
 			PlayerPuppet:SetWarningMessage("JB Third person mod not loaded yet!")
 			return;
