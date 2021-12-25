@@ -394,6 +394,7 @@ function JB:CheckForRestoration(delta)
         if self.photoModeBeenActive then
             self.photoModeBeenActive = false
 
+            print("JB:AA")
             Cron.After(1.0, function ()
                 Gender:AddHead(self.animatedFace)
             end)
@@ -477,10 +478,12 @@ function JB:CheckForRestoration(delta)
 	end
 
     if self.zoomIn then
+        print("self.zoomIn")
         self:Zoom(self.zoomSpeed)
     end
 
     if self.zoomOut then
+        print("self.zoomOut")
         self:Zoom(-self.zoomSpeed)
     end
 
@@ -721,6 +724,7 @@ function JB:NextCam()
 end
 
 function JB:SwitchCamTo(cam)
+    print("JB:SwitchCamTo")
 	if cam < self.amountCameras + 1 then
 	    self.camActive = cam
 		self:UpdateCamera()
