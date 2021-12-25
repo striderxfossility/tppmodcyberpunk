@@ -181,13 +181,13 @@ registerForEvent("onInit", function()
         end
 	end)
 
-	Override("vehicleCarBaseObject", "OnUnmountingEvent", function (self)
-		if JB.isTppEnabled then
-			Cron.After(1, function()
-				JB:ActivateTPP()
-			end)
-		end
-	end)
+	--Override("vehicleCarBaseObject", "OnUnmountingEvent", function (self)
+		--if JB.isTppEnabled then
+		--	Cron.After(1, function()
+		--		JB:ActivateTPP()
+		--	end)
+		--end
+	--end)
 
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
 		if not JB.disableMod then
