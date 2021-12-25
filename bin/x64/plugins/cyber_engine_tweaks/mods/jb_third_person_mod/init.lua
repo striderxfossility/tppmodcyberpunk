@@ -182,7 +182,6 @@ registerForEvent("onInit", function()
 	end)
 
 	Override("vehicleCarBaseObject", "OnUnmountingEvent", function (self)
-		print("OnUnmountingEvent")
 		if JB.isTppEnabled then
 			Cron.After(1, function()
 				JB:ActivateTPP()
