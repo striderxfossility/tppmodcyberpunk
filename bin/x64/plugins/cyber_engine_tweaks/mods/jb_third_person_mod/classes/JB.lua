@@ -198,7 +198,6 @@ function JB:new()
     class.zoomIn                    = false
     class.zoomOut                   = false
     class.updateSettings            = false
-    class.updateSettingsTimer       = 3.0
     class.moveCamera                = false
     class.moveCameraOnPlane         = false
     class.resetCams                 = false
@@ -218,7 +217,6 @@ end
 
 function JB:SetEnableTPPValue(value)
     self.isTppEnabled   = value
-    self.updateSettings = true
 end
 
 function JB:CheckForRestoration(delta)
@@ -228,9 +226,8 @@ function JB:CheckForRestoration(delta)
     local photoMode    = script.GetPhotoModeSystem()
     local fppCam       = GetPlayer():FindComponentByName('camera')
 
-    if self.updateSettings and self.updateSettingsTimer <= 0.0 then
+    if self.updateSettings then
         self.updateSettings         = false
-        self.updateSettingsTimer    = 3.0
 
         print("JB: updated settings")
         
@@ -291,8 +288,6 @@ function JB:CheckForRestoration(delta)
 		self.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(0, euler.pitch, euler.yaw)))
     end
 
-    self.updateSettingsTimer = self.updateSettingsTimer - delta
-
     self.inScene = Game.GetWorkspotSystem():IsActorInWorkspot(PlayerPuppet)
 
     if self.inScene then
@@ -317,7 +312,6 @@ function JB:CheckForRestoration(delta)
 
         self.camViews[self.camActive].pos = newPos
         self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
-        self.updateSettings = true
 
         self.xroll = 0
         self.yroll = 0
@@ -331,7 +325,6 @@ function JB:CheckForRestoration(delta)
 
         self.camViews[self.camActive].pos = newPos
         self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
-        self.updateSettings = true
 
         self.xroll = 0
         self.yroll = 0
@@ -660,7 +653,6 @@ function JB:CarTimer(deltaTime)
 end
 
 function JB:ResetZoom()
-    self.updateSettings = true
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].defaultZoomLevel
 	self:UpdateCamera()
 end
@@ -715,7 +707,6 @@ function JB:DeactivateTPP(noUpdate)
 end
 
 function JB:NextCam()
-    self.updateSettings = true
     self:SwitchCamTo(self.camActive + 1)
 end
 

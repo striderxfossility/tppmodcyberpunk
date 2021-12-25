@@ -56,52 +56,42 @@ registerForEvent("onInit", function()
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Disable Mod", "Disable the running mod", JB.disableMod, true, function(state)
 			JB.disableMod = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/settings", "Weapon override", "Activate first person camera when equiping weapon", JB.weaponOverride, true, function(state)
 			JB.weaponOverride = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/tpp", "Inverted camera", "", JB.inverted, false, function(state)
 			JB.inverted = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/tpp", "Roll always 0", "", JB.rollAlwaysZero, false, function(state)
 			JB.rollAlwaysZero = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/tpp", "Yaw always 0", "", JB.yawAlwaysZero, false, function(state)
 			JB.yawAlwaysZero = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Horizontal Sensitivity only 360 camera", "Determines how quickly the camera moves on the horizontal axis", 1, 30, 1, JB.horizontalSen, 5, function(value)
 			JB.horizontalSen = value
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Vertical Sensitivity", "Determines how quickly the camera moves on the vertical axis", 1, 30, 1, JB.verticalSen, 5, function(value)
 			JB.verticalSen = value
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addRangeInt("/jb_tpp/tpp", "Field of view", "", 50, 120, 1, JB.fov, 80, function(value)
 			JB.fov = value
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
-			JB.updateSettings = true
 		end)
 
 		nativeSettings.addSwitch("/jb_tpp/patches", "Fpp reflection patch", "", JB.fppPatch, false, function(state)
 			JB.fppPatch = state
-			JB.updateSettings = true
 		end)
 	end
 
@@ -471,7 +461,6 @@ function ResetCameras()
 	JB.secondCam:SetLocalOrientation(JB.camViews[JB.camActive].rot)
 	JB.secondCam:SetLocalPosition(JB.camViews[JB.camActive].pos)
 	
-	JB.updateSettings = true
 	JB.collisions.zoomedIn = 0.0
 end
 
@@ -600,6 +589,13 @@ registerForEvent("onDraw", function()
 
 			if (ImGui.Begin("JB Third Person Mod DEBUG MENU")) then
 
+				clicked = ImGui.Button("UPDATE DATABASE WITH THESE SETTINGS")
+	    		if (clicked) then
+					JB.updateSettings = true
+				end
+
+				ImGui.NewLine()
+
 				if ImGui.BeginTabBar("Tabbar") then
 					if ImGui.BeginTabItem("Main settings") then
 
@@ -629,7 +625,6 @@ registerForEvent("onDraw", function()
 
 						if pressedDisableMod then
 							JB.disableMod = value
-							JB.updateSettings = true
 
 							if value then
 								JB:DeactivateTPP()
@@ -648,7 +643,6 @@ registerForEvent("onDraw", function()
 
 							if pressedWeaponOverride then
 								JB.weaponOverride = value
-								JB.updateSettings = true
 							end
 
 							value, pressedResetZoom = ImGui.Checkbox("Reset Zoom", false)
@@ -672,21 +666,18 @@ registerForEvent("onDraw", function()
 
 							if pressedInverted then
 								JB.inverted = value
-								JB.updateSettings = true
 							end
 
 							value, pressedRollAlwaysZero = ImGui.Checkbox("Roll always 0", JB.rollAlwaysZero)
 
 							if pressedRollAlwaysZero then
 								JB.rollAlwaysZero = value
-								JB.updateSettings = true
 							end
 
 							value, pressedYawAlwaysZero = ImGui.Checkbox("Yaw always 0", JB.yawAlwaysZero)
 
 							if pressedYawAlwaysZero then
 								JB.yawAlwaysZero = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -697,7 +688,6 @@ registerForEvent("onDraw", function()
 
 							if usedHorizontalSen then
 								JB.horizontalSen = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -708,7 +698,6 @@ registerForEvent("onDraw", function()
 
 							if usedVerticalSen then
 								JB.verticalSen = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -719,7 +708,6 @@ registerForEvent("onDraw", function()
 
 							if usedFov then
 								JB.fov = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -730,7 +718,6 @@ registerForEvent("onDraw", function()
 
 							if usedZoomSpeed then
 								JB.zoomSpeed = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -743,7 +730,6 @@ registerForEvent("onDraw", function()
 
 							if usedAmountCameras then
 								JB.amountCameras = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -754,7 +740,6 @@ registerForEvent("onDraw", function()
 
 							if usedTrans then
 								JB.transitionSpeed = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -765,7 +750,6 @@ registerForEvent("onDraw", function()
 
 							if usedX then
 								JB.camViews[JB.camActive].pos.x = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -776,7 +760,6 @@ registerForEvent("onDraw", function()
 
 							if usedX then
 								JB.camViews[JB.camActive].pos.y = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -787,7 +770,6 @@ registerForEvent("onDraw", function()
 
 							if usedX then
 								JB.camViews[JB.camActive].pos.z = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -801,7 +783,6 @@ registerForEvent("onDraw", function()
 							if usedroll then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
 								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -813,7 +794,6 @@ registerForEvent("onDraw", function()
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
 								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -825,7 +805,6 @@ registerForEvent("onDraw", function()
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
 								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
-								JB.updateSettings = true
 							end
 
 							ImGui.EndTabItem()
@@ -840,14 +819,12 @@ registerForEvent("onDraw", function()
 
 							if (pressed) then
 								JB.ModelMod = value
-								JB.updateSettings = true
 							end
 
 							value, pressedFppPatch = ImGui.Checkbox("Fpp reflection head", JB.fppPatch)
 
 							if (pressedFppPatch) then
 								JB.fppPatch = value
-								JB.updateSettings = true
 							end
 
 							ImGui.NewLine()
@@ -858,7 +835,6 @@ registerForEvent("onDraw", function()
 
 							if usedZoomFpp then
 								JB.zoomFpp = value
-								JB.updateSettings = true
 							end
 
 							ImGui.EndTabItem()
