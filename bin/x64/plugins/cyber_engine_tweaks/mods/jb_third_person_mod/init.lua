@@ -529,17 +529,7 @@ registerForEvent("onUpdate", function(deltaTime)
 					JB:FppPatch()
 				end
 
-				GameObjectEffectHelper.StopEffectEvent(GetPlayer(), "camera_mask");
-				
-				local bump = GetPlayer():FindComponentByName('BumpComponent')
-				if bump ~= nil then
-					bump.isEnabled = false
-				end
-
-				local cus = GetPlayer():FindComponentByName('uiCharacterCustomizationGenitalsController0140')
-				if cus ~= nil then
-					cus.forceHideGenitals = false
-				end
+				GameObjectEffectHelper.StopEffectEvent(GetPlayer(), "camera_mask")
 			end
 		end
 	end

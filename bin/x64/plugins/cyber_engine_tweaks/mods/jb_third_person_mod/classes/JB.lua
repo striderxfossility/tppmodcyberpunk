@@ -459,6 +459,16 @@ function JB:CheckForRestoration(delta)
             end
         end
 
+        local bump = GetPlayer():FindComponentByName('BumpComponent')
+        if bump ~= nil then
+            bump.isEnabled = false
+        end
+
+        local cus = GetPlayer():FindComponentByName('uiCharacterCustomizationGenitalsController0140')
+        if cus ~= nil then
+            cus.forceHideGenitals = false
+        end
+
         self.timerCheckClothes = 0.0
     end
 
