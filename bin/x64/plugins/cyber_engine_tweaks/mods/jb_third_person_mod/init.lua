@@ -561,16 +561,6 @@ registerForEvent("onDraw", function()
 
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
-						value, pressedCrough = ImGui.Checkbox("Try fix crough bug", false)
-
-						if pressedCrough then
-							Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-							Gender:AddTppHead()
-							Cron.After(1.0, function()
-								Gender:AddHead(JB.animatedFace)
-							end)
-						end
-
 						value, pressedDisableMod = ImGui.Checkbox("Disable Mod", JB.disableMod)
 
 						if pressedDisableMod then
