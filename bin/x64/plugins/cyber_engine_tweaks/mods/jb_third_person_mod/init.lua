@@ -488,8 +488,6 @@ registerForEvent("onUpdate", function(deltaTime)
 				if JB.fppPatch then
 					JB:FppPatch()
 				end
-
-				GameObjectEffectHelper.StopEffectEvent(GetPlayer(), "camera_mask")
 			end
 		end
 	end
