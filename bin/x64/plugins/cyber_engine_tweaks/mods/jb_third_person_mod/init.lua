@@ -121,23 +121,6 @@ registerForEvent("onInit", function()
 		end
     end)
 
-	--GameSession.OnPause(function()
-		--JB.isInitialized   = false
-		--JB.secondCam       = nil
-		--JB.foundJohnnyEnt  = false
-		--JB.johnnyEntId     = nil
-		--exEntitySpawner.Despawn(JB.johnnyEnt)
-		--JB.johnnyEnt       = nil
-	--end)
-
-	--GameSession.OnResume(function()
-		--if not JB.disableMod then
-			--JB.isInitialized   = true
-			--FindSecondCamera()
-		--end
-	--end)
-
-	-- FIX CRASH LOAD SAVE
 	GameSession.OnEnd(function()
 		JB.isInitialized   = false
 		JB.secondCam       = nil
@@ -168,26 +151,10 @@ registerForEvent("onInit", function()
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
-			Cron.After(0.5, function()
-				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-				Gender:AddTppHead()
-			end)
-			Cron.After(1.0, function()
-				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
-				Gender:AddFppHead()
-			end)
         else
             JB.inCar = false
         end
 	end)
-
-	--Override("vehicleCarBaseObject", "OnUnmountingEvent", function (self)
-		--if JB.isTppEnabled then
-		--	Cron.After(1, function()
-		--		JB:ActivateTPP()
-		--	end)
-		--end
-	--end)
 
 	Observe('PlayerPuppet', 'OnAction', function(self, action)
 		if not JB.disableMod then
@@ -195,7 +162,6 @@ registerForEvent("onInit", function()
 				if not IsPlayerInAnyMenu() then
 					local actionName  = Game.NameToString(ListenerAction.GetName(action))
 					local actionValue = ListenerAction.GetValue(action)
-					local actionType  = action:GetType(action).value
 
 					if actionName == "right_trigger" and JB.controllerZoom then -- CONTROLLER
 						JB:Zoom(0.1)
@@ -381,8 +347,6 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		local PlayerSystem = Game.GetPlayerSystem()
 		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 
-		Game.GetTransactionSystem():AddItemToSlot(Game.GetPlayer(), "AttachmentSlots.RightArm", ItemID.FromTDBID(TweakDBID("Items.HolsteredFists")))
-
 		if JB.foundJohnnyEnt == false then
 			PlayerPuppet:SetWarningMessage("JB Third person mod not loaded yet!")
 			return;
@@ -396,13 +360,8 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 		if(JB.isTppEnabled) then
 			Cron.After(JB.transitionSpeed, function()
 				if not JB.fppPatch then
-					Gender:AddTppHead()
 					Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-					local ts     = Game.GetTransactionSystem()
-					local player = Game.GetPlayer()
-					ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
 					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-					Gender:AddFppHead()
 				end
 			end)
 			JB:DeactivateTPP(false)
@@ -502,7 +461,6 @@ registerForEvent("onUpdate", function(deltaTime)
 
 				if not PlayerPuppet:FindVehicleCameraManager():IsTPPActive() == JB.previousPerspective then
 					if PlayerPuppet:FindVehicleCameraManager():IsTPPActive() then
-						Gender:AddTppHead()
 						Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "TPP")
 					end
 				else

@@ -40,9 +40,6 @@ function Gender:AddFppHead()
 end
 
 function Gender:AddHead(animated, model)
-
-    Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
-
     model = model or false
 
     if not model then

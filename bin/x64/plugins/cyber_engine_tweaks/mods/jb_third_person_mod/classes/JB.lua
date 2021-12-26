@@ -393,12 +393,6 @@ function JB:CheckForRestoration(delta)
     if not self.isTppEnabled and self.photoModeBeenActive and not photoMode:IsPhotoModeActive() then
         if self.photoModeBeenActive then
             self.photoModeBeenActive = false
-
-            Cron.After(1.0, function ()
-                Gender:AddHead(self.animatedFace)
-            end)
-            
-            Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
             self:ActivateTPP()
         end
     end
@@ -409,13 +403,10 @@ function JB:CheckForRestoration(delta)
 				self.switchBackToTpp = true
 				Cron.After(self.transitionSpeed, function()
                     if not self.fppPatch then
-                        Gender:AddTppHead()
-                        Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
                         local ts     = Game.GetTransactionSystem()
                         local player = Game.GetPlayer()
                         ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
                         Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-                        Gender:AddFppHead()
                     end
                 end)
                 self:DeactivateTPP(false)
@@ -690,11 +681,11 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
+        Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         self.secondCam:Activate(self.transitionSpeed)
         self:SetEnableTPPValue(true)
         self:UpdateCamera()
-        Gender:AddHead(self.animatedFace)
     end
 end
 
