@@ -769,17 +769,6 @@ registerForEvent("onDraw", function()
 								JB.updateSettings = true
 							end
 
-							ImGui.NewLine()
-
-							ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "Zoom Fpp Patch")
-
-							value, usedZoomFpp = ImGui.SliderFloat("zoom", JB.zoomFpp, 0.3, 0.0)
-
-							if usedZoomFpp then
-								JB.zoomFpp = value
-								JB.updateSettings = true
-							end
-
 							ImGui.EndTabItem()
 						end
 
