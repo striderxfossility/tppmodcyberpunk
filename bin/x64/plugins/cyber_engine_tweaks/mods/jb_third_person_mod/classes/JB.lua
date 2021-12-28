@@ -282,12 +282,6 @@ function JB:CheckForRestoration(delta)
     if self.inScene then
         self.resetCams = true
     end
-    
-    if not self.inScene and self.resetCams then -- Reset cameras to before scene
-        self.secondCam:SetLocalPosition(self.camViews[self.camActive].pos)
-        self.secondCam:SetLocalOrientation(self.camViews[self.camActive].rot)
-        self.resetCams = false
-    end
 
     local quat = self.secondCam:GetLocalOrientation()
 
@@ -643,7 +637,6 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
-        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
         GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
 	end
 end
