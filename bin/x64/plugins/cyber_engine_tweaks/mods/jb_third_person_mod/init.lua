@@ -556,11 +556,6 @@ registerForEvent("onDraw", function()
 							ImGui.NewLine()
 						end
 
-						if ModArchiveExists('jb_tpp_mod_1.archive') == true then
-							ImGui.TextColored(1, 0, 0, 1, "REMOVE jb_tpp_mod_1.archive!!!")
-							ImGui.NewLine()
-						end
-
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
 						value, pressedDisableMod = ImGui.Checkbox("Disable Mod", JB.disableMod)
