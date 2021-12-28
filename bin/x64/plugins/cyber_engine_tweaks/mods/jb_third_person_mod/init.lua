@@ -151,6 +151,10 @@ registerForEvent("onInit", function()
     Observe("vehicleCarBaseObject", "OnVehicleFinishedMounting", function (self)
         if Game['GetMountedVehicle;GameObject'](Game.GetPlayer()) ~= nil then
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
+			if JB.inCar then
+				JB.isTppEnabled = false
+				GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
+			end
         else
             JB.inCar = false
         end
