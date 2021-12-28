@@ -644,6 +644,7 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
+        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
         GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
 	end
 end
