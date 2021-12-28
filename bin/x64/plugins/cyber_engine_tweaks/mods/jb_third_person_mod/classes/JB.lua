@@ -389,6 +389,7 @@ function JB:CheckForRestoration(delta)
                     local player = Game.GetPlayer()
                     ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
                     Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
+                    Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
                 end)
                 self:DeactivateTPP(false)
 			end
