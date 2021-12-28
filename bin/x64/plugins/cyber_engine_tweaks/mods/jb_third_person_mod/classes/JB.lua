@@ -46,8 +46,6 @@ function JB:new()
 
     db:exec("INSERT INTO settings SELECT 18, 'transitionSpeed', 2 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 18);")
 
-    db:exec("INSERT INTO settings SELECT 19, 'fppPatch', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 19);")
-
     db:exec("INSERT INTO settings SELECT 20, 'zoomFpp', 0.1 WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 20);")
 
     db:exec("INSERT INTO settings SELECT 21, 'disableMod', false WHERE NOT EXISTS(SELECT 1 FROM settings WHERE id = 21);")
@@ -135,14 +133,6 @@ function JB:new()
             class.yawAlwaysZero = false
         else
             class.yawAlwaysZero = true
-        end
-    end
-
-    for index, value in db:rows("SELECT value FROM settings WHERE name = 'fppPatch'") do
-        if(index[1] == 0) then
-            class.fppPatch = false
-        else
-            class.fppPatch = true
         end
     end
 
@@ -242,7 +232,6 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE settings SET value = " .. tostring(self.rollAlwaysZero) .. " WHERE name = 'rollAlwaysZero'")
         db:exec("UPDATE settings SET value = " .. tostring(self.yawAlwaysZero) .. " WHERE name = 'yawAlwaysZero'")
         db:exec("UPDATE settings SET value = " .. tostring(self.transitionSpeed) .. " WHERE name = 'transitionSpeed'")
-        db:exec("UPDATE settings SET value = " .. tostring(self.fppPatch) .. " WHERE name = 'fppPatch'")
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomFpp) .. " WHERE name = 'zoomFpp'")
         db:exec("UPDATE settings SET value = " .. tostring(self.disableMod) .. " WHERE name = 'disableMod'")
         db:exec("UPDATE settings SET value = " .. tostring(self.zoomSpeed) .. " WHERE name = 'zoomSpeed'")
@@ -359,7 +348,7 @@ function JB:CheckForRestoration(delta)
         self.moveHorizontal  = false
     end
 
-    if self.fppPatch or not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
+    if not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
         isDirectMovement = true
         local delta_quatY = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
@@ -402,12 +391,10 @@ function JB:CheckForRestoration(delta)
 			if(Attachment:HasWeaponActive()) then
 				self.switchBackToTpp = true
 				Cron.After(self.transitionSpeed, function()
-                    if not self.fppPatch then
-                        local ts     = Game.GetTransactionSystem()
-                        local player = Game.GetPlayer()
-                        ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-                        Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-                    end
+                    local ts     = Game.GetTransactionSystem()
+                    local player = Game.GetPlayer()
+                    ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+                    Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
                 end)
                 self:DeactivateTPP(false)
 			end
@@ -445,9 +432,7 @@ function JB:CheckForRestoration(delta)
         end
 
         if not self.isTppEnabled and not self.inCar then
-            if not self.fppPatch then
-                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-            end
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
         end
 
         local bump = GetPlayer():FindComponentByName('BumpComponent')
@@ -482,22 +467,9 @@ function JB:CheckForRestoration(delta)
         self:FppCameraMoveDown()
     end
 
-    if self.fppPatch then
-        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, -0.5, 0))
-    end
-
     if self.camViews[self.camActive].rot == Quaternion.new(0, 0, 0, 0) then
         print("JB: Gimbal lock!")
         self.camViews[self.camActive].rot = Quaternion.new(0, 0, 0, 1)
-    end
-end
-
-function JB:FppPatch()
-    if not self.isTppEnabled then
-        local fppCam       = GetPlayer():FindComponentByName('camera')
-        local loc          = fppCam:GetLocalPosition()
-
-        self.secondCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z + 0.5 + self.offset, 1))
     end
 end
 
@@ -671,13 +643,8 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
-        if self.fppPatch then 
-            self.secondCam:SetLocalPosition(Vector4.new(0, 0, 0, 1))
-            self.secondCam:SetLocalOrientation(Quaternion.new(0, 0, 0, 1))
-        else
-            GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
-            GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
-        end
+        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
+        GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
 	end
 end
 
@@ -707,10 +674,8 @@ function JB:DeactivateTPP(noUpdate)
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
         Cron.After(self.transitionSpeed, function()
-            if not self.fppPatch then
-                ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-                Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-            end
+            ts:RemoveItemFromSlot(player, TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+            Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
         end)
 	end
 

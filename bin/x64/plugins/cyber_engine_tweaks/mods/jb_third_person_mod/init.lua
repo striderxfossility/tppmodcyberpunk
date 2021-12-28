@@ -89,10 +89,6 @@ registerForEvent("onInit", function()
 		nativeSettings.addSwitch("/jb_tpp/patches", "Model head", "Patch for player replacer (activating head)", JB.ModelMod, false, function(state)
 			JB.ModelMod = state
 		end)
-
-		nativeSettings.addSwitch("/jb_tpp/patches", "Fpp reflection patch", "", JB.fppPatch, false, function(state)
-			JB.fppPatch = state
-		end)
 	end
 
 	local speed = 8
@@ -363,10 +359,8 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 
 		if(JB.isTppEnabled) then
 			Cron.After(JB.transitionSpeed, function()
-				if not JB.fppPatch then
-					Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-					Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
-				end
+				Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+				Attachment:TurnArrayToPerspective({"AttachmentSlots.Head", "AttachmentSlots.Eyes"}, "FPP")
 			end)
 			JB:DeactivateTPP(false)
 		else
@@ -488,10 +482,6 @@ registerForEvent("onUpdate", function(deltaTime)
 				JB.isMoving = false
 
 				Cron.Update(deltaTime)
-
-				if JB.fppPatch then
-					JB:FppPatch()
-				end
 			end
 		end
 	end
@@ -756,12 +746,6 @@ registerForEvent("onDraw", function()
 
 							if (pressed) then
 								JB.ModelMod = value
-							end
-
-							value, pressedFppPatch = ImGui.Checkbox("Fpp reflection head", JB.fppPatch)
-
-							if (pressedFppPatch) then
-								JB.fppPatch = value
 							end
 
 							ImGui.NewLine()
