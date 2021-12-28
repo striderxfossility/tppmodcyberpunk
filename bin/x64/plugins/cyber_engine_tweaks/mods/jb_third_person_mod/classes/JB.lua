@@ -359,7 +359,7 @@ function JB:CheckForRestoration(delta)
         self.moveHorizontal  = false
     end
 
-    if not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
+    if self.fppPatch or not self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar then
         isDirectMovement = true
         local delta_quatY = GetSingleton('Quaternion'):SetAxisAngle(Vector4.new(1,0,0,0), self.yroll * delta)
 
@@ -482,6 +482,10 @@ function JB:CheckForRestoration(delta)
         self:FppCameraMoveDown()
     end
 
+    if self.fppPatch then
+        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, -0.5, 0))
+    end
+
     if self.camViews[self.camActive].rot == Quaternion.new(0, 0, 0, 0) then
         print("JB: Gimbal lock!")
         self.camViews[self.camActive].rot = Quaternion.new(0, 0, 0, 1)
@@ -493,7 +497,7 @@ function JB:FppPatch()
         local fppCam       = GetPlayer():FindComponentByName('camera')
         local loc          = fppCam:GetLocalPosition()
 
-        fppCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z, 1))
+        self.secondCam:SetLocalPosition(Vector4.new(loc.x, self.zoomFpp, loc.z + 0.5 + self.offset, 1))
     end
 end
 
@@ -667,8 +671,13 @@ end
 
 function JB:RestoreFPPView()
 	if not self.isTppEnabled then
-        GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
-        GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
+        if self.fppPatch then 
+            self.secondCam:SetLocalPosition(Vector4.new(0, 0, 0, 1))
+            self.secondCam:SetLocalOrientation(Quaternion.new(0, 0, 0, 1))
+        else
+            GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
+            GetPlayer():FindComponentByName('camera'):Activate(self.transitionSpeed)
+        end
 	end
 end
 
@@ -681,10 +690,9 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
-        --Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(true)
-        local test = ActivateTPPRepresentationEvent.new()
-        test.playerController = Game.GetPlayer()
-        Game.GetPlayer():QueueEvent(test)
+        local tpp = ActivateTPPRepresentationEvent.new()
+        tpp.playerController = Game.GetPlayer()
+        Game.GetPlayer():QueueEvent(tpp)
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         self.secondCam:Activate(self.transitionSpeed)
         self:SetEnableTPPValue(true)
