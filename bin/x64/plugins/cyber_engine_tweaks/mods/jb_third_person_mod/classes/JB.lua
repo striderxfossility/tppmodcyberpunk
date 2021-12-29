@@ -578,25 +578,16 @@ function JB:UpdateSecondCam()
     end
     
     if self.secondCam ~= nil then
-        local PlayerSystem = Game.GetPlayerSystem()
-        local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
         local fppCam       = GetPlayer():FindComponentByName('camera')
         
         self.secondCam:SetLocalPosition(Vector4.new(self.secondCam:GetLocalPosition().x, self.secondCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
 
         local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw())
         local transform = Game.GetPlayer():GetWorldPosition()
-        local vec = Vector4.new(transform.x, transform.y, transform.z - 0)
+        local vec = Vector4.new(transform.x, transform.y, transform.z)
 
         if self.johnnyEnt ~= nil then
             Game.GetTeleportationFacility():Teleport(self.johnnyEnt, vec, moveEuler)
-
-            if not (self.johnnyEnt:GetWorldPosition().x >= PlayerPuppet:GetWorldPosition().x - 2) and 
-                not (self.johnnyEnt:GetWorldPosition().x <= PlayerPuppet:GetWorldPosition().x + 2) and 
-                not (self.johnnyEnt:GetWorldPosition().y >= PlayerPuppet:GetWorldPosition().y - 2) and
-                not (self.johnnyEnt:GetWorldPosition().y <= PlayerPuppet:GetWorldPosition().y + 2) then
-                print('CAMERA IS STUCK, HELP HIM!')
-            end
         end
     end
 end
