@@ -735,7 +735,6 @@ local function initialize(event)
 			initSessionKey()
 		end
 
-		---@param self PlayerPuppet
 		Observe('PlayerPuppet', 'OnTakeControl', function(self)
 			--spdlog.error(('PlayerPuppet::OnTakeControl()'))
 
@@ -763,7 +762,6 @@ local function initialize(event)
 			sessionLoadRequest = {}
 		end)
 
-		---@param self PlayerPuppet
 		Observe('PlayerPuppet', 'OnGameAttached', function(self)
 			--spdlog.error(('PlayerPuppet::OnGameAttached()'))
 
