@@ -174,12 +174,8 @@ function JB:new()
     class.IsMoving                  = false
     class.onChangePerspective       = false
     class.previousPerspective       = false
-    class.johnnyEntId               = nil
-    class.foundJohnnyEnt            = false
-    class.johnnyEnt                 = nil
-    class.secondCam                 = nil
     class.isInitialized             = false
-    class.offset                    = 5
+    class.offset                    = 1.7
     class.controllerZoom            = false
     class.controller360             = false
     class.controllerRightTrigger    = false
@@ -216,7 +212,6 @@ function JB:CheckForRestoration(delta)
     local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
     local script       = Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):GetGameInstance()
     local photoMode    = script.GetPhotoModeSystem()
-    local fppCam       = GetPlayer():FindComponentByName('camera')
 
     if self.updateSettings and self.updateSettingsTimer <= 0.0 then
         self.updateSettings         = false
@@ -244,10 +239,6 @@ function JB:CheckForRestoration(delta)
         db:exec("UPDATE cameras SET x = " .. self.camViews[5].pos.x .. ", y = " .. self.camViews[5].pos.y .. ", z=" .. self.camViews[5].pos.z .. ", rx=" .. self.camViews[5].rot.i .. ", ry=" .. self.camViews[5].rot.j .. ", rz=" .. self.camViews[5].rot.k .. ", rw=" .. self.camViews[5].rot.r .. "  WHERE id = 4")
     end
 
-    if self.secondCam == nil then
-        return
-    end
-
     if self.inverted then
         self.xroll = -self.xroll
         self.yroll = -self.yroll
@@ -257,7 +248,7 @@ function JB:CheckForRestoration(delta)
         if self.collisions.zoomValue > 0.5 then
             self.collisions.zoomValue = 0.5
         end
-        if self.secondCam:GetLocalPosition().y > -self.camViews[self.camActive].pos.y or self.secondCam:GetLocalPosition().y < self.camViews[self.camActive].pos.y then
+        if GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y > -self.camViews[self.camActive].pos.y or GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y < self.camViews[self.camActive].pos.y then
             self.collisions.zoomValue = 0
         end
         self:Zoom(self.collisions.zoomValue)
@@ -265,7 +256,7 @@ function JB:CheckForRestoration(delta)
     else
         if self.collisions.back and self.collisions.zoomedIn > 0 then
             self:Zoom(-0.1)
-            if self.secondCam:GetLocalPosition().y > -self.camViews[self.camActive].pos.y or self.secondCam:GetLocalPosition().y < self.camViews[self.camActive].pos.y then
+            if GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y > -self.camViews[self.camActive].pos.y or GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y < self.camViews[self.camActive].pos.y then
                 self.collisions.zoomValue = 0
             end
             self.collisions.zoomedIn = self.collisions.zoomedIn - 0.1
@@ -275,7 +266,7 @@ function JB:CheckForRestoration(delta)
     if self.rollAlwaysZero then
         local euler = GetSingleton("Quaternion"):ToEulerAngles(self.camViews[self.camActive].rot)
         self.camViews[self.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(0, euler.pitch, euler.yaw))
-		self.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(0, euler.pitch, euler.yaw)))
+		GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(0, euler.pitch, euler.yaw)))
     end
 
     self.updateSettingsTimer = self.updateSettingsTimer - delta
@@ -286,9 +277,9 @@ function JB:CheckForRestoration(delta)
         self.resetCams = true
     end
 
-    local quat = self.secondCam:GetLocalOrientation()
+    local quat = GetPlayer():FindComponentByName('tppCamera1'):GetLocalOrientation()
 
-    self.secondCam:SetFOV(self.fov)
+    GetPlayer():FindComponentByName('tppCamera1'):SetFOV(self.fov)
 
     if self.moveCamera then
         local newPos = Vector4.new(
@@ -297,7 +288,7 @@ function JB:CheckForRestoration(delta)
             self.camViews[self.camActive].pos.z + self.yroll / 10, 1)
 
         self.camViews[self.camActive].pos = newPos
-        self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
         self.updateSettings = true
 
         self.xroll = 0
@@ -311,7 +302,7 @@ function JB:CheckForRestoration(delta)
             self.camViews[self.camActive].pos.z, 1)
 
         self.camViews[self.camActive].pos = newPos
-        self.secondCam:SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(newPos.x, newPos.y, newPos.z + self.offset, 1))
         self.updateSettings = true
 
         self.xroll = 0
@@ -320,7 +311,7 @@ function JB:CheckForRestoration(delta)
 
     local isDirectMovement = false
     
-    if (fppCam.headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
+    if (GetPlayer():FindComponentByName('tppCamera1').headingLocked and self.isTppEnabled) or (self.directionalMovement and self.isTppEnabled and not JB.inScene and not JB.inCar) or self.controllerRightTrigger or self.controllerLeftTrigger then
         if self.controllerLeftTrigger then
             self.xroll = 2
             self.controllerLeftTrigger = false
@@ -341,8 +332,8 @@ function JB:CheckForRestoration(delta)
 
         self.camViews[self.camActive].rot = quat
 
-        self.secondCam:SetLocalOrientation(quat)
-        self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(quat)
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
         self.moveHorizontal  = false
     end
@@ -357,8 +348,8 @@ function JB:CheckForRestoration(delta)
 
         self.camViews[self.camActive].rot = quat
 
-        self.secondCam:SetLocalOrientation(quat)
-        self.secondCam:SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(quat)
+        GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(stick.x, stick.y, stick.z + self.offset, 1))
 
         self.moveHorizontal  = false
     end
@@ -367,7 +358,7 @@ function JB:CheckForRestoration(delta)
         if self.yawAlwaysZero then
             local euler = GetSingleton("Quaternion"):ToEulerAngles(self.camViews[self.camActive].rot)
             self.camViews[self.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, 0))
-            self.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, 0)))
+            GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, 0)))
         end
     end
 
@@ -407,10 +398,10 @@ function JB:CheckForRestoration(delta)
     end
 
     if self.isTppEnabled and not self.inCar and self.inScene then
-        self.secondCam.yawMaxLeft = 3600
-        self.secondCam.yawMaxRight = -3600
-        self.secondCam.pitchMax = 100
-        self.secondCam.pitchMin = -100
+        GetPlayer():FindComponentByName('tppCamera1').yawMaxLeft = 3600
+        GetPlayer():FindComponentByName('tppCamera1').yawMaxRight = -3600
+        GetPlayer():FindComponentByName('tppCamera1').pitchMax = 100
+        GetPlayer():FindComponentByName('tppCamera1').pitchMin = -100
     end
 
     if(self.inCar and self.isTppEnabled and not self.carCheckOnce) then
@@ -448,7 +439,7 @@ function JB:CheckForRestoration(delta)
         self.timerCheckClothes = 0.0
     end
 
-	if(self.secondCam:GetLocalPosition().x == 0.0 and self.secondCam:GetLocalPosition().y == 0.0 and self.secondCam:GetLocalPosition().z == 0.0) then
+	if(GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().x == 0.0 and GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y == 0.0 and GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().z == 0.0) then
         self:SetEnableTPPValue(false)
 	end
 
@@ -475,7 +466,7 @@ end
 
 function JB:FppCameraMoveDown()
     local fppCam    = GetPlayer():FindComponentByName('camera')
-    local dist      = GetSingleton("Vector4"):Distance(self.secondCam:GetLocalToWorld():GetTranslation(), fppCam:GetLocalToWorld():GetTranslation())
+    local dist      = GetSingleton("Vector4"):Distance(GetPlayer():FindComponentByName('tppCamera1'):GetLocalToWorld():GetTranslation(), fppCam:GetLocalToWorld():GetTranslation())
     
     if dist < 0.50 then
         local loc = fppCam:GetLocalPosition()
@@ -494,8 +485,8 @@ function JB:Collsion()
 
     local fppCam    = GetPlayer():FindComponentByName('camera')
     local from      = fppCam:GetLocalToWorld():GetTranslation()
-    local to        = self.secondCam:GetLocalToWorld():GetTranslation()
-    local forw      = self.johnnyEnt:GetWorldForward()
+    local to        = GetPlayer():FindComponentByName('tppCamera1'):GetLocalToWorld():GetTranslation()
+    local forw      = GetPlayer():GetWorldForward()
 
     local extendedTo = Vector4.new(to.x - forw.x, to.y - forw.y, to.z, 1)
 
@@ -516,7 +507,7 @@ function JB:Collsion()
         end
     end
 
-    from = self.secondCam:GetLocalToWorld():GetTranslation()
+    from = GetPlayer():FindComponentByName('tppCamera1'):GetLocalToWorld():GetTranslation()
     to = Vector4.new(from.x, from.y, from.z - 0.5, 1)
 
     for _, filter in ipairs(filters) do
@@ -554,42 +545,10 @@ function JB:Collsion()
     end
 end
 
-function JB:UpdateSecondCam()
-    if not self.foundJohnnyEnt then
-        if Game.FindEntityByID(self.johnnyEntId) ~= nil then
-            self.foundJohnnyEnt                 = true
-            self.johnnyEnt          	        = Ref.Weak(Game.FindEntityByID(self.johnnyEntId)) -- the spawned object
-            self.johnnyEnt.audioResourceName    = CName.new("johnnysecondcam")
-
-            local root = self.johnnyEnt:FindComponentByName(CName.new("root"))
-
-            root:SetLocalPosition(Vector4.new(0, 0, -self.offset, 1))
-            
-            self.secondCam = Ref.Weak(self.johnnyEnt:FindComponentByName(CName.new("camera")))
-
-            self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
-            	
-            if self.isTppEnabled then
-                self:ActivateTPP()
-            end
-
-            print('Jb Third Person Mod Loaded')
-        end
-    end
+function JB:UpdateTPPCamera()
+    local fppCam = GetPlayer():FindComponentByName('camera')
     
-    if self.secondCam ~= nil then
-        local fppCam       = GetPlayer():FindComponentByName('camera')
-        
-        self.secondCam:SetLocalPosition(Vector4.new(self.secondCam:GetLocalPosition().x, self.secondCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
-
-        local moveEuler = EulerAngles.new(0, 0, Game.GetPlayer():GetWorldYaw())
-        local transform = Game.GetPlayer():GetWorldPosition()
-        local vec = Vector4.new(transform.x, transform.y, transform.z)
-
-        if self.johnnyEnt ~= nil then
-            Game.GetTeleportationFacility():Teleport(self.johnnyEnt, vec, moveEuler)
-        end
-    end
+    GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().x, GetPlayer():FindComponentByName('tppCamera1'):GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
 end
 
 function JB:RotateQuaternion(orig_quat, delta_quat)
@@ -642,8 +601,8 @@ end
 
 function JB:UpdateCamera()
 	if self.isTppEnabled then
-		self.secondCam:SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
-		self.secondCam:SetLocalOrientation(self.camViews[self.camActive].rot)
+		GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(Vector4.new(self.camViews[self.camActive].pos.x, self.camViews[self.camActive].pos.y, self.camViews[self.camActive].pos.z + self.offset, 1))
+		GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(self.camViews[self.camActive].rot)
 	end
 end
 
@@ -653,7 +612,7 @@ function JB:ActivateTPP()
         tpp.playerController = Game.GetPlayer()
         Game.GetPlayer():QueueEvent(tpp)
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
-        self.secondCam:Activate(self.transitionSpeed)
+        GetPlayer():FindComponentByName('tppCamera1'):Activate(self.transitionSpeed)
         self:SetEnableTPPValue(true)
         self:UpdateCamera()
     end

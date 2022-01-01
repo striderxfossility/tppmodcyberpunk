@@ -1,14 +1,8 @@
 local JB 				= require("classes/JB.lua")
 local Attachment 		= require("classes/Attachment.lua")
-local Gender 			= require("classes/Gender.lua")
-local Item 				= require("classes/Item.lua")
 local Cron 				= require("classes/Cron.lua")
-local GameSession 		= require('classes/GameSession.lua')
-local GameUI 			= require('classes/GameUI.lua')
-local Ref        		= require("classes/Ref.lua")
 local UI			  	= require('classes/UI.lua')
 local nativeSettings 	= nil
-local ev 				= nil
 
 CamView         = {}
 CamView.__index = CamView
@@ -47,7 +41,6 @@ end)
 
 registerForEvent("onInit", function()
 	nativeSettings = GetMod("nativeSettings")
-
 	if nativeSettings ~= nil then
 		nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
 		nativeSettings.addSubcategory("/jb_tpp/settings", "Settings")
@@ -101,39 +94,6 @@ registerForEvent("onInit", function()
 	end
 
 	local speed = 8
-
-	GameUI.OnFastTravelStart(function()
-		JB.isInitialized   = false
-		JB.secondCam       = nil
-		JB.foundJohnnyEnt  = false
-		JB.johnnyEntId     = nil
-		exEntitySpawner.Despawn(JB.johnnyEnt)
-		JB.johnnyEnt       = nil
-
-        if not JB.disableMod then
-			JB.disableMod = true
-			JB.switchDisableMod = true
-		end
-    end)
-
-    GameUI.OnFastTravelFinish(function()
-		JB.isInitialized   = true
-		FindSecondCamera()
-
-        if JB.switchDisableMod then
-			JB.disableMod = false
-			JB.switchDisableMod = false
-		end
-    end)
-
-	GameSession.OnEnd(function()
-		JB.isInitialized   = false
-		JB.secondCam       = nil
-		JB.foundJohnnyEnt  = false
-		JB.johnnyEntId     = nil
-		exEntitySpawner.Despawn(JB.johnnyEnt)
-		JB.johnnyEnt       = nil
-	end)
 
 	Override('VehicleSystem', 'IsSummoningVehiclesRestricted;GameInstance', function()
 		return false
@@ -255,42 +215,23 @@ registerForEvent("onInit", function()
 		table.insert(JB.camViews, cam)
 	end
 
-	FindSecondCamera()
 end)
-
-function FindSecondCamera()
-	-- FIX CRASH RELOAD ALL MODS
-	local arr = JB:GetPlayerObjects()
-	for _, v in ipairs(arr) do
-		local obj = v:GetComponent(v):GetEntity()
-
-		if obj:GetClassName() == CName.new("PlayerPuppet") then
-			if obj.audioResourceName == CName.new("johnnysecondcam") then
-				JB.foundJohnnyEnt 	= true
-				JB.johnnyEntId 		= obj:GetEntityID()
-				JB.johnnyEnt 		= obj
-				JB.secondCam 		= Ref.Weak(JB.johnnyEnt:FindComponentByName(CName.new("camera")))
-				break
-			end
-		end
-	end
-end
 
 registerInput('jb_hold_360_cam', 'Hold to activate 360 camera', function(isDown)
 	if not JB.disableMod then
-		local fppCam       = GetPlayer():FindComponentByName('camera')
+		local tppCam = GetPlayer():FindComponentByName('camera')
 
 		if (isDown) then
 			JB.directionalMovement = true
 
 			if not JB.inScene then
-				fppCam.headingLocked = true
+				tppCam.headingLocked = true
 			end
 		else
 			if not JB.inScene then
 				JB.directionalMovement = false
 			end
-			fppCam.headingLocked = false
+			tppCam.headingLocked = false
 		end
 	end
 end)
@@ -319,34 +260,34 @@ end)
 
 registerInput('jb_move_camera', 'Move Camera up/down', function(isDown)
 	if not JB.disableMod then
-		local fppCam       = GetPlayer():FindComponentByName('camera')
+		local tppCam = GetPlayer():FindComponentByName('camera')
 
 		if isDown then
 			JB.moveCamera = true
 
 			if not JB.inScene then
-				fppCam.headingLocked = true
+				tppCam.headingLocked = true
 			end
 		else
 			JB.moveCamera = false
-			fppCam.headingLocked = false
+			tppCam.headingLocked = false
 		end
 	end
 end)
 
 registerInput('jb_move_camera_forward', 'Move Camera forward/backwards', function(isDown)
 	if not JB.disableMod then
-		local fppCam       = GetPlayer():FindComponentByName('camera')
+		local tppCam = GetPlayer():FindComponentByName('camera')
 
 		if isDown then
 			JB.moveCameraOnPlane = true
 
 			if not JB.inScene then
-				fppCam.headingLocked = true
+				tppCam.headingLocked = true
 			end
 		else
 			JB.moveCameraOnPlane = false
-			fppCam.headingLocked = false
+			tppCam.headingLocked = false
 		end
 	end
 end)
@@ -355,11 +296,6 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 	if not JB.disableMod then
 		local PlayerSystem = Game.GetPlayerSystem()
 		local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
-
-		if JB.foundJohnnyEnt == false then
-			PlayerPuppet:SetWarningMessage("JB Third person mod not loaded yet!")
-			return;
-		end
 
 		if JB.inCar then
 			PlayerPuppet:SetWarningMessage("JB: Do you want to have bugs?")
@@ -385,8 +321,6 @@ registerHotkey("jb_activate_tpp", "Activate/Deactivate Third Person", function()
 				JB:ActivateTPP()
 			end
 		end
-
-		JB:UpdateSecondCam()
 	end
 end)
 	
@@ -426,8 +360,8 @@ function ResetCameras()
 	JB.camViews[5].pos 	= JB.camViews[10].pos
 	JB.camViews[5].rot = JB.camViews[10].rot
 
-	JB.secondCam:SetLocalOrientation(JB.camViews[JB.camActive].rot)
-	JB.secondCam:SetLocalPosition(JB.camViews[JB.camActive].pos)
+	GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(JB.camViews[JB.camActive].rot)
+	GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(JB.camViews[JB.camActive].pos)
 	
 	JB.updateSettings = true
 	JB.collisions.zoomedIn = 0.0
@@ -446,22 +380,7 @@ registerForEvent("onUpdate", function(deltaTime)
 		if JB.isInitialized then
 			if not IsPlayerInAnyMenu() then
 
-				if GetPlayer().inCrouch then
-					JB.offset = 4.2
-				else
-					JB.offset = 5
-				end
-
-				if not (JB.johnnyEntId ~= nil) then
-					print("Jb Third Person Mod: Spawned second camera")
-					JB.johnnyEntId = exEntitySpawner.Spawn([[base\characters\entities\player\replacer\johnny_silverhand_replacer.ent]], Game.GetPlayer():GetWorldTransform())
-				end
-
-				if ev == nil then
-					ev = LookAtAddEvent.new()
-				end
-
-				JB:UpdateSecondCam()
+				JB:UpdateTPPCamera()
 
 				local PlayerSystem = Game.GetPlayerSystem()
 				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
@@ -496,30 +415,6 @@ registerForEvent("onUpdate", function(deltaTime)
 		end
 	end
 end)
-
-function EyesFollowCamera(deltaTime)
-	if JB.eyesTimer <= 0 then
-		local arr = JB:GetEYEObjects()
-		for _, v in ipairs(arr) do
-			local obj = v:GetComponent(v):GetEntity()
-			if obj:GetClassName() == CName.new("NPCPuppet") then
-				ev:SetEntityTarget(obj, CName.new('pla_default_tgt'), GetSingleton('Vector4'):EmptyVector())
-				ev.SetStyle = Enum.new('animLookAtStyle', 2)
-				ev.bodyPart = CName.new('Eyes')
-				ev.request.limits.softLimitDegrees = 360.00;
-				ev.request.limits.hardLimitDegrees = 270.00;
-				ev.request.limits.backLimitDegrees = 210.00;
-				ev.request.calculatePositionInParentSpace = true
-
-				Game.GetPlayer():QueueEvent(ev)
-				JB.eyesTimer = 15
-				break
-			end
-		end
-	end
-
-	JB.eyesTimer = JB.eyesTimer - deltaTime
-end
 
 function IsPlayerInAnyMenu()
 	if Game.GetSystemRequestsHandler():IsGamePaused() then
@@ -556,16 +451,6 @@ registerForEvent("onDraw", function()
 						if pressedDisableMod then
 							JB.disableMod = value
 							JB.updateSettings = true
-
-							if value then
-								JB:DeactivateTPP()
-								JB.isInitialized   = false
-								JB.secondCam       = nil
-								JB.foundJohnnyEnt  = false
-								JB.johnnyEntId     = nil
-								exEntitySpawner.Despawn(JB.johnnyEnt)
-								JB.johnnyEnt       = nil
-							end
 						end
 
 						if not JB.disableMod then
@@ -726,7 +611,7 @@ registerForEvent("onDraw", function()
 
 							if usedroll then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
-								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
+								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
 								JB.updateSettings = true
 							end
 
@@ -738,7 +623,7 @@ registerForEvent("onDraw", function()
 
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
-								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
+								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
 								JB.updateSettings = true
 							end
 
@@ -750,7 +635,7 @@ registerForEvent("onDraw", function()
 
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
-								JB.secondCam:SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
+								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
 								JB.updateSettings = true
 							end
 
@@ -812,8 +697,6 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
-							local fppCam       = GetPlayer():FindComponentByName('camera')
-
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "---------------------------------------")
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "isTppEnabled: " .. tostring(JB.isTppEnabled))
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timerCheckClothes: " .. tostring(JB.timerCheckClothes))
@@ -826,7 +709,6 @@ registerForEvent("onDraw", function()
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "switchBackToTpp: " .. tostring(JB.switchBackToTpp))
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "camActive: " .. tostring(JB.camActive))
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "timeStamp: " .. tostring(JB.timeStamp))
-							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "headingLocked: " .. tostring(fppCam.headingLocked))
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettings: " .. tostring(JB.updateSettings))
 							ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "updateSettingsTimer: " .. tostring(JB.updateSettingsTimer))
 							
