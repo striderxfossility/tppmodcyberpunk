@@ -451,7 +451,10 @@ function JB:CheckForRestoration(delta)
         self:Zoom(-self.zoomSpeed)
     end
 
-    self:Collsion()
+    if self.camViews[self.camActive].pos.y < 0 then
+        self:Collsion()
+    end
+
     self.colliedTimer = self.colliedTimer - delta
 
     if self.isTppEnabled then
@@ -582,9 +585,6 @@ end
 
 function JB:Zoom(i)
 	self.camViews[self.camActive].pos.y = self.camViews[self.camActive].pos.y + i
-    if self.camViews[self.camActive].pos.y > -0.1 then
-        self.camViews[self.camActive].pos.y = -0.1
-    end
 end
 
 function JB:RestoreFPPView()
