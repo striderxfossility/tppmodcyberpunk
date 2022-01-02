@@ -362,8 +362,8 @@ function ResetCameras()
 	JB.camViews[5].pos 	= JB.camViews[10].pos
 	JB.camViews[5].rot = JB.camViews[10].rot
 
-	GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(JB.camViews[JB.camActive].rot)
-	GetPlayer():FindComponentByName('tppCamera1'):SetLocalPosition(JB.camViews[JB.camActive].pos)
+	GetPlayer():FindComponentByName('tppCamera'):SetLocalOrientation(JB.camViews[JB.camActive].rot)
+	GetPlayer():FindComponentByName('tppCamera'):SetLocalPosition(JB.camViews[JB.camActive].pos)
 	
 	JB.updateSettings = true
 	JB.collisions.zoomedIn = 0.0
@@ -613,7 +613,7 @@ registerForEvent("onDraw", function()
 
 							if usedroll then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw))
-								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
+								GetPlayer():FindComponentByName('tppCamera'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(value, euler.pitch, euler.yaw)))
 								JB.updateSettings = true
 							end
 
@@ -625,7 +625,7 @@ registerForEvent("onDraw", function()
 
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw))
-								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
+								GetPlayer():FindComponentByName('tppCamera'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, value, euler.yaw)))
 								JB.updateSettings = true
 							end
 
@@ -637,7 +637,7 @@ registerForEvent("onDraw", function()
 
 							if usedpitch then
 								JB.camViews[JB.camActive].rot = GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value))
-								GetPlayer():FindComponentByName('tppCamera1'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
+								GetPlayer():FindComponentByName('tppCamera'):SetLocalOrientation(GetSingleton("EulerAngles"):ToQuat(EulerAngles.new(euler.roll, euler.pitch, value)))
 								JB.updateSettings = true
 							end
 
