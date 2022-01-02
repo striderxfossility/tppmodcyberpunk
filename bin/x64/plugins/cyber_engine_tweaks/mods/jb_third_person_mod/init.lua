@@ -382,8 +382,6 @@ registerForEvent("onUpdate", function(deltaTime)
 		if JB.isInitialized then
 			if not IsPlayerInAnyMenu() then
 
-				JB:UpdateTPPCamera()
-
 				local PlayerSystem = Game.GetPlayerSystem()
 				local PlayerPuppet = PlayerSystem:GetLocalPlayerMainGameObject()
 				local fppCam       = GetPlayer():FindComponentByName('camera')

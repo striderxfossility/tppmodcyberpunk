@@ -1,6 +1,5 @@
-local Gender     = require("classes/Gender.lua")
 local Attachment = require("classes/Attachment.lua")
-local Ref        = require("classes/Ref.lua")
+local Item       = require("classes/Item.lua")
 local Cron 		 = require("classes/Cron.lua")
 
 local JB         = {}
@@ -548,13 +547,6 @@ function JB:Collsion()
     end
 end
 
-function JB:UpdateTPPCamera()
-    local fppCam = GetPlayer():FindComponentByName('camera')
-    local tppCam = GetPlayer():FindComponentByName('tppCamera')
-    
-    tppCam:SetLocalPosition(Vector4.new(tppCam:GetLocalPosition().x, tppCam:GetLocalPosition().y, fppCam:GetLocalPosition().z + self.offset, 1))
-end
-
 function JB:RotateQuaternion(orig_quat, delta_quat)
     local x = orig_quat.r * delta_quat.i + orig_quat.i * delta_quat.r - orig_quat.j * delta_quat.k - orig_quat.k * delta_quat.j;
     local y = orig_quat.r * delta_quat.j + orig_quat.j * delta_quat.r + orig_quat.k * delta_quat.i + orig_quat.i * delta_quat.k;
@@ -623,8 +615,6 @@ function JB:ActivateTPP()
 end
 
 function JB:DeactivateTPP(noUpdate)
-    GetPlayer():FindComponentByName('camera'):ResetPitch()
-
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
