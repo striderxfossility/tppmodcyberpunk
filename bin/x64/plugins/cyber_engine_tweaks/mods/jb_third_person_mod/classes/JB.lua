@@ -614,6 +614,9 @@ function JB:ActivateTPP()
 end
 
 function JB:DeactivateTPP(noUpdate)
+    -- IFP FIX
+    GetPlayer():FindComponentByName('camera'):ResetPitch()
+
 	if self.isTppEnabled and noUpdate == nil then
         local ts     = Game.GetTransactionSystem()
         local player = Game.GetPlayer()
