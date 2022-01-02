@@ -1,5 +1,5 @@
 local JB 				= require("classes/JB.lua")
-local Gender 			= require("classes/Gender.lua")
+local GameSession 		= require("classes/GameSession.lua")
 local Attachment 		= require("classes/Attachment.lua")
 local Cron 				= require("classes/Cron.lua")
 local UI			  	= require('classes/UI.lua')
@@ -93,6 +93,12 @@ registerForEvent("onInit", function()
 			JB.updateSettings = true
 		end)
 	end
+
+	GameSession.OnStart(function()
+		if JB.isTppEnabled then
+			JB:ActivateTPP()
+		end
+	end)
 
 	local speed = 8
 
