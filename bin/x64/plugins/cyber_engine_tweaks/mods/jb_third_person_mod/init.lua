@@ -1,4 +1,5 @@
 local JB 				= require("classes/JB.lua")
+local Gender 			= require("classes/Gender.lua")
 local Attachment 		= require("classes/Attachment.lua")
 local Cron 				= require("classes/Cron.lua")
 local UI			  	= require('classes/UI.lua')
@@ -118,6 +119,8 @@ registerForEvent("onInit", function()
             JB.inCar = Game['GetMountedVehicle;GameObject'](Game.GetPlayer()):IsPlayerDriver()
 			if JB.inCar then
 				JB.isTppEnabled = false
+				GetPlayer():FindComponentByName('camera'):Activate(JB.transitionSpeed)
+				Gender:AddTppHead()
 				if GetMod('EnhancedVehicleCamera') == nil then
 					GetPlayer():FindComponentByName('camera'):SetLocalPosition(Vector4.new(0, 0, 0, 1))
 				end
