@@ -783,7 +783,7 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
-							if ImGui.BeginTabBar("Replacers") then
+							if ImGui.BeginTabBar("replacers") then
 								if Gender:IsFemale() then
 									if ImGui.BeginTabItem("Panam") then
 										ImGui.NewLine()
