@@ -898,6 +898,104 @@ registerForEvent("onDraw", function()
 
 									if ImGui.BeginTabItem("Judy") then
 
+										ImGui.NewLine()
+
+										value, pressedPanamDefault = ImGui.Checkbox("default", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_default"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_default')
+											JB.replacer = "judy_default"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("diving_suit", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_diving_suit"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_diving_suit')
+											JB.replacer = "judy_diving_suit"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("braindance_on", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_braindance_on"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_braindance_on')
+											JB.replacer = "judy_braindance_on"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("braindance_off", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_braindance_off"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_braindance_off')
+											JB.replacer = "judy_braindance_off"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("panties", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_panties"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_panties')
+											JB.replacer = "judy_panties"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("nude", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_nude"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_nude')
+											JB.replacer = "judy_nude"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("diving_suit_mask", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_diving_suit_mask"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_diving_suit_mask')
+											JB.replacer = "judy_diving_suit_mask"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("glove", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_glove"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_glove')
+											JB.replacer = "judy_glove"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("default__no_makeup", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_default__no_makeup"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_default__no_makeup')
+											JB.replacer = "judy_default__no_makeup"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("diving_suit_no_mask", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_diving_suit_no_mask"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_diving_suit_no_mask')
+											JB.replacer = "judy_diving_suit_no_mask"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("_q203__shower", GetPlayer():GetCurrentAppearanceName() == CName.new("judy__q203__shower"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy__q203__shower')
+											JB.replacer = "judy__q203__shower"
+										end
+
+										value, pressedPanamDefault = ImGui.Checkbox("crying", GetPlayer():GetCurrentAppearanceName() == CName.new("judy_crying"))
+
+										if (pressedPanamDefault) then
+											GetPlayer():FindComponentByName('body'):Toggle(false)
+											GetPlayer():ScheduleAppearanceChange('judy_crying')
+											JB.replacer = "judy_crying"
+										end
+
 										ImGui.EndTabItem()
 									end
 								end
