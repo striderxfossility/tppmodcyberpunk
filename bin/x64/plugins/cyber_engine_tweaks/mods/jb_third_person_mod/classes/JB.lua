@@ -187,6 +187,7 @@ function JB:new()
     class.moveCamera                = false
     class.moveCameraOnPlane         = false
     class.resetCams                 = false
+    class.replacer                  = ""
     class.collisions                = {
         down = false,
         zoomedIn = 0.0,
@@ -603,9 +604,12 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
-        local tpp = ActivateTPPRepresentationEvent.new()
-        tpp.playerController = Game.GetPlayer()
-        Game.GetPlayer():QueueEvent(tpp)
+        print(self.replacer)
+        if self.replacer == '' then
+            local tpp = ActivateTPPRepresentationEvent.new()
+            tpp.playerController = Game.GetPlayer()
+            Game.GetPlayer():QueueEvent(tpp)
+        end
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         GetPlayer():FindComponentByName('tppCamera'):Activate(self.transitionSpeed)
         self:SetEnableTPPValue(true)

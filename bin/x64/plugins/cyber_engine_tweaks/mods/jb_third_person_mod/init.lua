@@ -755,6 +755,150 @@ registerForEvent("onDraw", function()
 								end
 
 							end
+							ImGui.EndTabBar()
+							ImGui.EndTabItem()
+						end
+
+						if ImGui.BeginTabItem("Replacers") then
+
+							ImGui.NewLine()
+
+							value, pressedPanamDefault = ImGui.Checkbox("Player", JB.replacer == "")
+
+							if (pressedPanamDefault) then
+								
+								Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+
+								if JB.isTppEnabled then
+									Cron.After(1.0, function()
+										JB:ActivateTPP()
+									end)
+								end
+
+								GetPlayer():ScheduleAppearanceChange('none')
+								GetPlayer():FindComponentByName('body'):Toggle(true)
+								JB.replacer = ""
+							end
+
+							ImGui.NewLine()
+
+							if ImGui.BeginTabBar("replacers") then
+								if ImGui.BeginTabItem("Panam") then
+
+									ImGui.NewLine()
+
+									value, pressedPanamDefault = ImGui.Checkbox("default", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_default"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_default')
+										JB.replacer = "panam_default"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("nude", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_nude"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_nude')
+										JB.replacer = "panam_nude"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("underwear", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_underwear"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_underwear')
+										JB.replacer = "panam_underwear"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("no_jacket", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_no_jacket"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_no_jacket')
+										JB.replacer = "panam_no_jacket"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("_q203__shower_censored", GetPlayer():GetCurrentAppearanceName() == CName.new("panam__q203__shower_censored"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam__q203__shower_censored')
+										JB.replacer = "panam__q203__shower_censored"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("_q203__shower", GetPlayer():GetCurrentAppearanceName() == CName.new("panam__q203__shower"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam__q203__shower')
+										JB.replacer = "panam__q203__shower"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("default_scars", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_default_scars"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_default_scars')
+										JB.replacer = "panam_default_scars"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("_q203__after_shower", GetPlayer():GetCurrentAppearanceName() == CName.new("panam__q203__after_shower"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam__q203__after_shower')
+										JB.replacer = "panam__q203__after_shower"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("nude_fpp", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_nude_fpp"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_nude_fpp')
+										JB.replacer = "panam_nude_fpp"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("no_jacket_and_harness", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_no_jacket_and_harness"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_no_jacket_and_harness')
+										JB.replacer = "panam_no_jacket_and_harness"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("nude_fpp_censored", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_nude_fpp_censored"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_nude_fpp_censored')
+										JB.replacer = "panam_nude_fpp_censored"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("nude_censored", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_nude_censored"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_nude_censored')
+										JB.replacer = "panam_nude_censored"
+									end
+
+									value, pressedPanamDefault = ImGui.Checkbox("default_wounded", GetPlayer():GetCurrentAppearanceName() == CName.new("panam_default_wounded"))
+
+									if (pressedPanamDefault) then
+										GetPlayer():FindComponentByName('body'):Toggle(false)
+										GetPlayer():ScheduleAppearanceChange('panam_default_wounded')
+										JB.replacer = "panam_default_wounded"
+									end
+
+									ImGui.EndTabItem()
+								end
+
+								if ImGui.BeginTabItem("Judy") then
+
+									ImGui.EndTabItem()
+								end
+							end
 
 							ImGui.EndTabItem()
 						end
