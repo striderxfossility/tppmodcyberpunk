@@ -1,4 +1,5 @@
 local JB 				= require("classes/JB.lua")
+local Gender 			= require("classes/Gender.lua")
 local GameSession 		= require("classes/GameSession.lua")
 local Attachment 		= require("classes/Attachment.lua")
 local Cron 				= require("classes/Cron.lua")
