@@ -783,7 +783,7 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
-							if ImGui.BeginTabBar("replacers") then
+							if ImGui.BeginTabBar("Replacers") then
 								if Gender:IsFemale() then
 									if ImGui.BeginTabItem("Panam") then
 										ImGui.NewLine()
@@ -836,6 +836,27 @@ registerForEvent("onDraw", function()
 											"evelyn_default_FPP",
 											"evelyn_braindance",
 											"evelyn_braindance_FPP"
+										})
+										ImGui.EndTabItem()
+									end
+
+									if ImGui.BeginTabItem("Alt") then
+										ImGui.NewLine()
+										UI:ReplacerArray(JB, {
+											"alt_naked",
+											"alt_underwear",
+											"alt_default",
+											"alt_cyberspace",
+											"alt_undress_01",
+											"alt_undress_02",
+											"alt_naked_censored",
+											"alt_naked_bottom",
+											"alt_naked_bottom_censored",
+											"alt_cyberspace_visible",
+											"alt_naked__no_breast_sim",
+											"alt_cyberspace_visible_shader",
+											"alt_naked_bottom__no_breast_sim",
+											"alt_naked_bottom_lying_down"
 										})
 										ImGui.EndTabItem()
 									end
