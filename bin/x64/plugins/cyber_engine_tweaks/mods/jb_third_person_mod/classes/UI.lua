@@ -14,6 +14,17 @@ function UI:new()
     return class
 end
 
+function UI:Replacer(JB, name)
+    value, pressed = ImGui.Checkbox(name, GetPlayer():GetCurrentAppearanceName() == CName.new(name))
+
+    if (pressed) then
+        Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+        GetPlayer():FindComponentByName('body'):Toggle(false)
+        GetPlayer():ScheduleAppearanceChange(name)
+        JB.replacer = name
+    end
+end
+
 function UI:DrawCam(cam, id)
     ImGui.TextColored(0.509803, 0.752941, 0.60392, 1, "X-Axis")
 
