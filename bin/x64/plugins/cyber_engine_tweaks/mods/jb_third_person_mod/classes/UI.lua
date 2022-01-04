@@ -14,6 +14,12 @@ function UI:new()
     return class
 end
 
+function UI:ReplacerArray(JB, arr)
+    for index, name in ipairs(arr) do
+        self:Replacer(JB, name)
+    end
+end
+
 function UI:Replacer(JB, name)
     value, pressed = ImGui.Checkbox(name, GetPlayer():GetCurrentAppearanceName() == CName.new(name))
 

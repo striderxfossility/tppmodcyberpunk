@@ -787,38 +787,56 @@ registerForEvent("onDraw", function()
 								if Gender:IsFemale() then
 									if ImGui.BeginTabItem("Panam") then
 										ImGui.NewLine()
-										UI:Replacer(JB, "panam_default")
-										UI:Replacer(JB, "panam_nude")
-										UI:Replacer(JB, "panam_underwear")
-										UI:Replacer(JB, "panam_no_jacket")
-										UI:Replacer(JB, "panam__q203__shower_censored")
-										UI:Replacer(JB, "panam__q203__shower")
-										UI:Replacer(JB, "panam_default_scars")
-										UI:Replacer(JB, "panam__q203__after_shower")
-										UI:Replacer(JB, "panam_nude_fpp")
-										UI:Replacer(JB, "panam_no_jacket_and_harness")
-										UI:Replacer(JB, "panam_nude_fpp_censored")
-										UI:Replacer(JB, "panam_nude_censored")
-										UI:Replacer(JB, "panam_default_wounded")
-
+										UI:ReplacerArray(JB, {
+											"panam_default",
+											"panam_nude",
+											"panam_underwear",
+											"panam_no_jacket",
+											"panam__q203__shower_censored",
+											"panam__q203__shower",
+											"panam_default_scars",
+											"panam__q203__after_shower",
+											"panam_nude_fpp",
+											"panam_no_jacket_and_harness",
+											"panam_nude_fpp_censored",
+											"panam_default_wounded"
+										})
 										ImGui.EndTabItem()
 									end
 
 									if ImGui.BeginTabItem("Judy") then
 										ImGui.NewLine()
-										UI:Replacer(JB, "judy_default")
-										UI:Replacer(JB, "judy_diving_suit")
-										UI:Replacer(JB, "judy_braindance_on")
-										UI:Replacer(JB, "judy_braindance_off")
-										UI:Replacer(JB, "judy_panties")
-										UI:Replacer(JB, "judy_nude")
-										UI:Replacer(JB, "judy_diving_suit_mask")
-										UI:Replacer(JB, "judy_glove")
-										UI:Replacer(JB, "judy_default__no_makeup")
-										UI:Replacer(JB, "judy_diving_suit_no_mask")
-										UI:Replacer(JB, "judy__q203__shower")
-										UI:Replacer(JB, "judy_crying")
+										UI:ReplacerArray(JB, {
+											"judy_default",
+											"judy_diving_suit",
+											"judy_braindance_on",
+											"judy_braindance_off",
+											"judy_panties",
+											"judy_nude",
+											"judy_diving_suit_mask",
+											"judy_glove",
+											"judy_default__no_makeup",
+											"judy_diving_suit_no_mask",
+											"judy__q203__shower",
+											"judy_crying"
+										})
+										ImGui.EndTabItem()
+									end
 
+									if ImGui.BeginTabItem("Evelyn") then
+										ImGui.NewLine()
+										UI:ReplacerArray(JB, {
+											"evelyn_transparent",
+											"evelyn_default",
+											"evelyn_no_coat",
+											"evelyn_recovering",
+											"evelyn_disguised",
+											"evelyn_dead",
+											"evelyn_wounded",
+											"evelyn_default_FPP",
+											"evelyn_braindance",
+											"evelyn_braindance_FPP"
+										})
 										ImGui.EndTabItem()
 									end
 								end
