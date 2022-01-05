@@ -604,11 +604,14 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
-        print(self.replacer)
         if self.replacer == '' then
             local tpp = ActivateTPPRepresentationEvent.new()
             tpp.playerController = Game.GetPlayer()
-            Game.GetPlayer():QueueEvent(tpp)
+            GetPlayer():QueueEvent(tpp)
+        else
+            Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+            --Game.GetTransactionSystem():RemoveItemFromSlot(GetPlayer(), TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+            GetPlayer():ScheduleAppearanceChange(self.replacer)
         end
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         GetPlayer():FindComponentByName('tppCamera'):Activate(self.transitionSpeed)
@@ -673,8 +676,7 @@ function JB:GetEYEObjects()
 
         targetingSystem:AddIgnoredCollisionEntities(Game.GetPlayer())
         
-        searchQuery.maxDistance = 10
-        searchQuery.testedSet = Enum.new('gameTargetingSet', 0)
+        searchQuery.maxDistance = 15
 
         success, parts = targetingSystem:GetTargetParts(Game.GetPlayer(), searchQuery);
 

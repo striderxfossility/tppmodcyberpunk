@@ -42,6 +42,20 @@ registerForEvent('onTweak', function()
 end)
 
 registerForEvent("onInit", function()
+	Observe("gameuiPhotoModeMenuController", "OnAnimationEnded", function(self)
+		if JB.replacer ~= '' then
+			local parts = JB:GetEYEObjects()
+
+			for index, value in ipairs(parts) do
+				if value:GetComponent():GetEntity():GetClassName() == CName.new("NPCPuppet") then
+					if value:GetComponent():GetEntity():IsPuppet() then
+						value:GetComponent():GetEntity():ScheduleAppearanceChange(JB.replacer)
+					end
+				end
+			end
+		end
+	end)
+
 	nativeSettings = GetMod("nativeSettings")
 	if nativeSettings ~= nil then
 		nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")
@@ -780,7 +794,6 @@ registerForEvent("onDraw", function()
 									end)
 								end
 
-								GetPlayer():ScheduleAppearanceChange('none')
 								if GetPlayer():FindComponentByName('torso') ~= nil then
 									GetPlayer():FindComponentByName('torso'):Toggle(true)
 									GetPlayer():FindComponentByName('legs'):Toggle(true)
@@ -788,6 +801,8 @@ registerForEvent("onDraw", function()
 								else
 									GetPlayer():FindComponentByName('body'):Toggle(true)
 								end
+
+								GetPlayer():ScheduleAppearanceChange("none")
 								
 								JB.replacer = ""
 							end
@@ -799,135 +814,7 @@ registerForEvent("onDraw", function()
 							ImGui.NewLine()
 
 							if ImGui.BeginTabBar("replacers") then
-								if Gender:IsFemale() then
-									if ImGui.BeginTabItem("Panam") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"panam_default",
-											"panam_nude",
-											"panam_underwear",
-											"panam_no_jacket",
-											"panam__q203__shower_censored",
-											"panam__q203__shower",
-											"panam_default_scars",
-											"panam__q203__after_shower",
-											"panam_nude_fpp",
-											"panam_no_jacket_and_harness",
-											"panam_nude_fpp_censored",
-											"panam_default_wounded"
-										})
-										ImGui.EndTabItem()
-									end
-
-									if ImGui.BeginTabItem("Judy") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"judy_default",
-											"judy_diving_suit",
-											"judy_braindance_on",
-											"judy_braindance_off",
-											"judy_panties",
-											"judy_nude",
-											"judy_diving_suit_mask",
-											"judy_glove",
-											"judy_default__no_makeup",
-											"judy_diving_suit_no_mask",
-											"judy__q203__shower",
-											"judy_crying"
-										})
-										ImGui.EndTabItem()
-									end
-
-									if ImGui.BeginTabItem("Evelyn") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"evelyn_transparent",
-											"evelyn_default",
-											"evelyn_no_coat",
-											"evelyn_recovering",
-											"evelyn_disguised",
-											"evelyn_dead",
-											"evelyn_wounded",
-											"evelyn_default_FPP",
-											"evelyn_braindance",
-											"evelyn_braindance_FPP"
-										})
-										ImGui.EndTabItem()
-									end
-
-									if ImGui.BeginTabItem("Alt") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"alt_naked",
-											"alt_underwear",
-											"alt_default",
-											"alt_cyberspace",
-											"alt_undress_01",
-											"alt_undress_02",
-											"alt_naked_censored",
-											"alt_naked_bottom",
-											"alt_naked_bottom_censored",
-											"alt_cyberspace_visible",
-											"alt_naked__no_breast_sim",
-											"alt_cyberspace_visible_shader",
-											"alt_naked_bottom__no_breast_sim",
-											"alt_naked_bottom_lying_down"
-										})
-										ImGui.EndTabItem()
-									end
-
-									if ImGui.BeginTabItem("Other") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"service__dining_wa_waitress_avarage_01",
-											"demo_player_wa_default",
-											"woman_average_v_street_kid_suit",
-											"prostitute_wa_01"
-										})
-										ImGui.EndTabItem()
-									end
-								else
-									if ImGui.BeginTabItem("Johnny") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"q108_johnny_default",
-											"man_average_q108_johnny_no_sunglasses",
-											"silverhand_riot",
-											"silverhand_riot__no_glasses",
-											"silverhand_default",
-											"silverhand_clean_2020__no_glasses",
-											"silverhand_clean_2020",
-											"silverhand_wounded",
-											"silverhand__q101_bomb_bag",
-											"silverhand_riot_wounded",
-											"silverhand_wounded_bandaged",
-											"silverhand_riot_no_spikes",
-											"silverhand_default__cyberspace",
-											"silverhand_riot_cyberspace",
-											"silverhand_riot__no_glasses_no_spikes",
-											"silverhand_default__cyberspace_no_glasses",
-											"silverhand_blendable",
-											"adam_smasher_bossfight_stage_00"
-										})
-										ImGui.EndTabItem()
-									end
-
-									if ImGui.BeginTabItem("Adam Smasher") then
-										ImGui.NewLine()
-										UI:ReplacerArray(JB, {
-											"adam_smasher_bossfight_stage_00",
-											"adam_smasher_bossfight_stage_01",
-											"adam_smasher_bossfight_stage_02",
-											"adam_smasher_bossfight_stage_03",
-											"adam_smasher_bossfight_stage_04",
-											"adam_smasher_bossfight_stage_05",
-											"adam_smasher_2020_quest_appearance",
-											"adam_smasher_2077_quest_appearance"
-										})
-										ImGui.EndTabItem()
-									end
-									
-								end
+								Replacers(Gender:IsFemale())
 							end
 
 							ImGui.EndTabItem()
@@ -939,3 +826,177 @@ registerForEvent("onDraw", function()
 		end
 	end
 end)
+
+function Replacers(female)
+	if female then
+		if ImGui.BeginTabItem("Panam") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"panam_default",
+				"panam_nude",
+				"panam_underwear",
+				"panam_no_jacket",
+				"panam__q203__shower_censored",
+				"panam__q203__shower",
+				"panam_default_scars",
+				"panam__q203__after_shower",
+				"panam_nude_fpp",
+				"panam_no_jacket_and_harness",
+				"panam_nude_fpp_censored",
+				"panam_default_wounded"
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Judy") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"judy_default",
+				"judy_diving_suit",
+				"judy_braindance_on",
+				"judy_braindance_off",
+				"judy_panties",
+				"judy_nude",
+				"judy_diving_suit_mask",
+				"judy_glove",
+				"judy_default__no_makeup",
+				"judy_diving_suit_no_mask",
+				"judy__q203__shower",
+				"judy_crying"
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Evelyn") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"evelyn_transparent",
+				"evelyn_default",
+				"evelyn_no_coat",
+				"evelyn_recovering",
+				"evelyn_disguised",
+				"evelyn_dead",
+				"evelyn_wounded",
+				"evelyn_default_FPP",
+				"evelyn_braindance",
+				"evelyn_braindance_FPP"
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Alt") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"alt_naked",
+				"alt_underwear",
+				"alt_default",
+				"alt_cyberspace",
+				"alt_undress_01",
+				"alt_undress_02",
+				"alt_naked_censored",
+				"alt_naked_bottom",
+				"alt_naked_bottom_censored",
+				"alt_cyberspace_visible",
+				"alt_naked__no_breast_sim",
+				"alt_cyberspace_visible_shader",
+				"alt_naked_bottom__no_breast_sim",
+				"alt_naked_bottom_lying_down"
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Oda") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"oda",
+				"oda_no_mask",
+				"oda_cloak",
+				"oda_mask_damage",
+				"oda_no_gear",
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Other") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"service__dining_wa_waitress_avarage_01",
+				"demo_player_wa_default",
+				"woman_average_v_street_kid_suit",
+				"prostitute_wa_01",
+				"8ug8ear_default"
+			})
+			ImGui.EndTabItem()
+		end
+	else
+		if ImGui.BeginTabItem("Johnny") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"q108_johnny_default",
+				"man_average_q108_johnny_no_sunglasses",
+				"silverhand_riot",
+				"silverhand_riot__no_glasses",
+				"silverhand_default",
+				"silverhand_clean_2020__no_glasses",
+				"silverhand_clean_2020",
+				"silverhand_wounded",
+				"silverhand__q101_bomb_bag",
+				"silverhand_riot_wounded",
+				"silverhand_wounded_bandaged",
+				"silverhand_riot_no_spikes",
+				"silverhand_default__cyberspace",
+				"silverhand_riot_cyberspace",
+				"silverhand_riot__no_glasses_no_spikes",
+				"silverhand_default__cyberspace_no_glasses",
+				"silverhand_blendable",
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Adam Smasher") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"adam_smasher_bossfight_stage_00",
+				"adam_smasher_bossfight_stage_01",
+				"adam_smasher_bossfight_stage_02",
+				"adam_smasher_bossfight_stage_03",
+				"adam_smasher_bossfight_stage_04",
+				"adam_smasher_bossfight_stage_05",
+				"adam_smasher_2020_quest_appearance",
+				"adam_smasher_2077_quest_appearance"
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Kerry") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"kerry_eurodyne_old",
+				"kerry_eurodyne_young",
+				"kerry_nude",
+				"kerry_eurodyne_old_no_sunglasses",
+				"kerry_eurodyne_undress_01",
+				"kerry_eurodyne_undress_02",
+				"kerry_eurodyne_undress_03",
+				"kerry_eurodyne_undercover",
+				"kerry_eurodyne_undercover_no_glasses",
+				"kerry_eurodyne_bathrobe",
+				"kerry_eurodyne_undercover_backstage_pass",
+				"kerry_eurodyne_undercover_no_glasses_backstage_pass",
+				"kerry_eurodyne_undress_sexscene",
+				"kerry__q203__shower",
+				"kerry_eurodyne_young_2013",
+			})
+			ImGui.EndTabItem()
+		end
+
+		if ImGui.BeginTabItem("Other") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"gangster__lvl3_02",
+			})
+			ImGui.EndTabItem()
+		end
+		
+	end
+end
