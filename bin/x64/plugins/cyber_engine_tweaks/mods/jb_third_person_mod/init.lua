@@ -764,9 +764,13 @@ registerForEvent("onDraw", function()
 
 							ImGui.NewLine()
 
-							value, pressedPanamDefault = ImGui.Checkbox("Player", JB.replacer == "")
+							ImGui.TextColored(1, 0, 0, 1, "Do not report bugs if you use this, this is purely for fun")
 
-							if (pressedPanamDefault) then
+							ImGui.NewLine()
+
+							value, pressed = ImGui.Checkbox("Player", JB.replacer == "")
+
+							if (pressed) then
 								
 								Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
 
@@ -777,8 +781,19 @@ registerForEvent("onDraw", function()
 								end
 
 								GetPlayer():ScheduleAppearanceChange('none')
-								GetPlayer():FindComponentByName('body'):Toggle(true)
+								if GetPlayer():FindComponentByName('torso') ~= nil then
+									GetPlayer():FindComponentByName('torso'):Toggle(true)
+									GetPlayer():FindComponentByName('legs'):Toggle(true)
+									GetPlayer():FindComponentByName('n0_000_pma_base__full'):Toggle(true)
+								else
+									GetPlayer():FindComponentByName('body'):Toggle(true)
+								end
+								
 								JB.replacer = ""
+							end
+
+							if GetPlayer():FindComponentByName('torso') ~= nil then
+								ImGui.TextColored(0.58039, 0.4667, 0.5451, 1, "MALE: Reload a save to set the player back")
 							end
 
 							ImGui.NewLine()
@@ -860,6 +875,58 @@ registerForEvent("onDraw", function()
 										})
 										ImGui.EndTabItem()
 									end
+
+									if ImGui.BeginTabItem("Other") then
+										ImGui.NewLine()
+										UI:ReplacerArray(JB, {
+											"service__dining_wa_waitress_avarage_01",
+											"demo_player_wa_default",
+											"woman_average_v_street_kid_suit",
+											"prostitute_wa_01"
+										})
+										ImGui.EndTabItem()
+									end
+								else
+									if ImGui.BeginTabItem("Johnny") then
+										ImGui.NewLine()
+										UI:ReplacerArray(JB, {
+											"q108_johnny_default",
+											"man_average_q108_johnny_no_sunglasses",
+											"silverhand_riot",
+											"silverhand_riot__no_glasses",
+											"silverhand_default",
+											"silverhand_clean_2020__no_glasses",
+											"silverhand_clean_2020",
+											"silverhand_wounded",
+											"silverhand__q101_bomb_bag",
+											"silverhand_riot_wounded",
+											"silverhand_wounded_bandaged",
+											"silverhand_riot_no_spikes",
+											"silverhand_default__cyberspace",
+											"silverhand_riot_cyberspace",
+											"silverhand_riot__no_glasses_no_spikes",
+											"silverhand_default__cyberspace_no_glasses",
+											"silverhand_blendable",
+											"adam_smasher_bossfight_stage_00"
+										})
+										ImGui.EndTabItem()
+									end
+
+									if ImGui.BeginTabItem("Adam Smasher") then
+										ImGui.NewLine()
+										UI:ReplacerArray(JB, {
+											"adam_smasher_bossfight_stage_00",
+											"adam_smasher_bossfight_stage_01",
+											"adam_smasher_bossfight_stage_02",
+											"adam_smasher_bossfight_stage_03",
+											"adam_smasher_bossfight_stage_04",
+											"adam_smasher_bossfight_stage_05",
+											"adam_smasher_2020_quest_appearance",
+											"adam_smasher_2077_quest_appearance"
+										})
+										ImGui.EndTabItem()
+									end
+									
 								end
 							end
 

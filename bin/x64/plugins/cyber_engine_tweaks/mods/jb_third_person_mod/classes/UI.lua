@@ -25,7 +25,13 @@ function UI:Replacer(JB, name)
 
     if (pressed) then
         Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-        GetPlayer():FindComponentByName('body'):Toggle(false)
+        if GetPlayer():FindComponentByName('torso') ~= nil then
+            GetPlayer():FindComponentByName('torso'):Toggle(false)
+            GetPlayer():FindComponentByName('legs'):Toggle(false)
+            GetPlayer():FindComponentByName('n0_000_pma_base__full'):Toggle(false)
+        else
+            GetPlayer():FindComponentByName('body'):Toggle(false)
+        end
         GetPlayer():ScheduleAppearanceChange(name)
         JB.replacer = name
     end
