@@ -21,7 +21,7 @@ function UI:ReplacerArray(JB, arr)
 end
 
 function UI:Replacer(JB, name)
-    value, pressed = ImGui.Checkbox(name, GetPlayer():GetCurrentAppearanceName() == CName.new(name))
+    value, pressed = ImGui.Checkbox(name, JB.replacer == name)
 
     if (pressed) then
         Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
