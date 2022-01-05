@@ -990,6 +990,18 @@ function Replacers(female)
 			ImGui.EndTabItem()
 		end
 
+		if ImGui.BeginTabItem("Oda") then
+			ImGui.NewLine()
+			UI:ReplacerArray(JB, {
+				"oda",
+				"oda_no_mask",
+				"oda_cloak",
+				"oda_mask_damage",
+				"oda_no_gear",
+			})
+			ImGui.EndTabItem()
+		end
+
 		if ImGui.BeginTabItem("Other") then
 			ImGui.NewLine()
 			UI:ReplacerArray(JB, {
