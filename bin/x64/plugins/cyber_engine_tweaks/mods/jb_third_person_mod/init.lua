@@ -48,7 +48,7 @@ registerForEvent("onInit", function()
 
 			for index, value in ipairs(parts) do
 				if value:GetComponent():GetEntity():GetClassName() == CName.new("NPCPuppet") then
-					if value:GetComponent():GetEntity():IsPuppet() then
+					if value:GetComponent():GetEntity():IsPaperdoll() then
 						value:GetComponent():GetEntity():ScheduleAppearanceChange(JB.replacer)
 					end
 				end
