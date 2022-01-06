@@ -187,7 +187,6 @@ function JB:new()
     class.moveCamera                = false
     class.moveCameraOnPlane         = false
     class.resetCams                 = false
-    class.replacer                  = ""
     class.collisions                = {
         down = false,
         zoomedIn = 0.0,
@@ -196,6 +195,7 @@ function JB:new()
     }
     class.colliedTimer              = 0.0
     class.switchDisableMod          = false
+    class.jb_replacers              = nil
     ----------VARIABLES-------------
 
     setmetatable( class, JB )
@@ -604,14 +604,20 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
-        if self.replacer == '' then
+        local replacer = ""
+
+        if self.jb_replacers ~= nil then
+            replacer = self.jb_replacers.replacer
+        end
+        
+        if replacer == '' then
             local tpp = ActivateTPPRepresentationEvent.new()
             tpp.playerController = Game.GetPlayer()
             GetPlayer():QueueEvent(tpp)
         else
             Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
             --Game.GetTransactionSystem():RemoveItemFromSlot(GetPlayer(), TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
-            GetPlayer():ScheduleAppearanceChange(self.replacer)
+            GetPlayer():ScheduleAppearanceChange(replacer)
         end
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         GetPlayer():FindComponentByName('tppCamera'):Activate(self.transitionSpeed)
