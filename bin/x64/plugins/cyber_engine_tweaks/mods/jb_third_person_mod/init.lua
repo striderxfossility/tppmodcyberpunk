@@ -1,5 +1,6 @@
 local JB 				= require("classes/JB.lua")
 local Gender 			= require("classes/Gender.lua")
+local Item 				= require("classes/Item.lua")
 local GameSession 		= require("classes/GameSession.lua")
 local Attachment 		= require("classes/Attachment.lua")
 local Cron 				= require("classes/Cron.lua")
@@ -43,7 +44,7 @@ end)
 
 registerForEvent("onInit", function()
 	nativeSettings 	= GetMod("nativeSettings")
-	JB.jb_replacers = GetMod("jb_photomode_api")
+	JB.jb_replacers = GetMod("jb_replacers_api")
 	
 	if nativeSettings ~= nil then
 		nativeSettings.addTab("/jb_tpp", "JB Third Person Mod")

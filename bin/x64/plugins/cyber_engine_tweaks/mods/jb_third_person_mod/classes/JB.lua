@@ -1,6 +1,7 @@
 local Attachment = require("classes/Attachment.lua")
 local Item       = require("classes/Item.lua")
 local Cron 		 = require("classes/Cron.lua")
+local Gender     = require("classes/Gender.lua")
 
 local JB         = {}
       JB.__index = JB
@@ -604,21 +605,26 @@ end
 
 function JB:ActivateTPP()
     if not self.inCar then
-        local replacer = ""
+        local replacer      = ""
+        local replacePlayer = false
 
         if self.jb_replacers ~= nil then
-            replacer = self.jb_replacers.replacer
+            replacer        = self.jb_replacers.replacer
+            replacePlayer   = self.jb_replacers.replacePlayer
         end
+
+        local tpp = ActivateTPPRepresentationEvent.new()
+        tpp.playerController = Game.GetPlayer()
+        GetPlayer():QueueEvent(tpp)
         
-        if replacer == '' then
-            local tpp = ActivateTPPRepresentationEvent.new()
-            tpp.playerController = Game.GetPlayer()
-            GetPlayer():QueueEvent(tpp)
-        else
-            Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
-            --Game.GetTransactionSystem():RemoveItemFromSlot(GetPlayer(), TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+        if replacer == '' and not replacePlayer then 
+            Gender:AddTppHead()
+        end
+
+        if replacer ~= '' and replacePlayer then
             GetPlayer():ScheduleAppearanceChange(replacer)
         end
+
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
         GetPlayer():FindComponentByName('tppCamera'):Activate(self.transitionSpeed)
         self:SetEnableTPPValue(true)
