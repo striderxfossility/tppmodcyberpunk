@@ -457,6 +457,36 @@ registerForEvent("onDraw", function()
 							ImGui.NewLine()
 						end
 
+						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Fixes")
+
+						value, pressed = ImGui.Checkbox("Add Head, also fix car!", false)
+
+						if pressed then
+							Gender:AddTppHead()
+						end
+
+						value, pressed = ImGui.Checkbox("Remove Head", false)
+
+						if pressed then
+							Game.GetTransactionSystem():RemoveItemFromSlot(GetPlayer(), TweakDBID.new('AttachmentSlots.TppHead'), true, true, true)
+						end
+
+						value, pressed = ImGui.Checkbox("Add Headgear", false)
+
+						if pressed then
+							local tpp = ActivateTPPRepresentationEvent.new()
+							tpp.playerController = Game.GetPlayer()
+							GetPlayer():QueueEvent(tpp)
+						end
+
+						value, pressed = ImGui.Checkbox("Remove Headgear", false)
+
+						if pressed then
+							Game.GetScriptableSystemsContainer():Get(CName.new('TakeOverControlSystem')):EnablePlayerTPPRepresenation(false)
+						end
+
+						ImGui.NewLine()
+
 						ImGui.TextColored(0.509803, 0.57255, 0.59607, 1, "Settings")
 
 						value, pressedDisableMod = ImGui.Checkbox("Disable Mod", JB.disableMod)

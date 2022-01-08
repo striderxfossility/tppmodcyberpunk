@@ -607,10 +607,12 @@ function JB:ActivateTPP()
     if not self.inCar then
         local replacer      = ""
         local replacePlayer = false
+        local placeHead     = false
 
         if self.jb_replacers ~= nil then
             replacer        = self.jb_replacers.replacer
             replacePlayer   = self.jb_replacers.replacePlayer
+            placeHead       = self.jb_replacers.placeHead
         end
 
         local tpp = ActivateTPPRepresentationEvent.new()
@@ -618,6 +620,10 @@ function JB:ActivateTPP()
         GetPlayer():QueueEvent(tpp)
         
         if replacer == '' and not replacePlayer then 
+            Gender:AddTppHead()
+        end
+
+        if placeHead then
             Gender:AddTppHead()
         end
 
