@@ -155,7 +155,7 @@ function JB:new()
     for index, value in db:rows("SELECT value FROM settings WHERE name = 'amountCameras'") do
         class.amountCameras = tonumber(index[1])
     end
-
+    
     ----------VARIABLES-------------
     class.camViews                  = {}
     class.inCar                     = false
@@ -621,6 +621,15 @@ function JB:ActivateTPP()
         
         if replacer == '' and not replacePlayer then 
             Gender:AddTppHead()
+        else
+            if not placeHead then
+                Cron.After(1.0, function ()
+                    if self.jb_replacers ~= nil then
+                        self.jb_replacers.replaceF = replacer
+                    end
+                end)
+                Gender:AddFppHead()
+            end
         end
 
         if placeHead then
@@ -628,7 +637,9 @@ function JB:ActivateTPP()
         end
 
         if replacer ~= '' and replacePlayer then
-            GetPlayer():ScheduleAppearanceChange(replacer)
+            if self.jb_replacers ~= nil then
+                self.jb_replacers.replaceF = replacer
+            end
         end
 
         Attachment:TurnArrayToPerspective({"AttachmentSlots.Chest", "AttachmentSlots.Torso", "AttachmentSlots.Head", "AttachmentSlots.Outfit", "AttachmentSlots.Eyes"}, "TPP")
