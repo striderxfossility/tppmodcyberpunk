@@ -55,8 +55,8 @@ function Attachment:TurnToPerspective(slot, perspective)
                     end
                 end
             end
-
-            ts:ChangeItemAppearance(pl,item:GetItemID(),CName.new(newItemName),false)
+            
+            ts:ChangeItemAppearanceByName(pl,item:GetItemID(),CName.new(newItemName))
         end
     end
 end
